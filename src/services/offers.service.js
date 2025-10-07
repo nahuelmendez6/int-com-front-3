@@ -15,7 +15,13 @@ export const updateOffer = (offerId, offerData) => {
   return api.put(`/offers/${offerId}/`, offerData);
 };
 
-// Elimina una oferta
+// Realiza un soft delete de una oferta
 export const deleteOffer = (offerId) => {
-  return api.delete(`/offers/${offerId}/`);
+  return api.patch(`/offers/${offerId}/`, { is_deleted: true });
 };
+
+// Devuelve los tipos de oferta disponibles
+export const getOfferTypes = () => {
+  return api.get('/offers/type-offers/');
+};
+

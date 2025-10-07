@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
-const OfferForm = ({ show, onHide, onSubmit, initialData }) => {
+const OfferForm = ({ show, onHide, onSubmit, initialData, offerTypes = [] }) => {
   const [offer, setOffer] = useState({});
 
   useEffect(() => {
@@ -40,8 +40,13 @@ const OfferForm = ({ show, onHide, onSubmit, initialData }) => {
             <input type="text" className="form-control" id="name" name="name" value={offer.name} onChange={handleChange} required />
           </div>
           <div className="mb-3">
-            <label htmlFor="id_type_offer" className="form-label">Tipo de Oferta (ID)</label>
-            <input type="number" className="form-control" id="id_type_offer" name="id_type_offer" value={offer.id_type_offer} onChange={handleChange} required />
+            <label htmlFor="id_type_offer" className="form-label">Tipo de Oferta</label>
+            <select className="form-select" id="id_type_offer" name="id_type_offer" value={offer.id_type_offer} onChange={handleChange} required>
+              <option value="" disabled>Seleccione un tipo</option>
+              {offerTypes.map(type => (
+                <option key={type.id_type_offer} value={type.id_type_offer}>{type.name}</option>
+              ))}
+            </select>
           </div>
           <div className="mb-3">
             <label htmlFor="description" className="form-label">Descripción</label>

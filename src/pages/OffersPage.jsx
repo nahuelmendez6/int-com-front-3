@@ -4,10 +4,11 @@ import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import OfferForm from '../components/offers/OfferForm';
 import OfferList from '../components/offers/OfferList';
-import { getOffers, createOffer, updateOffer, deleteOffer } from '../services/offers.service.js';
+import { getOffers, createOffer, updateOffer, deleteOffer, getOfferTypes } from '../services/offers.service.js';
 
 const OffersPage = () => {
   const [offers, setOffers] = useState([]);
+  const [offerTypes, setOfferTypes] = useState([]);
   const [editingOffer, setEditingOffer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -16,11 +17,15 @@ const OffersPage = () => {
   const fetchOffers = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await getOffers();
-      setOffers(response.data);
+      const [offersRes, offerTypesRes] = await Promise.all([
+        getOffers(),
+        getOfferTypes(),
+      ]);
+      setOffers(offersRes.data);
+      setOfferTypes(offerTypesRes.data);
       setError(null);
     } catch (err) {
-      setError('Error al cargar las ofertas.');
+      setError('Error al cargar los datos.');
     } finally {
       setLoading(false);
     }
@@ -93,6 +98,7 @@ const OffersPage = () => {
           onHide={() => setShowModal(false)} 
           onSubmit={handleSubmit} 
           initialData={editingOffer}
+          offerTypes={offerTypes}
         />
 
         <div className="card shadow-sm">
