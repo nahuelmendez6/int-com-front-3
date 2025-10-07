@@ -11,6 +11,7 @@ import AvailabilityPage from "../pages/AvailabilityPage.jsx";
 import OffersPage from "../pages/OffersPage.jsx";
 
 import ProviderRegistrationForm from "../pages/ProviderRegistrationForm.jsx";
+import CustomerRegistrationForm from "../pages/CustomerRegistrationForm.jsx";
 
 // Componente para proteger rutas privadas
 const PrivateRoute = ({ children }) => {
@@ -29,16 +30,10 @@ const AppRoutes = () => {
         <Route path="/login" element={<LoginPage />} />
 
         <Route path="/register-provider" element={<ProviderRegistrationForm />} />
+        <Route path="/register-customer" element={<CustomerRegistrationForm />} />
 
         {/* Rutas privadas */}
-        {/* <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        /> */}
+
         <Route
           path="/feed"
           element={
