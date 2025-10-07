@@ -28,6 +28,7 @@ const Sidebar = () => {
       { to: '/feed', label: 'Inicio', icon: 'bi-house-door'},
       { to: '/profile', label: 'Perfil', icon: 'bi-person'},
       { to: '/availability', label: 'Disponibilidad', icon: 'bi-calendar-check'},
+      { to: '/offers', label: 'Ofertas', icon: 'bi-tag'},
     ]
   }
 

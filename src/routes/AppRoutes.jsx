@@ -8,6 +8,7 @@ import LoginPage from "../pages/LoginPage.jsx";
 import Feed from "../pages/Feed.jsx";
 import Profile from "../pages/Profile.jsx";
 import AvailabilityPage from "../pages/AvailabilityPage.jsx";
+import OffersPage from "../pages/OffersPage.jsx";
 
 import ProviderRegistrationForm from "../pages/ProviderRegistrationForm.jsx";
 
@@ -62,6 +63,15 @@ const AppRoutes = () => {
           element={
             <PrivateRoute>
               <AvailabilityPage />
+            </PrivateRoute>  
+          }
+        />
+
+        <Route
+          path="/offers"
+          element={
+            <PrivateRoute>
+              <OffersPage />
             </PrivateRoute>  
           }
         />
