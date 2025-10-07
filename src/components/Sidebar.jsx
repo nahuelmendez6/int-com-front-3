@@ -1,6 +1,8 @@
 import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
 
+import { useAuth } from '../hooks/useAuth';
+
 const Sidebar = () => {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
 

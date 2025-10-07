@@ -1,7 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+import { useNavigate } from 'react-router-dom';
+
+import { useAuth } from '../hooks/useAuth';
+
 const Navbar = () => {
+  
+  const {user, logout } = useAuth();
+  const navigate = useNavigate();
+  
   const [showDropdown, setShowDropdown] = useState(false);
 
   const toggleDropdown = () => {
@@ -11,6 +19,12 @@ const Navbar = () => {
   const closeDropdown = () => {
     setShowDropdown(false);
   };
+
+  const handleLogout = () => {
+    logout();
+    closeDropdown();
+    navigate('/login');
+  }
 
   return (
     <nav
@@ -63,14 +77,14 @@ const Navbar = () => {
                   <i className="bi bi-person me-2"></i>
                   Perfil
                 </Link>
-                <Link
-                  to="/logout"
+                <button
                   className="dropdown-item d-flex align-items-center"
-                  onClick={closeDropdown}
+                  onClick={handleLogout}
                 >
                   <i className="bi bi-box-arrow-right me-2"></i>
                   Logout
-                </Link>
+                </button>
+
               </div>
             )}
           </div>
