@@ -5,10 +5,9 @@ const getProfile = () => {
 };
 
 const updateProfile = (profileData) => {
-  return api.patch('/profiles/user/', profileData, {
-    headers: { "Content-Type": "application/json" }
-  });
+  return api.patch('/profiles/user/', profileData); // quitar el Content-Type
 };
+
 
 
 const getCategories = () => {

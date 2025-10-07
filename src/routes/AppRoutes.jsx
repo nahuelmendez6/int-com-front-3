@@ -8,6 +8,8 @@ import LoginPage from "../pages/LoginPage.jsx";
 import Feed from "../pages/Feed.jsx";
 import Profile from "../pages/Profile.jsx";
 
+import ProviderRegistrationForm from "../pages/ProviderRegistrationForm.jsx";
+
 // Componente para proteger rutas privadas
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -23,6 +25,8 @@ const AppRoutes = () => {
       <Routes>
         {/* Rutas públicas */}
         <Route path="/login" element={<LoginPage />} />
+
+        <Route path="/register-provider" element={<ProviderRegistrationForm />} />
 
         {/* Rutas privadas */}
         {/* <Route

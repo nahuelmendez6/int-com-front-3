@@ -1,7 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const ImageUpload = ({ currentImage, onFileSelect, disabled = false }) => {
   const [preview, setPreview] = useState(currentImage);
+  const [inputId] = useState(() => `profileImage-${Math.random().toString(36).substr(2, 9)}`);
+
+  useEffect(() => {
+    setPreview(currentImage);
+  }, [currentImage]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -17,12 +22,7 @@ const ImageUpload = ({ currentImage, onFileSelect, disabled = false }) => {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setPreview(e.target.result);
-    };
-    reader.readAsDataURL(file);
-
+    setPreview(URL.createObjectURL(file)); // preview rápido
     onFileSelect(file);
   };
 
@@ -49,20 +49,25 @@ const ImageUpload = ({ currentImage, onFileSelect, disabled = false }) => {
             <i className="bi bi-person-circle text-muted" style={{ fontSize: '3rem' }}></i>
           </div>
         )}
-        
+
         {!disabled && (
           <div className="mt-3">
             <input
               type="file"
               className="form-control d-none"
-              id="profileImage"
+              id={inputId}
               accept="image/*"
               onChange={handleFileChange}
             />
-            <label htmlFor="profileImage" className="btn btn-outline-primary btn-sm">
+            <label htmlFor={inputId} className="btn btn-outline-primary btn-sm">
               <i className="bi bi-camera me-1"></i>
               {preview ? 'Cambiar Imagen' : 'Subir Imagen'}
             </label>
+            {preview && (
+              <button type="button" className="btn btn-outline-danger btn-sm ms-2" onClick={handleRemoveImage}>
+                <i className="bi bi-trash"></i> Eliminar
+              </button>
+            )}
           </div>
         )}
       </div>

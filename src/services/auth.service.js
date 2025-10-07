@@ -1,11 +1,13 @@
 import axios from 'axios';
 
+import api from './api.js';
+
 const API_URL = "http://127.0.0.1:8000";
 
 
 export const registerUser = async (formData) => {
     try {
-        const response = await api.post('auth/register-user/', formData);
+        const response = await api.post('/auth/register-user/', formData);
         return response.data;
     } catch (error) {
         console.error('Error axios:', error.response);

@@ -80,15 +80,23 @@ const Login = () => {
                 </form>
 
                 <div className="text-center mt-4">
-                  <p className="mb-0">
-                    ¿No tienes cuenta?{" "}
-                    <Link
-                      to="/register"
-                      className="text-decoration-none fw-semibold"
-                    >
-                      Regístrate
-                    </Link>
+                  <p className="mb-2">
+                    ¿No tienes cuenta? 
                   </p>
+                  <div className="d-grid gap-2">
+                    <Link
+                      to="/register-provider"
+                      className="btn btn-outline-secondary"
+                    >
+                      Registrarse como proveedor
+                    </Link>
+                    <Link
+                      to="/register-customer"
+                      className="btn btn-outline-secondary"
+                    >
+                      Registrarse como cliente
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
