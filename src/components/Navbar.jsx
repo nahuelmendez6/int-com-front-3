@@ -7,7 +7,8 @@ import { useAuth } from '../hooks/useAuth';
 
 const Navbar = () => {
   
-  const {user, logout } = useAuth();
+  const {user, profile, logout } = useAuth();
+  console.log('este es el perfil',profile)
   const navigate = useNavigate();
   
   const [showDropdown, setShowDropdown] = useState(false);
@@ -56,7 +57,9 @@ const Navbar = () => {
               aria-expanded={showDropdown}
             >
               <i className="bi bi-person-circle fs-4"></i>
-              <span className="d-none d-md-inline ms-2">Usuario</span>
+              <span className="d-none d-md-inline ms-2">
+                {profile && profile.user ? profile.user.name : "Usuario"}
+              </span>
             </button>
             
             {showDropdown && (

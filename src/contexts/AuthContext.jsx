@@ -6,20 +6,38 @@ export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null); // guarda info del user
+  const [profile, setProfile] = useState(null); // guarda info del profile
   const [loading, setLoading] = useState(true);
+  
+  const fetchUserProfile = async (token) => {
+    if (!token) return;
+
+    try {
+      const res = await api.get("/profiles/user/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setProfile(res.data);
+    } catch (err) {
+      console.error("Failed to fetch user profile", err);
+      setProfile(null);
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Chequea si hay token en localStorage
     const token = localStorage.getItem("token");
     if (token) {
-      api.get("/profiles/user/")
-        .then((res) => setUser(res.data))
-        .catch(() => localStorage.removeItem("token"))
-        .finally(() => setLoading(false));
+      fetchUserProfile(token);
     } else {
       setLoading(false);
     }
   }, []);
+
 
   const login = async (email, password) => {
     const res = await api.post("/auth/login/", { email, password });
@@ -37,6 +55,8 @@ export const AuthProvider = ({ children }) => {
       refresh,
     });
 
+    await fetchUserProfile(access);
+
     return user;
   };
 
@@ -47,7 +67,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, profile }}>
       {children}
     </AuthContext.Provider>
   );
