@@ -1,65 +1,47 @@
-import { useState, useEffect } from 'react';
+import { useAuth } from '../hooks/useAuth.js';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import ProviderProfile from '../components/ProviderProfile';
 import CustomerProfile from '../components/CustomerProfile';
 
-import { useAuth } from '../hooks/useAuth.js';
-
 const Profile = () => {
-  
   const { profile, loading } = useAuth();
-  
-  if (loading) {
 
-    return (
-      <div className="min-vh-100 bg-light">
-        <Navbar />
-        <Sidebar />
-        <div 
-          className="container-fluid feed-container"
-          style={{
-            paddingTop: '80px',
-            paddingLeft: '290px',
-            paddingRight: '20px',
-            width: '100%',
-            maxWidth: 'none'
-          }}
-        >
-          <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
-            <div className="text-center">
-              <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Cargando...</span>
-              </div>
-              <p className="mt-3 text-muted">Cargando perfil...</p>
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+          <div className="text-center">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Cargando...</span>
             </div>
+            <p className="mt-3 text-muted">Cargando perfil...</p>
           </div>
         </div>
-      </div>
-    )
-  }
+      );
+    }
 
-  if (!profile) {
-        return (
-      <div className="min-vh-100 bg-light">
-        <Navbar />
-        <Sidebar />
-        <div className="container-fluid" style={{ paddingTop: '80px', paddingLeft: '290px' }}>
-          <div className="alert alert-danger">
-            No se pudo cargar el perfil del usuario.
-          </div>
+    if (!profile) {
+      return (
+        <div className="alert alert-danger">
+          No se pudo cargar el perfil del usuario.
         </div>
-      </div>
+      );
+    }
+
+    return profile.role === 'provider' ? (
+      <ProviderProfile userData={profile} />
+    ) : (
+      <CustomerProfile userData={profile} />
     );
-  }
+  };
 
   return (
     <div className="min-vh-100 bg-light">
       <Navbar />
       <Sidebar />
-      
       <div 
-        className="container-fluid feed-container"
+        className="container-fluid"
         style={{
           paddingTop: '80px',
           paddingLeft: '290px',
@@ -76,20 +58,14 @@ const Profile = () => {
                   <i className="bi bi-person-circle me-2"></i>
                   Mi Perfil
                 </h1>
-
-                {profile.role === 'provider' ? (
-                  <ProviderProfile userData={profile} />
-                ) : (
-                  <CustomerProfile userData={profile} />
-                )}
+                {renderContent()}
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
-
+  );
 };
 
 export default Profile;

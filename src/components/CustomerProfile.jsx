@@ -1,113 +1,168 @@
-import React, { useState } from "react";
+import { useState, useEffect } from 'react';
+import { profileService } from '../services/profile.service.js';
+import { getProvinces, getDepartmentsByProvince, getCitiesByDepartment } from '../services/location.service.js';
+import AddressForm from './AddressForm.jsx';
+import ImageUpload from './ImageUpload.jsx';
 
-const CustomerProfile = ({ userData, onUpdate }) => {
-  const { user, profile } = userData;
+const CustomerProfile = ({ userData }) => {
+  const [isEditing, setIsEditing] = useState(false);
 
+  // Datos de usuario y perfil
+  const [profileData, setProfileData] = useState(userData.profile || {});
+  const [user, setUser] = useState(userData.user || {});
+
+  // Formulario editable
   const [formData, setFormData] = useState({
-    name: user.name || "",
-    lastname: user.lastname || "",
-    email: user.email || "",
-    dni: profile.dni || "",
-    phone: profile.phone || "",
-    street: profile.address?.street || "",
-    number: profile.address?.number || "",
-    city: profile.address?.city_detail?.name || "",
-    postal_code: profile.address?.postal_code || "",
+    first_name: user.first_name || '',
+    last_name: user.last_name || '',
+    email: user.email || '',
+    phone_number: profileData.phone_number || '',
+    address: profileData.address || {},
   });
+  const [imageFile, setImageFile] = useState(null);
 
-  const handleChange = (e) => {
+  // Opciones de ubicación
+  const [provinces, setProvinces] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [cities, setCities] = useState([]);
+
+  // Cargar provincias al iniciar
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      try {
+        const provRes = await getProvinces();
+        setProvinces(provRes);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchProvinces();
+  }, []);
+
+  // Cambios en los inputs de texto
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleSave = () => {
-    onUpdate(formData);
-    // 👉 acá luego harías api.put("/customers/:id", formData)
+  // Cambios en la dirección
+  const handleAddressChange = (address) => {
+    setFormData({ ...formData, address });
   };
+
+  const handleProvinceChange = async (e) => {
+    const provinceId = e.target.value;
+    handleAddressChange({ ...formData.address, province: provinceId, department: '', city: '' });
+    if (provinceId) {
+      const deps = await getDepartmentsByProvince(provinceId);
+      setDepartments(deps);
+      setCities([]);
+    } else {
+      setDepartments([]);
+      setCities([]);
+    }
+  };
+
+  const handleDepartmentChange = async (e) => {
+    const departmentId = e.target.value;
+    handleAddressChange({ ...formData.address, department: departmentId, city: '' });
+    if (departmentId) {
+      const cits = await getCitiesByDepartment(departmentId);
+      setCities(cits);
+    } else {
+      setCities([]);
+    }
+  };
+
+  // Guardar cambios
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const data = new FormData();
+      if (imageFile) data.append('profile_image', imageFile);
+      data.append('first_name', formData.first_name);
+      data.append('last_name', formData.last_name);
+      data.append('email', formData.email);
+      data.append('phone_number', formData.phone_number);
+      if (formData.address) {
+        data.append('address', JSON.stringify(formData.address));
+      }
+
+      const res = await profileService.updateProfile(data);
+
+      // Actualizamos localmente los datos
+      setProfileData(res.data.customer || profileData);
+      setUser(res.data.user || user);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    }
+  };
+
+  if (!isEditing) {
+    const addr = profileData.address;
+    const fullAddress = addr
+      ? `${addr.street || ''} ${addr.number || ''}, ${addr.city_detail?.name || ''}`
+      : 'No registrada';
+
+    return (
+      <div>
+        <div className="row">
+          <div className="col-md-4 text-center">
+            <ImageUpload currentImage={user.profile_image} disabled />
+            <h4 className="mt-3">{user.first_name} {user.last_name}</h4>
+            <p className="text-muted">{user.email}</p>
+            <p><strong>Teléfono:</strong> {profileData.phone_number || 'No registrado'}</p>
+          </div>
+          <div className="col-md-8">
+            <h5>Dirección</h5>
+            <p>{fullAddress}</p>
+          </div>
+        </div>
+        <button onClick={() => setIsEditing(true)} className="btn btn-primary mt-4">Editar Perfil</button>
+      </div>
+    );
+  }
 
   return (
-    <form>
-      <div className="d-flex align-items-center mb-4">
-        <img
-          src={user.profile_image}
-          alt="Foto de perfil"
-          className="rounded-circle me-3"
-          style={{ width: "80px", height: "80px", objectFit: "cover" }}
-        />
-        <div>
-          <h4 className="mb-1">{formData.name} {formData.lastname}</h4>
-          <p className="text-muted mb-0">{formData.email}</p>
-          <span className="badge bg-primary">Cliente</span>
+    <form onSubmit={handleSubmit}>
+      <div className="row mb-3">
+        <div className="col-md-4 text-center">
+          <ImageUpload currentImage={user.profile_image} onFileSelect={setImageFile} />
+        </div>
+        <div className="col-md-8">
+          <div className="mb-3">
+            <label className="form-label">Nombre</label>
+            <input className="form-control" name="first_name" value={formData.first_name} onChange={handleInputChange} />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Apellido</label>
+            <input className="form-control" name="last_name" value={formData.last_name} onChange={handleInputChange} />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Email</label>
+            <input className="form-control" name="email" value={formData.email} onChange={handleInputChange} />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Teléfono</label>
+            <input className="form-control" name="phone_number" value={formData.phone_number} onChange={handleInputChange} />
+          </div>
         </div>
       </div>
 
-      <h5 className="mb-3">Datos de cliente</h5>
-      <div className="mb-3">
-        <label className="form-label">DNI</label>
-        <input
-          type="text"
-          name="dni"
-          value={formData.dni}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
-      <div className="mb-3">
-        <label className="form-label">Teléfono</label>
-        <input
-          type="text"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
+      <h5>Dirección</h5>
+      <AddressForm
+        addressData={formData.address}
+        provinces={provinces}
+        departments={departments}
+        cities={cities}
+        onAddressChange={handleAddressChange}
+        onProvinceChange={handleProvinceChange}
+        onDepartmentChange={handleDepartmentChange}
+      />
 
-      <h6 className="mt-4">Dirección</h6>
-      <div className="mb-3">
-        <label className="form-label">Calle</label>
-        <input
-          type="text"
-          name="street"
-          value={formData.street}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
-      <div className="mb-3">
-        <label className="form-label">Número</label>
-        <input
-          type="text"
-          name="number"
-          value={formData.number}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
-      <div className="mb-3">
-        <label className="form-label">Ciudad</label>
-        <input
-          type="text"
-          name="city"
-          value={formData.city}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
-      <div className="mb-3">
-        <label className="form-label">Código Postal</label>
-        <input
-          type="text"
-          name="postal_code"
-          value={formData.postal_code}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
-
-      <button type="button" className="btn btn-primary mt-3" onClick={handleSave}>
-        Guardar cambios
-      </button>
+      <button type="submit" className="btn btn-success me-2 mt-3">Guardar Cambios</button>
+      <button type="button" onClick={() => setIsEditing(false)} className="btn btn-secondary mt-3">Cancelar</button>
     </form>
   );
 };

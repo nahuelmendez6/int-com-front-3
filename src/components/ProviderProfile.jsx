@@ -1,123 +1,232 @@
-import React, { useState } from "react";
+import { useState, useEffect } from 'react';
+import { profileService } from '../services/profile.service.js';
+import { getProvinces, getDepartmentsByProvince, getCitiesByDepartment } from '../services/location.service.js';
+import AddressForm from './AddressForm.jsx';
+import ImageUpload from './ImageUpload.jsx';
 
-const ProviderProfile = ({ userData, onUpdate }) => {
-  const { user, profile } = userData;
+const ProviderProfile = ({ userData }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [profile, setProfile] = useState(userData);
+  const [formData, setFormData] = useState({});
+  const [imageFile, setImageFile] = useState(null);
 
-  const [formData, setFormData] = useState({
-    name: user.name || "",
-    lastname: user.lastname || "",
-    email: user.email || "",
-    description: profile.description || "",
-    profession: profile.profession?.name || "",
-    type_provider: profile.type_provider?.name || "",
-    categories: profile.categories?.map((c) => c.name).join(", ") || "",
-    street: profile.address?.street || "",
-    number: profile.address?.number || "",
-    city: profile.address?.city_detail?.name || "",
-  });
+  // Profile options
+  const [categories, setCategories] = useState([]);
+  const [typeProviders, setTypeProviders] = useState([]);
+  const [professions, setProfessions] = useState([]);
 
-  const handleChange = (e) => {
+  // Location options
+  const [provinces, setProvinces] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [cities, setCities] = useState([]);
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        const [catRes, typeProvRes, profRes, provRes] = await Promise.all([
+          profileService.getCategories(),
+          profileService.getTypeProviders(),
+          profileService.getProfessions(),
+          getProvinces(),
+        ]);
+        setCategories(catRes.data);
+        setTypeProviders(typeProvRes.data);
+        setProfessions(profRes.data);
+        setProvinces(provRes);
+      } catch (error) {
+        console.error("Error fetching initial data:", error);
+      }
+    };
+    fetchInitialData();
+  }, []);
+
+  const startEditing = () => {
+    setFormData({
+      description: profile.profile.description || '',
+      phone_number: profile.profile.phone_number || '',
+      categories: (profile.profile.categories || []).map(c => c.id_category),
+      type_provider: profile.profile.type_provider?.id_type_provider || '',
+      profession: profile.profile.profession?.id_profession || '',
+      address: profile.profile.address || {},
+    });
+    // Clear location dropdowns
+    setDepartments([]);
+    setCities([]);
+    setImageFile(null);
+    setIsEditing(true);
+  };
+
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleSave = () => {
-    onUpdate(formData);
-    // 👉 acá luego harías api.put("/providers/:id", formData)
+  const handleCategoryChange = (e) => {
+    const { value, checked } = e.target;
+    const categoryId = parseInt(value);
+    let updatedCategories = formData.categories || [];
+    if (checked) {
+      updatedCategories = [...updatedCategories, categoryId];
+    } else {
+      updatedCategories = updatedCategories.filter(id => id !== categoryId);
+    }
+    setFormData({ ...formData, categories: updatedCategories });
   };
+  
+  const handleAddressChange = (address) => {
+    setFormData({ ...formData, address });
+  };
+
+  const handleProvinceChange = async (e) => {
+    const provinceId = e.target.value;
+    handleAddressChange({ ...formData.address, province: provinceId, department: '', city: '' });
+    if (provinceId) {
+      const deps = await getDepartmentsByProvince(provinceId);
+      setDepartments(deps);
+      setCities([]);
+    } else {
+      setDepartments([]);
+      setCities([]);
+    }
+  };
+
+  const handleDepartmentChange = async (e) => {
+    const departmentId = e.target.value;
+    handleAddressChange({ ...formData.address, department: departmentId, city: '' });
+    if (departmentId) {
+      const cits = await getCitiesByDepartment(departmentId);
+      setCities(cits);
+    } else {
+      setCities([]);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const data = new FormData();
+    if (imageFile) data.append('profile_image', imageFile);
+    data.append('description', formData.description);
+    data.append('phone_number', formData.phone_number);
+    data.append('type_provider', formData.type_provider);
+    data.append('profession', formData.profession);
+    if (formData.categories && formData.categories.length > 0) {
+        formData.categories.forEach(catId => data.append('categories', catId));
+    } else {
+        data.append('categories', '');
+    }
+    if (formData.address) {
+        data.append('address', JSON.stringify(formData.address));
+    }
+    try {
+      const res = await profileService.updateProfile(data);
+      setProfile(res.data);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating profile:", error.response?.data || error.message);
+    }
+  };
+
+  if (!isEditing) {
+    const { user, profile: profileDetails } = profile;
+    const address = profileDetails.address;
+    const fullAddress = address 
+      ? `${address.street || ''} ${address.number || ''}, ${address.floor || ''} ${address.apartment || ''} - ${address.city_detail?.name || ''}, CP: ${address.postal_code || ''}`
+      : 'No especificada';
+
+    return (
+      <div>
+        <div className="row">
+          <div className="col-md-4 text-center">
+            <ImageUpload currentImage={userData.user.profile_image} disabled={true} />
+            <h4 className="mt-3">{userData.user.name} {userData.user.lastname}</h4>
+            <p className="text-muted">{userData.user.email}</p>
+          </div>
+          <div className="col-md-8">
+            <h5>Descripción</h5>
+            <p>{profileDetails.description || 'No especificada'}</p>
+            <hr />
+            <p><strong>Profesión:</strong> {profileDetails.profession?.name || 'No especificada'}</p>
+            <p><strong>Tipo de Proveedor:</strong> {profileDetails.type_provider?.name || 'No especificado'}</p>
+            <p><strong>Dirección:</strong> {fullAddress}</p>
+            <h5>Categorías</h5>
+            <div>
+              {(profileDetails.categories || []).map(cat => (
+                <span key={cat.id_category} className="badge bg-secondary me-1">{cat.name}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+        <button onClick={startEditing} className="btn btn-primary mt-4">Editar Perfil</button>
+      </div>
+    );
+  }
 
   return (
-    <form>
-      <div className="d-flex align-items-center mb-4">
-        <img
-          src={user.profile_image}
-          alt="Foto de perfil"
-          className="rounded-circle me-3"
-          style={{ width: "80px", height: "80px", objectFit: "cover" }}
-        />
-        <div>
-          <h4 className="mb-1">{formData.name} {formData.lastname}</h4>
-          <p className="text-muted mb-0">{formData.email}</p>
-          <span className="badge bg-success">Proveedor</span>
+    <form onSubmit={handleSubmit}>
+      <div className="row mb-3">
+        <div className="col-md-4 text-center">
+          <ImageUpload currentImage={profile.user.profile_image} onFileSelect={setImageFile} />
+        </div>
+        <div className="col-md-8">
+          <div className="mb-3">
+              <label htmlFor="description" className="form-label">Descripción</label>
+              <textarea className="form-control" id="description" name="description" value={formData.description} onChange={handleInputChange}></textarea>
+          </div>
+          <div className="mb-3">
+              <label htmlFor="phone_number" className="form-label">Teléfono</label>
+              <input type="text" className="form-control" id="phone_number" name="phone_number" value={formData.phone_number} onChange={handleInputChange} />
+          </div>
         </div>
       </div>
+      
+      <AddressForm 
+        addressData={formData.address}
+        provinces={provinces}
+        departments={departments}
+        cities={cities}
+        onAddressChange={handleAddressChange}
+        onProvinceChange={handleProvinceChange}
+        onDepartmentChange={handleDepartmentChange}
+      />
 
-      <h5 className="mb-3">Datos profesionales</h5>
       <div className="mb-3">
-        <label className="form-label">Profesión</label>
-        <input
-          type="text"
-          name="profession"
-          value={formData.profession}
-          onChange={handleChange}
-          className="form-control"
-        />
+          <label className="form-label">Categorías</label>
+          <div className="d-flex flex-wrap">
+          {categories.map(category => (
+              <div key={category.id_category} className="form-check form-check-inline">
+              <input 
+                  className="form-check-input" 
+                  type="checkbox" 
+                  id={`category-${category.id_category}`} 
+                  value={category.id_category}
+                  checked={(formData.categories || []).includes(category.id_category)}
+                  onChange={handleCategoryChange}
+              />
+              <label className="form-check-label" htmlFor={`category-${category.id_category}`}>{category.name}</label>
+              </div>
+          ))}
+          </div>
       </div>
       <div className="mb-3">
-        <label className="form-label">Tipo de proveedor</label>
-        <input
-          type="text"
-          name="type_provider"
-          value={formData.type_provider}
-          onChange={handleChange}
-          className="form-control"
-        />
+          <label htmlFor="type_provider" className="form-label">Tipo de Proveedor</label>
+          <select className="form-select" id="type_provider" name="type_provider" value={formData.type_provider} onChange={handleInputChange}>
+          <option value="">Seleccione...</option>
+          {typeProviders.map(type => (
+              <option key={type.id_type_provider} value={type.id_type_provider}>{type.name}</option>
+          ))}
+          </select>
       </div>
       <div className="mb-3">
-        <label className="form-label">Descripción</label>
-        <textarea
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          className="form-control"
-        />
+          <label htmlFor="profession" className="form-label">Profesión</label>
+          <select className="form-select" id="profession" name="profession" value={formData.profession} onChange={handleInputChange}>
+          <option value="">Seleccione...</option>
+          {professions.map(prof => (
+              <option key={prof.id_profession} value={prof.id_profession}>{prof.name}</option>
+          ))}
+          </select>
       </div>
-      <div className="mb-3">
-        <label className="form-label">Categorías (separadas por coma)</label>
-        <input
-          type="text"
-          name="categories"
-          value={formData.categories}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
-
-      <h6 className="mt-4">Dirección</h6>
-      <div className="mb-3">
-        <label className="form-label">Calle</label>
-        <input
-          type="text"
-          name="street"
-          value={formData.street}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
-      <div className="mb-3">
-        <label className="form-label">Número</label>
-        <input
-          type="text"
-          name="number"
-          value={formData.number}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
-      <div className="mb-3">
-        <label className="form-label">Ciudad</label>
-        <input
-          type="text"
-          name="city"
-          value={formData.city}
-          onChange={handleChange}
-          className="form-control"
-        />
-      </div>
-
-      <button type="button" className="btn btn-primary mt-3" onClick={handleSave}>
-        Guardar cambios
-      </button>
+      <button type="submit" className="btn btn-success me-2 mt-3">Guardar Cambios</button>
+      <button type="button" onClick={() => setIsEditing(false)} className="btn btn-secondary mt-3">Cancelar</button>
     </form>
   );
 };
