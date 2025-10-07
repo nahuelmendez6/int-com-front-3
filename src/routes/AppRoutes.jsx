@@ -7,6 +7,7 @@ import LoginPage from "../pages/LoginPage.jsx";
 // import Dashboard from "../pages/main/Dashboard";
 import Feed from "../pages/Feed.jsx";
 import Profile from "../pages/Profile.jsx";
+import AvailabilityPage from "../pages/AvailabilityPage.jsx";
 
 import ProviderRegistrationForm from "../pages/ProviderRegistrationForm.jsx";
 
@@ -54,6 +55,15 @@ const AppRoutes = () => {
             </PrivateRoute>  
           }
         
+        />
+
+        <Route
+          path="/availability"
+          element={
+            <PrivateRoute>
+              <AvailabilityPage />
+            </PrivateRoute>  
+          }
         />
 
         {/* Ruta catch-all */}

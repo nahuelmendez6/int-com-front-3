@@ -27,6 +27,7 @@ const Sidebar = () => {
     provider: [
       { to: '/feed', label: 'Inicio', icon: 'bi-house-door'},
       { to: '/profile', label: 'Perfil', icon: 'bi-person'},
+      { to: '/availability', label: 'Disponibilidad', icon: 'bi-calendar-check'},
     ]
   }
 
