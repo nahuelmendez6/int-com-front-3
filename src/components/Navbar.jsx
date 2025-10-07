@@ -14,79 +14,66 @@ const Navbar = () => {
 
   return (
     <nav
-      className="navbar navbar-expand-lg bg-white shadow rounded-3 position-fixed w-100"
+      className="navbar navbar-expand-lg bg-white shadow rounded-3 position-fixed"
       style={{
         top: '10px',
         left: '50%',
-        transform: 'translateX(-50%)',
-        width: 'calc(100% - 20px)',
+        transform: 'translateX(-50%)', // Centrar el navbar
+        width: 'auto', // Ancho automático basado en el contenido
+        minWidth: '200px', // Ancho mínimo reducido
+        maxWidth: '300px', // Ancho máximo más pequeño
         zIndex: 1030
       }}
     >
       <div className="container-fluid">
-        {/* Logo o título */}
-        <Link to="/feed" className="navbar-brand fw-bold">
+        {/* Logo o título - solo visible en desktop */}
+        <Link to="/feed" className="navbar-brand fw-bold d-none d-md-inline">
           Mi App
         </Link>
 
-        {/* Botón para colapsar en móviles */}
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-
         {/* Contenido del navbar */}
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
-            {/* Dropdown de usuario */}
-            <li className="nav-item dropdown">
-              <button
-                className="btn btn-link nav-link dropdown-toggle d-flex align-items-center"
-                type="button"
-                onClick={toggleDropdown}
-                aria-expanded={showDropdown}
+        <div className="navbar-nav ms-auto">
+          {/* Dropdown de usuario */}
+          <div className="nav-item dropdown">
+            <button
+              className="btn btn-link nav-link dropdown-toggle d-flex align-items-center"
+              type="button"
+              onClick={toggleDropdown}
+              aria-expanded={showDropdown}
+            >
+              <i className="bi bi-person-circle fs-4"></i>
+              <span className="d-none d-md-inline ms-2">Usuario</span>
+            </button>
+            
+            {showDropdown && (
+              <div
+                className="dropdown-menu show position-absolute"
+                style={{
+                  right: '0',
+                  left: 'auto',
+                  top: '100%',
+                  marginTop: '0.5rem'
+                }}
               >
-                <i className="bi bi-person-circle fs-4 me-1"></i>
-                <span className="d-none d-sm-inline">Usuario</span>
-              </button>
-              
-              {showDropdown && (
-                <div
-                  className="dropdown-menu show position-absolute"
-                  style={{
-                    right: '0',
-                    left: 'auto',
-                    top: '100%',
-                    marginTop: '0.5rem'
-                  }}
+                <Link
+                  to="/profile"
+                  className="dropdown-item d-flex align-items-center"
+                  onClick={closeDropdown}
                 >
-                  <Link
-                    to="/profile"
-                    className="dropdown-item d-flex align-items-center"
-                    onClick={closeDropdown}
-                  >
-                    <i className="bi bi-person me-2"></i>
-                    Perfil
-                  </Link>
-                  <Link
-                    to="/logout"
-                    className="dropdown-item d-flex align-items-center"
-                    onClick={closeDropdown}
-                  >
-                    <i className="bi bi-box-arrow-right me-2"></i>
-                    Logout
-                  </Link>
-                </div>
-              )}
-            </li>
-          </ul>
+                  <i className="bi bi-person me-2"></i>
+                  Perfil
+                </Link>
+                <Link
+                  to="/logout"
+                  className="dropdown-item d-flex align-items-center"
+                  onClick={closeDropdown}
+                >
+                  <i className="bi bi-box-arrow-right me-2"></i>
+                  Logout
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -104,6 +91,19 @@ const Navbar = () => {
           onClick={closeDropdown}
         ></div>
       )}
+
+      {/* Estilos responsivos para el navbar */}
+      <style>{`
+        @media (min-width: 768px) {
+          .navbar {
+            left: 290px !important; /* Comenzar desde el margen del sidebar */
+            transform: none !important; /* Quitar centrado */
+            width: calc(100% - 310px) !important; /* Extender hasta el margen derecho */
+            max-width: none !important; /* Sin límite de ancho máximo */
+            min-width: auto !important; /* Sin ancho mínimo */
+          }
+        }
+      `}</style>
     </nav>
   );
 };

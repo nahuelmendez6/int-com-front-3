@@ -12,11 +12,15 @@ const Feed = () => {
       
       {/* Contenido principal */}
       <div 
-        className="container-fluid"
+        className="container-fluid feed-container"
         style={{
-          paddingTop: '100px', // Espacio para el navbar
-          paddingLeft: '280px', // Espacio para el sidebar en desktop
-          paddingRight: '20px'
+          paddingTop: '80px', // Reducir espacio para el navbar más pequeño
+          paddingLeft: '290px', // Espacio para el sidebar en desktop (250px + 40px margen)
+          paddingRight: '20px',
+          marginLeft: '0',
+          marginRight: '0',
+          width: '100%',
+          maxWidth: 'none' // Permitir que use todo el ancho disponible
         }}
       >
         <div className="row">
@@ -62,10 +66,24 @@ const Feed = () => {
       </div>
       
       {/* Ajustes responsivos para móviles */}
-      <style jsx>{`
+      <style>{`
         @media (max-width: 767.98px) {
-          .container-fluid {
+          .feed-container {
             padding-left: 20px !important;
+            padding-right: 20px !important;
+            padding-top: 60px !important;
+            width: 100% !important;
+            max-width: none !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+        }
+        @media (min-width: 768px) {
+          .feed-container {
+            width: 100% !important;
+            max-width: none !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
           }
         }
       `}</style>

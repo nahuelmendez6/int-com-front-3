@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Feed from '../pages/Feed';
+import Profile from '../pages/Profile';
 
 const AppRoutes = () => {
   return (
@@ -16,8 +17,8 @@ const AppRoutes = () => {
       {/* Ruta principal del feed */}
       <Route path="/feed" element={<Feed />} />
       
-      {/* Rutas adicionales que se pueden agregar más tarde */}
-      <Route path="/profile" element={<div className="min-vh-100 d-flex align-items-center justify-content-center"><h1>Página de Perfil (Próximamente)</h1></div>} />
+      {/* Ruta de perfil */}
+      <Route path="/profile" element={<Profile />} />
       <Route path="/messages" element={<div className="min-vh-100 d-flex align-items-center justify-content-center"><h1>Mensajes (Próximamente)</h1></div>} />
       <Route path="/settings" element={<div className="min-vh-100 d-flex align-items-center justify-content-center"><h1>Configuración (Próximamente)</h1></div>} />
       <Route path="/logout" element={<div className="min-vh-100 d-flex align-items-center justify-content-center"><h1>Logout (Próximamente)</h1></div>} />

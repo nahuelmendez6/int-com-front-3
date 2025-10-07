@@ -17,7 +17,7 @@ const Sidebar = () => {
       {/* Botón para mostrar sidebar en móviles */}
       <button
         className="btn btn-primary d-md-none position-fixed"
-        style={{ top: '80px', left: '10px', zIndex: 1050 }}
+        style={{ top: '20px', left: '10px', zIndex: 1050 }}
         type="button"
         onClick={toggleOffcanvas}
       >
@@ -29,15 +29,14 @@ const Sidebar = () => {
         <div
           className="bg-white shadow rounded-3 position-fixed"
           style={{
-            top: '80px',
+            top: '10px', // Misma altura que el navbar
             left: '20px',
             width: '250px',
-            height: 'calc(100vh - 100px)',
+            height: 'calc(100vh - 20px)', // Ajustar altura
             zIndex: 1000
           }}
         >
           <div className="p-3">
-            <h5 className="mb-3">Navegación</h5>
             <nav className="nav flex-column">
               <NavLink
                 to="/feed"
