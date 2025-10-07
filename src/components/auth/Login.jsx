@@ -1,23 +1,25 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+// src/components/Login.jsx
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth.js";
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí iría la lógica de login
-    console.log('Login data:', formData);
+
+    try {
+      await login(email, password);
+      navigate("/feed"); // redirigir al dashboard después del login
+    } catch (err) {
+      setError("Credenciales inválidas. Intenta de nuevo.");
+    }
   };
 
   return (
@@ -25,8 +27,10 @@ const Login = () => {
       <div className="container">
         <div className="row justify-content-center">
           <div className="col-md-6 col-lg-4">
-            <div className="card shadow rounded-3" style={{ maxWidth: "400px", margin: "0 auto" }}>
-
+            <div
+              className="card shadow rounded-3"
+              style={{ maxWidth: "400px", margin: "0 auto" }}
+            >
               <div className="card-body p-4">
                 <div className="text-center mb-4">
                   <h2 className="card-title fw-bold">Iniciar Sesión</h2>
@@ -42,9 +46,8 @@ const Login = () => {
                       type="email"
                       className="form-control"
                       id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                       placeholder="tu@email.com"
                     />
@@ -58,9 +61,8 @@ const Login = () => {
                       type="password"
                       className="form-control"
                       id="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       required
                       placeholder="Tu contraseña"
                     />
@@ -71,12 +73,19 @@ const Login = () => {
                       Iniciar Sesión
                     </button>
                   </div>
+
+                  {error && (
+                    <p className="text-danger text-center mt-3">{error}</p>
+                  )}
                 </form>
 
                 <div className="text-center mt-4">
                   <p className="mb-0">
-                    ¿No tienes cuenta?{' '}
-                    <Link to="/register" className="text-decoration-none fw-semibold">
+                    ¿No tienes cuenta?{" "}
+                    <Link
+                      to="/register"
+                      className="text-decoration-none fw-semibold"
+                    >
                       Regístrate
                     </Link>
                   </p>
