@@ -6,6 +6,7 @@ import { useAuth } from "../hooks/useAuth.js";
 import LoginPage from "../pages/LoginPage.jsx";
 // import Dashboard from "../pages/main/Dashboard";
 import Feed from "../pages/Feed.jsx";
+import Profile from "../pages/Profile.jsx";
 
 // Componente para proteger rutas privadas
 const PrivateRoute = ({ children }) => {
@@ -39,6 +40,16 @@ const AppRoutes = () => {
               <Feed />
             </PrivateRoute>
           }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>  
+          }
+        
         />
 
         {/* Ruta catch-all */}
