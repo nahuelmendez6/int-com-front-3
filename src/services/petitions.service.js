@@ -57,3 +57,13 @@ export const deletePetition = async (id) => {
     throw error;
   }
 };
+
+export const getProviderFeedPetitions = async () => {
+  try {
+    const response = await api.get('/petitions/provider-feed/');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching provider feed petitions:', error);
+    throw error;
+  }
+};
