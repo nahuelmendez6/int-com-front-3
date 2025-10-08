@@ -44,8 +44,8 @@ export const getProviderArea = async (providerId, signal) => {
 
 export const updateProviderCities = async (token, data) => {
     try {
-        const response = await api.post(
-            `/locations/provider-cities/`,
+        const response = await api.patch(
+            `/locations/provider-cities/sync/`,
             data,
             {
                 headers: {
@@ -54,6 +54,7 @@ export const updateProviderCities = async (token, data) => {
                 }
             }
         );
+        console.log('se imprime?');
         return response.data;
     } catch (error) {
         console.error('Error updating provider cities:', error.response?.data || error);

@@ -7,7 +7,7 @@ import ServiceAreaForm from './ServiceAreaForm.jsx';
 import { useAuth } from '../../hooks/useAuth.js';
 
 const ProviderServiceArea = ({ providerId }) => {
-    const { token } = useAuth();
+    const { token, profile } = useAuth();
     const [serviceArea, setServiceArea] = useState([]);
     const [loading, setLoading] = useState(true);
     const [deletingCity, setDeletingCity] = useState(null);
@@ -20,6 +20,8 @@ const ProviderServiceArea = ({ providerId }) => {
     const [provinces, setProvinces] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [cities, setCities] = useState([]);
+
+    const id_provider = profile?.profile?.id_provider;
 
     const fetchServiceArea = async () => {
         if (!providerId) return;
@@ -162,7 +164,13 @@ const ProviderServiceArea = ({ providerId }) => {
             }));
 
         try {
-            await updateProviderCities(token, cityPayload);
+            console.log('esto se esta mandando',cityPayload);
+            // await updateProviderCities(token, cityPayload);
+            await updateProviderCities(token, {
+                provider: id_provider,
+                cities: formData.serviceArea.cities.map(Number)
+            });
+
             fetchServiceArea();
             setEditMode(false);
         } catch (error) {
