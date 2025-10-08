@@ -36,7 +36,7 @@ export const getPetitionTypes = async () => {
 
 export const updatePetition = async (id, petitionData) => {
   try {
-    const response = await api.put(`/petitions/${id}/`, petitionData, {
+    const response = await api.patch(`/petitions/${id}/`, petitionData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -44,6 +44,16 @@ export const updatePetition = async (id, petitionData) => {
     return response.data;
   } catch (error) {
     console.error('Error updating petition:', error);
+    throw error;
+  }
+};
+
+export const deletePetition = async (id) => {
+  try {
+    const response = await api.patch(`/petitions/${id}/`, { is_deleted: true });
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting petition:', error);
     throw error;
   }
 };
