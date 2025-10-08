@@ -9,6 +9,7 @@ import Feed from "../pages/Feed.jsx";
 import Profile from "../pages/Profile.jsx";
 import AvailabilityPage from "../pages/AvailabilityPage.jsx";
 import OffersPage from "../pages/OffersPage.jsx";
+import ServiceAreaPage from "../pages/ServiceAreaPage.jsx";
 
 import ProviderRegistrationForm from "../pages/ProviderRegistrationForm.jsx";
 import CustomerRegistrationForm from "../pages/CustomerRegistrationForm.jsx";
@@ -68,6 +69,15 @@ const AppRoutes = () => {
             <PrivateRoute>
               <OffersPage />
             </PrivateRoute>  
+          }
+        />
+
+        <Route
+          path="/service-area"
+          element={
+            <PrivateRoute>
+              <ServiceAreaPage />
+            </PrivateRoute>
           }
         />
 

@@ -29,6 +29,7 @@ const Sidebar = () => {
       { to: '/profile', label: 'Perfil', icon: 'bi-person'},
       { to: '/availability', label: 'Disponibilidad', icon: 'bi-calendar-check'},
       { to: '/offers', label: 'Ofertas', icon: 'bi-tag'},
+      { to: '/service-area', label: 'Área de servicio', icon: 'bi-geo-alt'},
     ]
   }
 
