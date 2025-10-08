@@ -49,7 +49,7 @@ export const updateProviderCities = async (token, data) => {
             data,
             {
                 headers: {
-                    Authorization: `Token ${token}`,
+                    Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             }
@@ -67,7 +67,7 @@ export const removeCityFromProviderArea = async (token, providerId, cityId) => {
         // const API_BASE_URL = 'http://127.0.0.1:8000'; 
         const response = await api.delete(`locations/providers/${providerId}/cities/${cityId}/`, {
             headers: {
-                Authorization: `Token ${token}`
+                Authorization: `Bearer ${token}`
             }
         });
         return response.data;
