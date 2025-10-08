@@ -22,6 +22,7 @@ const Sidebar = () => {
     customer: [
       { to: '/feed', label: 'Inicio', icon: 'bi-house-door'},
       { to: '/profile', label: 'Perfil', icon: 'bi-person'},
+      { to: '/petitions', label: 'Peticiones', icon: 'bi-card-list'},
       { to: '/messages', label: 'Mensajes', icon: 'bi-chat-dots'},
     ],
     provider: [

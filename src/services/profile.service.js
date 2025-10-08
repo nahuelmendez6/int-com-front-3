@@ -10,16 +10,34 @@ const updateProfile = (profileData) => {
 
 
 
-const getCategories = () => {
-  return api.get('/profiles/categories/');
+export const getCategories = async () => {
+  try {
+    const response = await api.get('/profiles/categories/');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    throw error;
+  }
 };
 
-const getTypeProviders = () => {
-  return api.get('/profiles/type-providers/');
+export const getTypeProviders = async () => {
+  try {
+    const response = await api.get('/profiles/type-providers/');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching type providers:', error);
+    throw error;
+  }
 };
 
-const getProfessions = () => {
-  return api.get('/profiles/professions/');
+export const getProfessions = async () => {
+  try {
+    const response = await api.get('/profiles/professions/');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching professions:', error);
+    throw error;
+  }
 };
 
 export const profileService = {
