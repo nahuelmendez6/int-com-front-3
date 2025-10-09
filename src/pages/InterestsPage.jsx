@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
-import { getCategories, saveInterest, getInterestsByCustomer } from '../services/interest.service.js';
+import { getCategories, saveInterest, getInterestsByCustomer, deleteInterest } from '../services/interest.service.js';
 import { useAuth } from '../hooks/useAuth';
 
 const InterestsPage = () => {
   const [categories, setCategories] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState(new Set());
+  const [customerInterests, setCustomerInterests] = useState([]);
+  const [categoryMap, setCategoryMap] = useState(new Map());
   const { profile } = useAuth();
 
   useEffect(() => {
@@ -16,57 +17,51 @@ const InterestsPage = () => {
         getInterestsByCustomer(profile.profile.id_customer)
       ])
       .then(([categoriesResponse, interestsResponse]) => {
-        setCategories(categoriesResponse.data);
-        const interestIds = new Set(interestsResponse.data.map(interest => interest.id_category));
-        setSelectedCategories(interestIds);
+        const cats = categoriesResponse.data;
+        setCategories(cats);
+        setCustomerInterests(interestsResponse.data);
+        setCategoryMap(new Map(cats.map(c => [c.id_category, c.name])));
       })
       .catch(error => {
         console.error('Error fetching data:', error);
-        // Si falla la obtención de intereses, al menos mostramos las categorías
-        if (!categories.length) {
-          getCategories().then(res => setCategories(res.data));
-        }
       });
     }
   }, [profile]);
 
-  const handleCheckboxChange = (categoryId) => {
-    setSelectedCategories(prevSelected => {
-      const newSelected = new Set(prevSelected);
-      if (newSelected.has(categoryId)) {
-        newSelected.delete(categoryId);
-      } else {
-        newSelected.add(categoryId);
-      }
-      return newSelected;
-    });
+  const handleAddInterest = (categoryId) => {
+    if (!profile || !profile.profile.id_customer) return;
+    
+    saveInterest(profile.profile.id_customer, categoryId)
+      .then(response => {
+        // Add the new interest to the local state to update the UI instantly
+        setCustomerInterests(prevInterests => [...prevInterests, response.data]);
+      })
+      .catch(error => {
+        console.error('Error adding interest:', error);
+        alert('Hubo un error al añadir el interés.');
+      });
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (!profile || !profile.profile.id_customer) {
-      alert('Debe iniciar sesión como cliente para guardar sus intereses.');
-      return;
-    }
-
-    const promises = Array.from(selectedCategories).map(categoryId => {
-      return saveInterest(profile.profile.id_customer, categoryId);
-    });
-
-    try {
-      await Promise.all(promises);
-      alert('Intereses guardados con éxito!');
-    } catch (error) {
-      console.error('Error saving interests:', error);
-      alert('Hubo un error al guardar los intereses.');
-    }
+  const handleDeleteInterest = (interestId) => {
+    deleteInterest(interestId)
+      .then(() => {
+        // Remove the interest from the local state to update the UI instantly
+        setCustomerInterests(prevInterests => prevInterests.filter(interest => interest.id_interest !== interestId));
+      })
+      .catch(error => {
+        console.error('Error deleting interest:', error);
+        alert('Hubo un error al eliminar el interés.');
+      });
   };
+
+  const selectedCategoryIds = new Set(customerInterests.map(i => i.id_category));
+  const availableCategories = categories.filter(c => !selectedCategoryIds.has(c.id_category));
 
   return (
     <div className="min-vh-100 bg-light">
       <Navbar />
       <Sidebar />
-            <div 
+      <div 
         className="container-fluid"
         style={{
           paddingTop: '80px',
@@ -77,31 +72,54 @@ const InterestsPage = () => {
         }}
       >
         <div className="card shadow rounded-3">
-          <div className="card-body p-4"></div>
-            <h1>Selecciona tus Intereses</h1>
-            <p>Selecciona las categorías de servicios que te interesan para recibir notificaciones y ofertas personalizadas.</p>
-            <form onSubmit={handleSubmit}>
-              <div className="row">
-                {categories.map(category => (
-                  <div key={category.id_category} className="col-md-4">
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        id={`category-${category.id_category}`}
-                        value={category.id_category}
-                        checked={selectedCategories.has(category.id_category)}
-                        onChange={() => handleCheckboxChange(category.id_category)}
-                      />
-                      <label className="form-check-label" htmlFor={`category-${category.id_category}`}>
-                        {category.name}
-                      </label>
-                    </div>
+          <div className="card-body p-4">
+            <h1>Gestiona tus Intereses</h1>
+            <p>Añade o elimina categorías de servicios para personalizar tu experiencia. Los cambios se guardan automáticamente.</p>
+            
+            <hr />
+
+            <h4>Mis Intereses</h4>
+            <div className="d-flex flex-wrap align-items-center mb-3">
+              {customerInterests.length > 0 ? (
+                customerInterests.map(interest => (
+                  <span key={`selected-${interest.id_interest}`} className="badge bg-primary fs-6 me-2 mb-2 d-flex align-items-center">
+                    {categoryMap.get(interest.id_category) || 'Cargando...'}
+                    <button
+                      type="button"
+                      className="btn-close btn-close-white ms-2"
+                      aria-label="Remove"
+                      onClick={() => handleDeleteInterest(interest.id_interest)}
+                    ></button>
+                  </span>
+                ))
+              ) : (
+                <p className="text-muted">No has seleccionado ningún interés todavía.</p>
+              )}
+            </div>
+
+            <hr />
+
+            <h4>Agregar Nuevos Intereses</h4>
+            <div className="row mt-3">
+              {availableCategories.map(category => (
+                <div key={category.id_category} className="col-md-4">
+                  <div className="form-check">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      id={`category-${category.id_category}`}
+                      value={category.id_category}
+                      checked={false}
+                      onChange={() => handleAddInterest(category.id_category)}
+                    />
+                    <label className="form-check-label" htmlFor={`category-${category.id_category}`}>
+                      {category.name}
+                    </label>
                   </div>
-                ))}
-              </div>
-              <button type="submit" className="btn btn-primary mt-3">Guardar Intereses</button>
-            </form>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
