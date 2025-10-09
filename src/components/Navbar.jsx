@@ -37,13 +37,15 @@ const Navbar = () => {
         width: 'auto', // Ancho automático basado en el contenido
         minWidth: '200px', // Ancho mínimo reducido
         maxWidth: '300px', // Ancho máximo más pequeño
-        zIndex: 1030
+        zIndex: 1030,
+        borderLeft: '4px solid #cfe2ff',
+        borderBottom: '4px solid #cfe2ff'
       }}
     >
       <div className="container-fluid">
         {/* Logo o título - solo visible en desktop */}
         <Link to="/feed" className="navbar-brand fw-bold d-none d-md-inline">
-          Mi App
+          Integración Comunitaria
         </Link>
 
         {/* Contenido del navbar */}

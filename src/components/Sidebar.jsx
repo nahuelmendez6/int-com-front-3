@@ -5,6 +5,7 @@ import { useAuth } from '../hooks/useAuth';
 
 const Sidebar = () => {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
+  const [hoveredLink, setHoveredLink] = useState(null);
   const { profile } = useAuth();
 
 
@@ -45,7 +46,16 @@ const Sidebar = () => {
         className={({ isActive }) =>
           `nav-link d-flex align-items-center mb-2 ${isActive ? 'active' : ''}`
         }
+        style={({ isActive }) => ({
+          backgroundColor: isActive || hoveredLink === link.to ? 'rgba(0, 123, 255, 0.1)' : 'transparent',
+          borderRight: isActive ? '4px solid #0d6efd' : 'none',
+          color: isActive ? '#0d6efd' : '',
+          transition: 'background-color 0.2s ease-in-out',
+          borderRadius: '5px'
+        })}
         onClick={onClick}
+        onMouseEnter={() => setHoveredLink(link.to)}
+        onMouseLeave={() => setHoveredLink(null)}
       >
         <i className={`bi ${link.icon} me-2`}></i>
         {link.label}
@@ -75,6 +85,7 @@ const Sidebar = () => {
             width: '250px',
             height: 'calc(100vh - 20px)',
             zIndex: 1000,
+            borderRight: '4px solid #cfe2ff'
           }}
         >
           <div className="p-3">
