@@ -25,3 +25,8 @@ export const getOfferTypes = () => {
   return api.get('/offers/type-offers/');
 };
 
+// Devuelve el feed de ofertas para el cliente autenticado
+export const getCustomerFeedOffers = () => {
+  return api.get('/offers/customer-feed/');
+};
+

@@ -4,11 +4,15 @@ import Navbar from '../components/Navbar';
 import { useAuth } from '../hooks/useAuth.js';
 import { getProviderFeedPetitions } from '../services/petitions.service.js';
 import PetitionList from '../components/petitions/PetitionList';
+import { getCustomerFeedOffers } from '../services/offers.service.js';
+import OfferList from '../components/offers/OfferList';
 
 const Feed = () => {
   const { profile, loading: authLoading } = useAuth();
   const [providerPetitions, setProviderPetitions] = useState([]);
+  const [customerOffers, setCustomerOffers] = useState([]);
   const [loadingPetitions, setLoadingPetitions] = useState(true);
+  const [loadingOffers, setLoadingOffers] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -30,8 +34,27 @@ const Feed = () => {
       }
     };
 
+    const fetchCustomerOffers = async () => {
+      if (profile && profile.role === 'customer') {
+        try {
+          setLoadingOffers(true);
+          const { data } = await getCustomerFeedOffers();
+          setCustomerOffers(data);
+          setError(null);
+        } catch (err) {
+          console.error("Error fetching customer offers:", err);
+          setError('Error al cargar las ofertas para clientes.');
+        } finally {
+          setLoadingOffers(false);
+        }
+      } else {
+        setLoadingOffers(false);
+      }
+    };
+
     if (!authLoading) {
       fetchProviderPetitions();
+      fetchCustomerOffers();
     }
   }, [profile, authLoading]);
 
@@ -50,6 +73,20 @@ const Feed = () => {
               <p>Cargando peticiones...</p>
             ) : ( 
               <PetitionList petitions={providerPetitions} />
+            )}
+          </div>
+        </div>
+      );
+    } else if (profile && profile.role === 'customer') {
+      return (
+        <div className="card shadow rounded-3">
+          <div className="card-body p-4">
+            <h1 className="card-title mb-4">Ofertas para ti</h1>
+            {error && <div className="alert alert-danger">{error}</div>}
+            {loadingOffers ? (
+              <p>Cargando ofertas...</p>
+            ) : (
+              <OfferList offers={customerOffers} />
             )}
           </div>
         </div>

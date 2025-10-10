@@ -1,10 +1,10 @@
 import React from 'react';
 
-const OfferList = ({ offers, onEdit, onDelete }) => {
+const OfferList = ({ offers }) => {
   if (offers.length === 0) {
     return (
       <div className="alert alert-info" role="alert">
-        No tienes ofertas activas en este momento.
+        No hay ofertas disponibles en este momento.
       </div>
     );
   }
@@ -19,10 +19,6 @@ const OfferList = ({ offers, onEdit, onDelete }) => {
           </div>
           <p className="mb-1">{offer.description}</p>
           <small className="text-muted">Válida desde {new Date(offer.date_open).toLocaleString()} hasta {new Date(offer.date_close).toLocaleString()}</small>
-          <div className="mt-2">
-            <button onClick={() => onEdit(offer)} className="btn btn-sm btn-outline-primary me-2">Editar</button>
-            <button onClick={() => onDelete(offer.offer_id)} className="btn btn-sm btn-outline-danger">Eliminar</button>
-          </div>
         </div>
       ))}
     </div>
@@ -30,3 +26,4 @@ const OfferList = ({ offers, onEdit, onDelete }) => {
 };
 
 export default OfferList;
+
