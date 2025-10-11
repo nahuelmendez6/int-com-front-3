@@ -12,6 +12,7 @@ import OffersPage from "../pages/OffersPage.jsx";
 import ServiceAreaPage from "../pages/ServiceAreaPage.jsx";
 import PetitionsPage from "../pages/PetitionsPage.jsx";
 import InterestsPage from "../pages/InterestsPage.jsx";
+import PostulationPage from "../pages/PostulationPage.jsx";
 
 import ProviderRegistrationForm from "../pages/ProviderRegistrationForm.jsx";
 import CustomerRegistrationForm from "../pages/CustomerRegistrationForm.jsx";
@@ -97,6 +98,15 @@ const AppRoutes = () => {
           element={
             <PrivateRoute>
               <InterestsPage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/petitions/:id/apply"
+          element={
+            <PrivateRoute>
+              <PostulationPage />
             </PrivateRoute>
           }
         />

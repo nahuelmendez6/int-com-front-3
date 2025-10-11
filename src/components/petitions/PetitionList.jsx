@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Carousel, Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+
 
 const PetitionList = ({ petitions, onEdit, onDelete }) => {
   const [showModal, setShowModal] = useState(false);
@@ -107,6 +109,11 @@ const PetitionList = ({ petitions, onEdit, onDelete }) => {
               >
                 Eliminar
               </Button>
+              <Link to={`/petitions/${petition.id_petition}/apply`}>
+                <Button size="sm" variant="outline-success">
+                  Postularse
+                </Button>
+              </Link>
             </div>
           </div>
         ))}
