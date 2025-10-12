@@ -19,3 +19,14 @@ export const getPostulationsByPetition = async (petitionId) => {
     throw error;
   }
 };
+
+export const updatePostulation = async (postulationId, data) => {
+  try {
+    console.log('Sending data to update postulation:', JSON.stringify(data, null, 2));
+    const response = await api.patch(`/postulations/${postulationId}/`, data);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating postulation ${postulationId}:`, error.response?.data || error.message);
+    throw error;
+  }
+};

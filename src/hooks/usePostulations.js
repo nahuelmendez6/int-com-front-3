@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { getPostulationsByPetition } from "../services/postulation.service.js";
+import { useState, useCallback } from "react";
+import { getPostulationsByPetition, updatePostulation } from "../services/postulation.service.js";
 import { getUserProfile } from "../services/profile.service.js";
 
 export const usePostulations = () => {
@@ -8,31 +8,17 @@ export const usePostulations = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const togglePostulations = async (petitionId) => {
-    if (visiblePetition === petitionId) {
-      // ocultar
-      setVisiblePetition(null);
-      return;
-    }
-
+  const fetchPostulations = useCallback(async (petitionId) => {
     setLoading(true);
     setError(null);
-    setPostulations([]);
-
     try {
-      // 1️⃣ Obtener las postulaciones
       const data = await getPostulationsByPetition(petitionId);
-
       if (!data || data.length === 0) {
         setPostulations([]);
-        setVisiblePetition(petitionId);
         return;
       }
 
-      // 2️⃣ Obtener IDs únicos de proveedores
       const uniqueProviderIds = [...new Set(data.map((p) => p.id_provider))];
-
-      // 3️⃣ Traer datos de usuario para cada proveedor (en paralelo)
       const providerMap = {};
       await Promise.all(
         uniqueProviderIds.map(async (id_provider) => {
@@ -45,22 +31,50 @@ export const usePostulations = () => {
         })
       );
 
-      // 4️⃣ Enriquecer cada postulación con los datos del proveedor
       const enrichedPostulations = data.map((p) => ({
         ...p,
         provider_user: providerMap[p.id_provider] || null,
       }));
 
       setPostulations(enrichedPostulations);
-      console.log("Enriched Postulations:", enrichedPostulations);
-      setVisiblePetition(petitionId);
     } catch (err) {
       console.error(err);
-      setError("No se pudieron cargar las postulaciones o los datos de los proveedores.");
+      setError("No se pudieron cargar las postulaciones.");
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const togglePostulations = useCallback(async (petitionId) => {
+    if (visiblePetition === petitionId) {
+      setVisiblePetition(null);
+    } else {
+      setVisiblePetition(petitionId);
+      await fetchPostulations(petitionId);
+    }
+  }, [visiblePetition, fetchPostulations]);
+
+  const handleUpdatePostulation = async (postulationId, newState, petitionId) => {
+    if (!petitionId) {
+      console.error("Error: petitionId no fue proporcionado para la actualización.");
+      return;
+    }
+
+    try {
+      await updatePostulation(postulationId, { 
+        id_state: newState,
+        id_petition: petitionId
+      });
+      
+      setPostulations(currentPostulations =>
+        currentPostulations.map(p =>
+          p.id_postulation === postulationId ? { ...p, id_state: newState } : p
+        )
+      );
+    } catch (err) {
+      console.error("Error al actualizar la postulación:", err);
+    }
   };
 
-  return { postulations, visiblePetition, loading, error, togglePostulations };
+  return { postulations, visiblePetition, loading, error, togglePostulations, handleUpdatePostulation };
 };

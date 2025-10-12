@@ -1,5 +1,5 @@
 // components/PetitionList.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
@@ -13,12 +13,7 @@ const PetitionList = ({ petitions, onEdit, onDelete }) => {
   const [attachments, setAttachments] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const { postulations, visiblePetition, loading, error, togglePostulations } = usePostulations();
-
-  // 🔹 Loguear cambios en postulations cada vez que se actualicen
-  useEffect(() => {
-    console.log("Postulations updated:", postulations);
-  }, [postulations]);
+  const { postulations, visiblePetition, loading, error, togglePostulations, handleUpdatePostulation } = usePostulations();
 
   if (!petitions?.length) {
     return (
@@ -86,7 +81,13 @@ const PetitionList = ({ petitions, onEdit, onDelete }) => {
               </div>
 
               {isVisible && (
-                <PostulationsList postulations={postulations} loading={loading} error={error} />
+                <PostulationsList 
+                  postulations={postulations} 
+                  loading={loading} 
+                  error={error} 
+                  onUpdate={handleUpdatePostulation}
+                  petitionId={petition.id_petition} // Pasando el ID de la petición
+                />
               )}
             </div>
           );
