@@ -9,3 +9,13 @@ export const createPostulation = async (postulationData) => {
     throw error;
   }
 };
+
+export const getPostulationsByPetition = async (petitionId) => {
+  try {
+    const response = await api.get(`/postulations/by-petition/${petitionId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching postulations for petition ${petitionId}:`, error.response?.data || error.message);
+    throw error;
+  }
+};
