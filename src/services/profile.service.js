@@ -40,6 +40,23 @@ export const getProfessions = async () => {
   }
 };
 
+export const getUserProfile = async ({id_customer, id_provider}) => {
+  try {
+    const params = {};
+
+    if (id_customer) params.id_customer = id_customer;
+    if (id_provider) params.id_provider = id_provider;
+
+    const { data } = await api.get("/profiles/user-detail", { params });
+
+    return data;
+
+  } catch (error) {
+    console.error("Error obteniendo perfil de usuario:", error);
+    throw error;
+  }
+};
+
 export const profileService = {
   getProfile,
   updateProfile,

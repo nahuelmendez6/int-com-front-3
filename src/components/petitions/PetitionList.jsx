@@ -1,5 +1,5 @@
 // components/PetitionList.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
@@ -15,11 +15,22 @@ const PetitionList = ({ petitions, onEdit, onDelete }) => {
 
   const { postulations, visiblePetition, loading, error, togglePostulations } = usePostulations();
 
-  if (!petitions?.length)
-    return <div className="alert alert-info">No tienes peticiones creadas en este momento.</div>;
+  // 🔹 Loguear cambios en postulations cada vez que se actualicen
+  useEffect(() => {
+    console.log("Postulations updated:", postulations);
+  }, [postulations]);
+
+  if (!petitions?.length) {
+    return (
+      <div className="alert alert-info">
+        No tienes peticiones creadas en este momento.
+      </div>
+    );
+  }
 
   const handleOpenModal = (atts, idx) => {
-    setAttachments(atts.filter((a) => /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(a.file)));
+    const images = atts.filter((a) => /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(a.file));
+    setAttachments(images);
     setCurrentIndex(idx);
     setShowModal(true);
   };
@@ -27,46 +38,59 @@ const PetitionList = ({ petitions, onEdit, onDelete }) => {
   return (
     <>
       <div className="list-group">
-        {petitions.map((petition) => (
-          <div key={petition.id_petition} className="list-group-item mb-3">
-            <div className="d-flex justify-content-between">
-              <h5>{petition.description}</h5>
-              <small>
-                Estado: <span className={`badge bg-${petition.id_state === 1 ? "success" : "secondary"}`}>{petition.id_state}</span>
+        {petitions.map((petition) => {
+          const isVisible = visiblePetition === petition.id_petition;
+
+          return (
+            <div key={petition.id_petition} className="list-group-item mb-3">
+              <div className="d-flex justify-content-between align-items-center">
+                <h5>{petition.description}</h5>
+                <small>
+                  Estado:{" "}
+                  <span
+                    className={`badge bg-${petition.id_state === 1 ? "success" : "secondary"}`}
+                  >
+                    {petition.id_state}
+                  </span>
+                </small>
+              </div>
+
+              <small className="text-muted d-block mb-2">
+                Desde: {petition.date_since || "No especificado"} hasta {petition.date_until || "No especificado"}
               </small>
+
+              <AttachmentsGallery attachments={petition.attachments} onOpenModal={handleOpenModal} />
+
+              <div className="mt-2 d-flex flex-wrap align-items-center gap-2">
+                <Button size="sm" variant="outline-primary" onClick={() => onEdit(petition)}>
+                  Editar
+                </Button>
+                <Button size="sm" variant="outline-danger" onClick={() => onDelete(petition.id_petition)}>
+                  Eliminar
+                </Button>
+                <Link to={`/petitions/${petition.id_petition}/apply`}>
+                  <Button size="sm" variant="outline-success">Postularse</Button>
+                </Link>
+                <Button
+                  size="sm"
+                  variant="info"
+                  onClick={() => togglePostulations(petition.id_petition)}
+                  disabled={loading && isVisible}
+                >
+                  {loading && isVisible
+                    ? "Cargando..."
+                    : isVisible
+                    ? "Ocultar Postulaciones"
+                    : "Ver Postulaciones"}
+                </Button>
+              </div>
+
+              {isVisible && (
+                <PostulationsList postulations={postulations} loading={loading} error={error} />
+              )}
             </div>
-            <small className="text-muted">
-              Desde: {petition.date_since || "No especificado"} hasta {petition.date_until || "No especificado"}
-            </small>
-
-            <AttachmentsGallery attachments={petition.attachments} onOpenModal={handleOpenModal} />
-
-            <div className="mt-2">
-              <Button size="sm" variant="outline-primary" className="me-2" onClick={() => onEdit(petition)}>Editar</Button>
-              <Button size="sm" variant="outline-danger" className="me-2" onClick={() => onDelete(petition.id_petition)}>Eliminar</Button>
-              <Link to={`/petitions/${petition.id_petition}/apply`}>
-                <Button size="sm" variant="outline-success">Postularse</Button>
-              </Link>
-              <Button
-                size="sm"
-                variant="info"
-                className="ms-2"
-                onClick={() => togglePostulations(petition.id_petition)}
-                disabled={loading && visiblePetition === petition.id_petition}
-              >
-                {loading && visiblePetition === petition.id_petition
-                  ? "Cargando..."
-                  : visiblePetition === petition.id_petition
-                  ? "Ocultar Postulaciones"
-                  : "Ver Postulaciones"}
-              </Button>
-            </div>
-
-            {visiblePetition === petition.id_petition && (
-              <PostulationsList postulations={postulations} loading={loading} error={error} />
-            )}
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <ImageModal
