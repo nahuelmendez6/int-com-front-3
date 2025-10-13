@@ -48,9 +48,9 @@ const Sidebar = () => {
           `nav-link d-flex align-items-center mb-2 ${isActive ? 'active' : ''}`
         }
         style={({ isActive }) => ({
-          backgroundColor: isActive || hoveredLink === link.to ? 'rgba(0, 123, 255, 0.1)' : 'transparent',
-          borderRight: isActive ? '4px solid #0d6efd' : 'none',
-          color: isActive ? '#0d6efd' : '',
+          backgroundColor: isActive || hoveredLink === link.to ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+          borderRight: isActive ? '4px solid white' : 'none',
+          color: 'white',
           transition: 'background-color 0.2s ease-in-out',
           borderRadius: '5px'
         })}
@@ -79,14 +79,15 @@ const Sidebar = () => {
       {/* Sidebar desktop */}
       <div className="d-none d-md-block">
         <div
-          className="bg-white shadow rounded-3 position-fixed"
+          className="shadow rounded-3 position-fixed"
           style={{
+            backgroundColor: '#46807E',
             top: '10px',
             left: '20px',
             width: '250px',
             height: 'calc(100vh - 20px)',
             zIndex: 1000,
-            borderRight: '4px solid #cfe2ff'
+            borderRight: '4px solid #3a706e'
           }}
         >
           <div className="p-3">
@@ -101,11 +102,11 @@ const Sidebar = () => {
       <div
         className={`offcanvas offcanvas-start ${showOffcanvas ? 'show' : ''}`}
         tabIndex="-1"
-        style={{ visibility: showOffcanvas ? 'visible' : 'hidden' }}
+        style={{ visibility: showOffcanvas ? 'visible' : 'hidden', backgroundColor: '#46807E' }}
       >
         <div className="offcanvas-header">
-          <h5 className="offcanvas-title">Navegación</h5>
-          <button type="button" className="btn-close" onClick={closeOffcanvas}></button>
+          <h5 className="offcanvas-title" style={{ color: 'white' }}>Navegación</h5>
+          <button type="button" className="btn-close btn-close-white" onClick={closeOffcanvas}></button>
         </div>
         <div className="offcanvas-body">
           <nav className="nav flex-column">{renderLinks(closeOffcanvas)}</nav>

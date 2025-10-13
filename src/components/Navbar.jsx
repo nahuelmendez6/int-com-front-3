@@ -29,8 +29,9 @@ const Navbar = () => {
 
   return (
     <nav
-      className="navbar navbar-expand-lg bg-white shadow rounded-3 position-fixed"
+      className="navbar navbar-expand-lg shadow rounded-3 position-fixed"
       style={{
+        backgroundColor: '#46807E',
         top: '10px',
         left: '50%',
         transform: 'translateX(-50%)', // Centrar el navbar
@@ -38,13 +39,13 @@ const Navbar = () => {
         minWidth: '200px', // Ancho mínimo reducido
         maxWidth: '300px', // Ancho máximo más pequeño
         zIndex: 1030,
-        borderLeft: '4px solid #cfe2ff',
-        borderBottom: '4px solid #cfe2ff'
+        borderLeft: '4px solid #3a706e',
+        borderBottom: '4px solid #3a706e'
       }}
     >
       <div className="container-fluid">
         {/* Logo o título - solo visible en desktop */}
-        <Link to="/feed" className="navbar-brand fw-bold d-none d-md-inline">
+        <Link to="/feed" className="navbar-brand fw-bold d-none d-md-inline" style={{ color: 'white' }}>
           Integración Comunitaria
         </Link>
 
@@ -57,8 +58,13 @@ const Navbar = () => {
               type="button"
               onClick={toggleDropdown}
               aria-expanded={showDropdown}
+              style={{ color: 'white' }}
             >
-              <i className="bi bi-person-circle fs-4"></i>
+              {profile && profile.user && profile.user.profile_image ? (
+                <img src={profile.user.profile_image} alt="Perfil" className="rounded-circle" style={{ width: '32px', height: '32px', objectFit: 'cover' }} />
+              ) : (
+                <i className="bi bi-person-circle fs-4"></i>
+              )}
               <span className="d-none d-md-inline ms-2">
                 {profile && profile.user ? profile.user.name : "Usuario"}
               </span>
