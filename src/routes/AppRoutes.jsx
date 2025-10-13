@@ -1,43 +1,69 @@
 // src/routes/AppRoutes.jsx
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { Suspense, lazy } from "react";
 import { useAuth } from "../hooks/useAuth.js";
 
-// Páginas
-import LoginPage from "../pages/LoginPage.jsx";
-// import Dashboard from "../pages/main/Dashboard";
-import Feed from "../pages/Feed.jsx";
-import Profile from "../pages/Profile.jsx";
-import AvailabilityPage from "../pages/AvailabilityPage.jsx";
-import OffersPage from "../pages/OffersPage.jsx";
-import ServiceAreaPage from "../pages/ServiceAreaPage.jsx";
-import PetitionsPage from "../pages/PetitionsPage.jsx";
-import InterestsPage from "../pages/InterestsPage.jsx";
-import PostulationPage from "../pages/PostulationPage.jsx";
+// 🔹 Lazy load de las páginas para mejorar rendimiento
+const LoginPage = lazy(() => import("../pages/LoginPage.jsx"));
+const Feed = lazy(() => import("../pages/Feed.jsx"));
+const Profile = lazy(() => import("../pages/Profile.jsx"));
+const AvailabilityPage = lazy(() => import("../pages/AvailabilityPage.jsx"));
+const OffersPage = lazy(() => import("../pages/OffersPage.jsx"));
+const ServiceAreaPage = lazy(() => import("../pages/ServiceAreaPage.jsx"));
+const PetitionsPage = lazy(() => import("../pages/PetitionsPage.jsx"));
+const InterestsPage = lazy(() => import("../pages/InterestsPage.jsx"));
+const PostulationPage = lazy(() => import("../pages/PostulationPage.jsx"));
+const ProviderRegistrationForm = lazy(() => import("../pages/ProviderRegistrationForm.jsx"));
+const CustomerRegistrationForm = lazy(() => import("../pages/CustomerRegistrationForm.jsx"));
 
-import ProviderRegistrationForm from "../pages/ProviderRegistrationForm.jsx";
-import CustomerRegistrationForm from "../pages/CustomerRegistrationForm.jsx";
-
-// Componente para proteger rutas privadas
+// 🔒 Componente para proteger rutas privadas
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
-  if (loading) return <p>Cargando...</p>; // o un spinner
+  if (loading) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "100vh" }}
+      >
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+    );
+  }
 
-  return user ? children : <Navigate to="/login" />;
+  return user ? children : <Navigate to="/login" replace />;
 };
+
+// 🔧 Envoltorio para manejar el Suspense (lazy loading)
+const Loader = ({ children }) => (
+  <Suspense
+    fallback={
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "100vh" }}
+      >
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+    }
+  >
+    {children}
+  </Suspense>
+);
 
 const AppRoutes = () => {
   return (
-    <Router>
+    <Loader>
       <Routes>
-        {/* Rutas públicas */}
+        {/* 🔓 Rutas públicas */}
         <Route path="/login" element={<LoginPage />} />
-
         <Route path="/register-provider" element={<ProviderRegistrationForm />} />
         <Route path="/register-customer" element={<CustomerRegistrationForm />} />
 
-        {/* Rutas privadas */}
-
+        {/* 🔐 Rutas privadas */}
         <Route
           path="/feed"
           element={
@@ -52,9 +78,8 @@ const AppRoutes = () => {
           element={
             <PrivateRoute>
               <Profile />
-            </PrivateRoute>  
+            </PrivateRoute>
           }
-        
         />
 
         <Route
@@ -62,7 +87,7 @@ const AppRoutes = () => {
           element={
             <PrivateRoute>
               <AvailabilityPage />
-            </PrivateRoute>  
+            </PrivateRoute>
           }
         />
 
@@ -71,7 +96,7 @@ const AppRoutes = () => {
           element={
             <PrivateRoute>
               <OffersPage />
-            </PrivateRoute>  
+            </PrivateRoute>
           }
         />
 
@@ -111,10 +136,10 @@ const AppRoutes = () => {
           }
         />
 
-        {/* Ruta catch-all */}
-        <Route path="*" element={<Navigate to="/login" />} />
+        {/* 🧭 Ruta por defecto */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
-    </Router>
+    </Loader>
   );
 };
 

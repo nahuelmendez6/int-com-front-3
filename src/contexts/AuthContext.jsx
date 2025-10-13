@@ -1,73 +1,128 @@
 // src/context/AuthContext.jsx
-import { createContext, useState, useEffect } from "react";
-import api from "../services/api"; // tu axios configurado
+import { createContext, useState, useEffect, useCallback } from "react";
+import api from "../services/api";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // guarda info del user
-  const [profile, setProfile] = useState(null); // guarda info del profile
-  const [loading, setLoading] = useState(true);
-  
-  const fetchUserProfile = async (token) => {
-    if (!token) return;
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
+  const [profile, setProfile] = useState(() => {
+    const savedProfile = localStorage.getItem("profile");
+    return savedProfile ? JSON.parse(savedProfile) : null;
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  // 🔹 Función auxiliar: guarda todo el estado persistente
+  const persistSession = useCallback((userData, profileData) => {
+    if (userData) localStorage.setItem("user", JSON.stringify(userData));
+    if (profileData) localStorage.setItem("profile", JSON.stringify(profileData));
+  }, []);
+
+  // 🔹 Obtener perfil del usuario logueado
+  const fetchUserProfile = useCallback(async (token) => {
     try {
       const res = await api.get("/profiles/user/", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setProfile(res.data);
+      localStorage.setItem("profile", JSON.stringify(res.data));
     } catch (err) {
-      console.error("Failed to fetch user profile", err);
-      setProfile(null);
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      fetchUserProfile(token);
-    } else {
-      setLoading(false);
+      console.error("❌ Error al obtener el perfil:", err);
+      // No borramos token enseguida — dejamos que el refresh se encargue
     }
   }, []);
 
+  // 🔹 Intentar refrescar token si expira
+  const refreshToken = useCallback(async () => {
+    const refresh = localStorage.getItem("refreshToken");
+    if (!refresh) return null;
 
+    try {
+      const res = await api.post("/auth/refresh/", { refresh });
+      const newAccess = res.data.access;
+      localStorage.setItem("token", newAccess);
+      return newAccess;
+    } catch (err) {
+      console.warn("⚠️ No se pudo refrescar el token:", err);
+      logout();
+      return null;
+    }
+  }, []);
+
+  // 🔹 Rehidratar sesión al cargar la app
+  useEffect(() => {
+    const init = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        await fetchUserProfile(token);
+      } catch {
+        const newToken = await refreshToken();
+        if (newToken) await fetchUserProfile(newToken);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    init();
+  }, [fetchUserProfile, refreshToken]);
+
+  // 🔹 Iniciar sesión
   const login = async (email, password) => {
-    const res = await api.post("/auth/login/", { email, password });
+    try {
+      const res = await api.post("/auth/login/", { email, password });
+      const { access, refresh, role, user_id, email: userEmail } = res.data;
 
-    // ejemplo: el backend devuelve { token, user: {..., id_customer, id_provider} }
-    const { access, refresh, role, user_id, email: userEmail } = res.data;
+      const userData = {
+        id: user_id,
+        email: userEmail,
+        role,
+        access,
+        refresh,
+      };
 
-    localStorage.setItem("token", access);
-    localStorage.setItem("refreshToken", refresh);
-    setUser({
-      id: user_id,
-      email: userEmail,
-      role,
-      access,
-      refresh,
-    });
+      localStorage.setItem("token", access);
+      localStorage.setItem("refreshToken", refresh);
+      persistSession(userData, null);
 
-    await fetchUserProfile(access);
-
-    return user;
+      setUser(userData);
+      await fetchUserProfile(access);
+    } catch (err) {
+      console.error("❌ Error al iniciar sesión:", err);
+      throw err;
+    }
   };
 
-  const logout = () => {
+  // 🔹 Cerrar sesión completamente
+  const logout = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
+    localStorage.removeItem("profile");
     setUser(null);
-  };
+    setProfile(null);
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, profile }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        profile,
+        login,
+        logout,
+        loading,
+        setProfile, // opcional: para actualizar datos del perfil manualmente
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
