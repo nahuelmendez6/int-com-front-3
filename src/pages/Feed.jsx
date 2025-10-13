@@ -71,7 +71,7 @@ const Feed = () => {
             {loadingPetitions ? (
               <p>Cargando peticiones...</p>
             ) : ( 
-              <PetitionList petitions={providerPetitions} />
+              <PetitionList petitions={providerPetitions} profile={profile} />
             )}
           </div>
         </div>
