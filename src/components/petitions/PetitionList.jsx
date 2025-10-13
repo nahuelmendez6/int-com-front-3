@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Card } from "react-bootstrap";
+import { Button, Card, Image } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 import { usePostulations } from "../../hooks/usePostulations.js";
@@ -17,7 +17,7 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
   if (!petitions?.length) {
     return (
       <div className="alert alert-info">
-        No tienes peticiones creadas en este momento.
+        No hay peticiones disponibles en este momento.
       </div>
     );
   }
@@ -38,6 +38,15 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
           return (
             <Card key={petition.id_petition} className="mb-3 shadow-sm">
               <Card.Body>
+                {petition.customer_user && (
+                  <div className="d-flex align-items-center mb-3 pb-3 border-bottom">
+                    <Image src={`http://localhost:8000${petition.customer_user.profile_image}`} roundedCircle style={{ width: '45px', height: '45px', objectFit: 'cover' }} />
+                    <div className="ms-3">
+                      <h6 className="mb-0">{petition.customer_user.name} {petition.customer_user.lastname}</h6>
+                      <small className="text-muted">{petition.customer_user.email}</small>
+                    </div>
+                  </div>
+                )}
                 <div className="row">
                   <div className="col-md-8">
                     <h4 className="card-title border-start border-4 border-primary ps-3 mb-3">{petition.description}</h4>
