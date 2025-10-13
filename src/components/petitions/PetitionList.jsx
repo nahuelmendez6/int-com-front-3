@@ -1,6 +1,5 @@
-// components/PetitionList.jsx
 import React, { useState } from "react";
-import { Button } from "react-bootstrap";
+import { Button, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 import { usePostulations } from "../../hooks/usePostulations.js";
@@ -8,7 +7,7 @@ import AttachmentsGallery from "../attachments/AttachmentsGallery.jsx";
 import ImageModal from "../attachments/ImageModal.jsx";
 import PostulationsList from "../postulations/PostulationList.jsx";
 
-const PetitionList = ({ petitions, onEdit, onDelete }) => {
+const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
   const [showModal, setShowModal] = useState(false);
   const [attachments, setAttachments] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -32,64 +31,75 @@ const PetitionList = ({ petitions, onEdit, onDelete }) => {
 
   return (
     <>
-      <div className="list-group">
+      <div>
         {petitions.map((petition) => {
           const isVisible = visiblePetition === petition.id_petition;
 
           return (
-            <div key={petition.id_petition} className="list-group-item mb-3">
-              <div className="d-flex justify-content-between align-items-center">
-                <h5>{petition.description}</h5>
-                <small>
-                  Estado:{" "}
-                  <span
-                    className={`badge bg-${petition.id_state === 1 ? "success" : "secondary"}`}
-                  >
-                    {petition.id_state}
-                  </span>
-                </small>
-              </div>
+            <Card key={petition.id_petition} className="mb-3 shadow-sm">
+              <Card.Body>
+                <div className="row">
+                  <div className="col-md-8">
+                    <h4 className="card-title border-start border-4 border-primary ps-3 mb-3">{petition.description}</h4>
+                    <p className="text-muted small">
+                      <i className="bi bi-calendar-range me-2"></i>
+                      Publicado desde {new Date(petition.date_since).toLocaleDateString()} hasta {new Date(petition.date_until).toLocaleDateString()}
+                    </p>
+                    
+                    <div className="mt-3" style={{ maxWidth: '400px' }}>
+                      <AttachmentsGallery attachments={petition.attachments} onOpenModal={handleOpenModal} />
+                    </div>
+                  </div>
 
-              <small className="text-muted d-block mb-2">
-                Desde: {petition.date_since || "No especificado"} hasta {petition.date_until || "No especificado"}
-              </small>
+                  <div className="col-md-4 d-flex flex-column align-items-end">
+                    {profile && profile.role === 'customer' && (
+                      <div className="mb-auto">
+                        <Button variant="link" className="text-secondary p-1" onClick={() => onEdit(petition)}>
+                          <i className="bi bi-pencil-square fs-5"></i>
+                        </Button>
+                        <Button variant="link" className="text-danger p-1" onClick={() => onDelete(petition.id_petition)}>
+                          <i className="bi bi-trash fs-5"></i>
+                        </Button>
+                      </div>
+                    )}
 
-              <AttachmentsGallery attachments={petition.attachments} onOpenModal={handleOpenModal} />
+                    {profile && profile.role === 'provider' && (
+                      <Link to={`/petitions/${petition.id_petition}/apply`} className="w-100 mb-2">
+                        <Button variant="success" className="w-100">
+                          <i className="bi bi-send-check me-2"></i>
+                          Postularse
+                        </Button>
+                      </Link>
+                    )}
+                    
+                    {profile && profile.role === 'customer' && (
+                        <Button
+                          variant="info"
+                          className="w-100"
+                          onClick={() => togglePostulations(petition.id_petition)}
+                          disabled={loading && isVisible}
+                        >
+                          <i className="bi bi-eye me-2"></i>
+                          {loading && isVisible ? "Cargando..." : isVisible ? "Ocultar Postulaciones" : "Ver Postulaciones"}
+                        </Button>
+                    )}
+                  </div>
+                </div>
 
-              <div className="mt-2 d-flex flex-wrap align-items-center gap-2">
-                <Button size="sm" variant="outline-primary" onClick={() => onEdit(petition)}>
-                  Editar
-                </Button>
-                <Button size="sm" variant="outline-danger" onClick={() => onDelete(petition.id_petition)}>
-                  Eliminar
-                </Button>
-                <Link to={`/petitions/${petition.id_petition}/apply`}>
-                  <Button size="sm" variant="outline-success">Postularse</Button>
-                </Link>
-                <Button
-                  size="sm"
-                  variant="info"
-                  onClick={() => togglePostulations(petition.id_petition)}
-                  disabled={loading && isVisible}
-                >
-                  {loading && isVisible
-                    ? "Cargando..."
-                    : isVisible
-                    ? "Ocultar Postulaciones"
-                    : "Ver Postulaciones"}
-                </Button>
-              </div>
-
-              {isVisible && (
-                <PostulationsList 
-                  postulations={postulations} 
-                  loading={loading} 
-                  error={error} 
-                  onUpdate={handleUpdatePostulation}
-                  petitionId={petition.id_petition} // Pasando el ID de la petición
-                />
-              )}
-            </div>
+                {isVisible && (
+                  <div className="mt-3 border-top pt-3">
+                    <h5 className="mb-3">Postulaciones Recibidas</h5>
+                    <PostulationsList 
+                      postulations={postulations} 
+                      loading={loading} 
+                      error={error} 
+                      onUpdate={handleUpdatePostulation}
+                      petitionId={petition.id_petition}
+                    />
+                  </div>
+                )}
+              </Card.Body>
+            </Card>
           );
         })}
       </div>

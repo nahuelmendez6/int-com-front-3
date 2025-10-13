@@ -101,6 +101,7 @@ const PetitionsPage = () => {
                             petitions={petitions} 
                             onEdit={handleShowEditModal} 
                             onDelete={handleDeletePetition} 
+                            profile={profile}
                         />
                     )}
                 </Card.Body>
