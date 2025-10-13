@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 import { useAuth } from '../hooks/useAuth';
@@ -6,7 +6,8 @@ import { useAuth } from '../hooks/useAuth';
 const Sidebar = () => {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
   const [hoveredLink, setHoveredLink] = useState(null);
-  const { profile } = useAuth();
+  const { profile, logout } = useAuth();
+  const navigate = useNavigate();
 
 
   const toggleOffcanvas = () => {
@@ -16,6 +17,12 @@ const Sidebar = () => {
   const closeOffcanvas = () => {
     setShowOffcanvas(false);
   };
+
+  const handleLogout = () => {
+    logout();
+    closeOffcanvas();
+    navigate('/login');
+  }
 
 
   // accesos por rol
@@ -41,6 +48,7 @@ const Sidebar = () => {
 
   const renderLinks = (onClick) =>
     links.map((link) => (
+      
       <NavLink
         key={link.to}
         to={link.to}
@@ -62,6 +70,30 @@ const Sidebar = () => {
         {link.label}
       </NavLink>
     ));
+
+  const renderSidebarFooter = () => (
+    <div className="mt-auto">
+        <div className="p-3 border-top" style={{borderColor: 'rgba(255,255,255,0.5)'}}>
+            <div className="d-flex align-items-center text-white">
+                {profile && profile.user && profile.user.profile_image ? (
+                    <img src={profile.user.profile_image} alt="Perfil" className="rounded-circle" style={{ width: '40px', height: '40px', objectFit: 'cover' }} />
+                ) : (
+                    <i className="bi bi-person-circle fs-2"></i>
+                )}
+                <span className="ms-2">
+                    {profile && profile.user ? profile.user.name : "Usuario"}
+                </span>
+            </div>
+            <button
+                className="btn btn-outline-light w-100 mt-3"
+                onClick={handleLogout}
+            >
+                <i className="bi bi-box-arrow-right me-2"></i>
+                Cerrar sesión
+            </button>
+        </div>
+    </div>
+  );
 
 
   return (
@@ -90,10 +122,14 @@ const Sidebar = () => {
             borderRight: '4px solid #3a706e'
           }}
         >
-          <div className="p-3">
-            <nav className="nav flex-column">
-              {renderLinks()}
-            </nav>
+          <div className="p-3 d-flex flex-column" style={{ height: '100%'}}>
+            <div>
+              <h4 className="text-white text-center mb-4">Integración Comunitaria</h4>
+              <nav className="nav flex-column">
+                {renderLinks()}
+              </nav>
+            </div>
+            {renderSidebarFooter()}
           </div>
         </div>
       </div>
@@ -105,11 +141,12 @@ const Sidebar = () => {
         style={{ visibility: showOffcanvas ? 'visible' : 'hidden', backgroundColor: '#46807E' }}
       >
         <div className="offcanvas-header">
-          <h5 className="offcanvas-title" style={{ color: 'white' }}>Navegación</h5>
+          <h5 className="offcanvas-title" style={{ color: 'white' }}>Integración Comunitaria</h5>
           <button type="button" className="btn-close btn-close-white" onClick={closeOffcanvas}></button>
         </div>
-        <div className="offcanvas-body">
+        <div className="offcanvas-body d-flex flex-column">
           <nav className="nav flex-column">{renderLinks(closeOffcanvas)}</nav>
+          {renderSidebarFooter()}
         </div>
       </div>
 

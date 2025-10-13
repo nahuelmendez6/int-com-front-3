@@ -121,9 +121,9 @@ const Navbar = () => {
       <style>{`
         @media (min-width: 768px) {
           .navbar {
-            left: 290px !important; /* Comenzar desde el margen del sidebar */
+            left: 280px !important; /* Comenzar desde el margen del sidebar */
             transform: none !important; /* Quitar centrado */
-            width: calc(100% - 310px) !important; /* Extender hasta el margen derecho */
+            width: calc(100% - 290px) !important; /* Extender hasta el margen derecho */
             max-width: none !important; /* Sin límite de ancho máximo */
             min-width: auto !important; /* Sin ancho mínimo */
           }

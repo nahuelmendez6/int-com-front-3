@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
-import Navbar from '../components/Navbar';
 import { useAuth } from '../hooks/useAuth.js';
 import { getProviderFeedPetitions } from '../services/petitions.service.js';
 import PetitionList from '../components/petitions/PetitionList';
@@ -79,9 +78,11 @@ const Feed = () => {
       );
     } else if (profile && profile.role === 'customer') {
       return (
+        
         <div className="card shadow rounded-3">
+          <h1 className="card-title mb-4">Ofertas para ti</h1>  
           <div className="card-body p-4">
-            <h1 className="card-title mb-4">Ofertas para ti</h1>
+            
             {error && <div className="alert alert-danger">{error}</div>}
             {loadingOffers ? (
               <p>Cargando ofertas...</p>
@@ -134,9 +135,6 @@ const Feed = () => {
 
   return (
     <div className="min-vh-100 bg-light">
-      {/* Navbar flotante */}
-      <Navbar />
-      
       {/* Sidebar flotante */}
       <Sidebar />
       
@@ -144,9 +142,9 @@ const Feed = () => {
       <div 
         className="container-fluid feed-container"
         style={{
-          paddingTop: '80px', // Reducir espacio para el navbar más pequeño
-          paddingLeft: '290px', // Espacio para el sidebar en desktop (250px + 40px margen)
-          paddingRight: '20px',
+          paddingTop: '10px', // Espacio superior
+          paddingLeft: '280px', // Espacio para el sidebar en desktop (250px + 20px margen + 10px gap)
+          paddingRight: '10px',
           marginLeft: '0',
           marginRight: '0',
           width: '100%',
@@ -164,9 +162,9 @@ const Feed = () => {
       <style>{`
         @media (max-width: 767.98px) {
           .feed-container {
-            padding-left: 20px !important;
-            padding-right: 20px !important;
-            padding-top: 60px !important;
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+            padding-top: 10px !important;
             width: 100% !important;
             max-width: none !important;
             margin-left: 0 !important;

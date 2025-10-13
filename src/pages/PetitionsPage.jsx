@@ -5,7 +5,6 @@ import CreatePetitionForm from '../components/petitions/CreatePetitionForm';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import { useAuth } from '../hooks/useAuth.js';
 import Sidebar from '../components/Sidebar';
-import Navbar from '../components/Navbar';
 import { Button, Card } from 'react-bootstrap';
 
 const PetitionsPage = () => {
@@ -73,16 +72,13 @@ const PetitionsPage = () => {
 
   return (
     <div className="min-vh-100 bg-light">
-        <Navbar />
         <Sidebar />
         <div 
-            className="container-fluid"
+            className="container-fluid main-content"
             style={{
-                paddingTop: '80px',
-                paddingLeft: '290px',
-                paddingRight: '20px',
-                width: '100%',
-                maxWidth: 'none'
+                paddingTop: '10px',
+                paddingLeft: '280px',
+                paddingRight: '10px',
             }}
         >
             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -126,6 +122,21 @@ const PetitionsPage = () => {
                 body="¿Estás seguro de que quieres eliminar esta petición? Esta acción no se puede deshacer."
             />
         </div>
+        <style>{`
+            .main-content {
+                width: 100%;
+                max-width: none;
+                margin-left: 0;
+                margin-right: 0;
+            }
+            @media (max-width: 767.98px) {
+              .main-content {
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+                padding-top: 10px !important;
+              }
+            }
+        `}</style>
     </div>
   );
 };

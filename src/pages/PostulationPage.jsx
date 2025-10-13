@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import PostulationForm from '../components/postulations/PostulationForm';
 import { createPostulation } from '../services/postulation.service.js';
 import { useAuth } from '../hooks/useAuth';
-import Navbar from '../components/Navbar.jsx';
 import Sidebar from '../components/Sidebar.jsx';
 
 const PostulationPage = () => {
@@ -50,14 +49,13 @@ const PostulationPage = () => {
 
   return (
     <div className="min-vh-100 bg-light">
-      <Navbar />
       <Sidebar />
       <div
-        className="container-fluid"
+        className="container-fluid main-content"
         style={{
-          paddingTop: '80px',
-          paddingLeft: '290px',
-          paddingRight: '20px'
+          paddingTop: '10px',
+          paddingLeft: '280px',
+          paddingRight: '10px'
         }}
       >
         {/* The page content can go here, maybe details about the petition */}
@@ -70,6 +68,21 @@ const PostulationPage = () => {
           submitting={submitting}
         />
       </div>
+      <style>{`
+        .main-content {
+            width: 100%;
+            max-width: none;
+            margin-left: 0;
+            margin-right: 0;
+        }
+        @media (max-width: 767.98px) {
+          .main-content {
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+            padding-top: 10px !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };
