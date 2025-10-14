@@ -1,0 +1,39 @@
+.petition-card .card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: #f8f9fa;
+  padding: 1rem;
+}
+
+.petition-card .profile-image {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border: 3px solid #dee2e6;
+  margin-bottom: 0.5rem;
+}
+
+.petition-card .user-info h6 {
+  margin-bottom: 0.1rem;
+}
+
+.petition-card .card-body p {
+  text-align: justify;
+  line-height: 1.6;
+}
+
+@media (min-width: 768px) {
+  .petition-card .card-header {
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .petition-card .profile-image {
+    width: 55px;
+    height: 55px;
+    margin-bottom: 0;
+    margin-right: 1rem;
+  }
+}

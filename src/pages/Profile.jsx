@@ -47,7 +47,7 @@ const Profile = () => {
         }}
       >
         <div className="row">
-          <div className="col-12">
+          <div className="col-12 px-0">
             <div className="card shadow rounded-3">
               <div className="card-body p-4">
                 <h1 className="card-title mb-4">

@@ -1,29 +1,38 @@
 import React, { useState } from "react";
 import { Button, Card, Image } from "react-bootstrap";
 import { Link } from "react-router-dom";
-
 import { usePostulations } from "../../hooks/usePostulations.js";
 import AttachmentsGallery from "../attachments/AttachmentsGallery.jsx";
 import ImageModal from "../attachments/ImageModal.jsx";
 import PostulationsList from "../postulations/PostulationList.jsx";
+import "./PetitionList.css";
 
 const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
   const [showModal, setShowModal] = useState(false);
   const [attachments, setAttachments] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const { postulations, visiblePetition, loading, error, togglePostulations, handleUpdatePostulation } = usePostulations();
+  const {
+    postulations,
+    visiblePetition,
+    loading,
+    error,
+    togglePostulations,
+    handleUpdatePostulation,
+  } = usePostulations();
 
   if (!petitions?.length) {
     return (
-      <div className="alert alert-info">
+      <div className="alert alert-info text-center mt-4">
         No hay peticiones disponibles en este momento.
       </div>
     );
   }
 
   const handleOpenModal = (atts, idx) => {
-    const images = atts.filter((a) => /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(a.file));
+    const images = atts.filter((a) =>
+      /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(a.file)
+    );
     setAttachments(images);
     setCurrentIndex(idx);
     setShowModal(true);
@@ -31,47 +40,43 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
 
   return (
     <>
-      <div className="feed-container">
+      <div className="petition-list-container">
         {petitions.map((petition) => {
           const isVisible = visiblePetition === petition.id_petition;
 
           return (
             <Card
               key={petition.id_petition}
-              className="mb-4 shadow-sm border rounded-4 overflow-hidden bg-white"
+              className="petition-card shadow-sm border rounded-4 overflow-hidden bg-white"
             >
-              {/* 🟦 Encabezado: Usuario */}
+              {/* 🟦 Encabezado */}
               {petition.customer_user && (
-                <div className="d-flex align-items-center p-3 border-bottom bg-light">
+                <div className="card-header d-flex align-items-center gap-3 bg-white">
                   <Image
                     src={`http://localhost:8000${petition.customer_user.profile_image}`}
                     roundedCircle
-                    style={{
-                      width: "55px",
-                      height: "55px",
-                      objectFit: "cover",
-                      border: "2px solid #e9ecef",
-                    }}
+                    className="profile-image"
                   />
-                  <div className="ms-3">
+                  <div>
                     <h6 className="mb-0 fw-semibold">
-                      {petition.customer_user.name} {petition.customer_user.lastname}
+                      {petition.customer_user.name}{" "}
+                      {petition.customer_user.lastname}
                     </h6>
-                    <small className="text-muted">{petition.customer_user.email}</small>
+                    <small className="text-muted">
+                      {petition.customer_user.email}
+                    </small>
                   </div>
                 </div>
               )}
 
-              {/* 🟩 Contenido */}
+              {/* 🟩 Cuerpo */}
               <Card.Body className="p-4">
                 <div className="border-start border-3 border-primary ps-3 mb-3">
-                  <p className="fs-5 mb-0" style={{ whiteSpace: "pre-line" }}>
-                    {petition.description}
-                  </p>
+                  <p className="fs-5 mb-0">{petition.description}</p>
                 </div>
 
                 {/* Galería */}
-                {petition.attachments && petition.attachments.length > 0 && (
+                {petition.attachments?.length > 0 && (
                   <div className="post-image-gallery mb-3">
                     <AttachmentsGallery
                       attachments={petition.attachments}
@@ -86,16 +91,15 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
                 )}
               </Card.Body>
 
-              {/* 🟥 Acciones y fecha */}
-              <div className="border-top d-flex justify-content-between align-items-center px-4 py-3 bg-light">
+              {/* 🟥 Pie de acciones */}
+              <div className="border-top d-flex flex-wrap justify-content-between align-items-center px-4 py-3 bg-light">
                 <small className="text-muted">
                   <i className="bi bi-calendar-range me-2"></i>
-                  Publicado: {new Date(petition.date_since).toLocaleDateString()} -{" "}
+                  {new Date(petition.date_since).toLocaleDateString()} -{" "}
                   {new Date(petition.date_until).toLocaleDateString()}
                 </small>
 
-                <div className="d-flex align-items-center gap-2">
-                  {/* Cliente */}
+                <div className="d-flex align-items-center gap-2 flex-wrap">
                   {profile?.role === "customer" && (
                     <>
                       <Button
@@ -128,7 +132,6 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
                     </>
                   )}
 
-                  {/* Proveedor */}
                   {profile?.role === "provider" && (
                     <Link
                       to={`/petitions/${petition.id_petition}/apply`}
@@ -147,7 +150,7 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
                 </div>
               </div>
 
-              {/* 🟨 Sección Postulaciones */}
+              {/* 🟨 Postulaciones */}
               {isVisible && (
                 <div className="px-4 py-3 border-top bg-white">
                   <h6 className="fw-semibold mb-3">Postulaciones recibidas</h6>
@@ -165,18 +168,34 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
         })}
       </div>
 
-      {/* Modal de imágenes */}
-      <ImageModal
-        show={showModal}
-        onHide={() => setShowModal(false)}
-        images={attachments}
-        currentIndex={currentIndex}
-        setCurrentIndex={setCurrentIndex}
-      />
+      <style>{`
+  /* Sidebar fijo en escritorio */
+  @media (min-width: 768px) {
+    .sidebar-container {
+      width: 250px; /* Ajustá según el ancho real del Sidebar */
+      flex-shrink: 0;
+    }
+
+    main {
+      margin-left: 250px; /* Debe coincidir con el ancho del sidebar */
+      width: calc(100% - 250px);
+    }
+  }
+
+  /* En móviles, que ocupe todo */
+  @media (max-width: 767.98px) {
+    main {
+      margin-left: 0 !important;
+      width: 100%;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+  }
+`}</style>
+
+
     </>
   );
-
-
 };
 
 export default PetitionList;

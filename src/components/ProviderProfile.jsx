@@ -7,6 +7,7 @@ import {
 } from '../services/location.service.js';
 import AddressForm from './AddressForm.jsx';
 import ImageUpload from './ImageUpload.jsx';
+import './ProviderProfile.css';
 
 const ProviderProfile = ({ userData }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -34,18 +35,10 @@ const ProviderProfile = ({ userData }) => {
           getProvinces(),
         ]);
 
-        console.log('🔍 catRes:', catRes);
-      console.log('🔍 typeProvRes:', typeProvRes);
-      console.log('🔍 profRes:', profRes);
-
-
         setCategories(catRes|| []);
         setTypeProviders(typeProvRes || []);
         setProfessions(profRes|| []);
         setProvinces(provRes || []);
-        console.log('categorias',categories);
-        console.log(typeProviders);
-        console.log(professions);
       } catch (error) {
         console.error('Error fetching initial data:', error);
       }
@@ -160,25 +153,25 @@ const ProviderProfile = ({ userData }) => {
     : 'No especificada';
 
   return (
-    <div className="card shadow-sm border-0 rounded-4 overflow-hidden">
-      <div className="card-body p-4">
+    <div className="card shadow-sm border-0 rounded-4 overflow-hidden provider-profile-container">
+      <div className="card-body p-3 p-md-4">
 
         {/* 🔹 Vista normal */}
         {!isEditing && (
           <>
-            <div className="row">
-              <div className="col-md-4 text-center border-end">
+            <div className="row g-3">
+              {/* Imagen y datos básicos */}
+              <div className="col-12 col-md-4 text-center border-end border-md-end-0">
                 <ImageUpload
                   currentImage={user.profile_image || '/placeholder.png'}
-                  disabled={true}
+                  disabled
+                  className="img-fluid rounded-circle mb-3"
                 />
-                <h4 className="mt-3 mb-1">
-                  {user.name} {user.lastname}
-                </h4>
+                <h4 className="mb-1">{user.name} {user.lastname}</h4>
                 <p className="text-muted mb-2">{user.email}</p>
               </div>
 
-              <div className="col-md-8 ps-md-4 mt-4 mt-md-0">
+              <div className="col-12 col-md-8 ps-md-4">
                 <h5 className="border-start border-3 border-primary ps-3 mb-3 fw-semibold">
                   Descripción
                 </h5>
@@ -205,8 +198,8 @@ const ProviderProfile = ({ userData }) => {
               </div>
             </div>
 
-            <div className="text-end mt-4">
-              <button onClick={startEditing} className="btn btn-primary px-4 rounded-pill">
+            <div className="d-grid d-md-flex justify-content-md-end mt-4 gap-2">
+              <button onClick={startEditing} className="btn btn-primary rounded-pill px-4">
                 <i className="bi bi-pencil-square me-2"></i>Editar Perfil
               </button>
             </div>
@@ -216,20 +209,20 @@ const ProviderProfile = ({ userData }) => {
         {/* 🔹 Vista de edición */}
         {isEditing && (
           <form onSubmit={handleSubmit}>
-            <div className="row mb-3">
-              <div className="col-md-4 text-center border-end">
+            <div className="row g-3 mb-3">
+              <div className="col-12 col-md-4 text-center border-end border-md-end-0">
                 <ImageUpload
                   currentImage={profile.user.profile_image || '/placeholder.png'}
                   onFileSelect={setImageFile}
+                  className="img-fluid rounded-circle mb-3"
                 />
               </div>
 
-              <div className="col-md-8 ps-md-4 mt-4 mt-md-0">
+              <div className="col-12 col-md-8 ps-md-4">
                 <div className="mb-3">
-                  <label htmlFor="description" className="form-label fw-semibold">Descripción</label>
+                  <label className="form-label fw-semibold">Descripción</label>
                   <textarea
                     className="form-control"
-                    id="description"
                     name="description"
                     rows="3"
                     value={formData.description}
@@ -238,11 +231,10 @@ const ProviderProfile = ({ userData }) => {
                 </div>
 
                 <div className="mb-3">
-                  <label htmlFor="phone_number" className="form-label fw-semibold">Teléfono</label>
+                  <label className="form-label fw-semibold">Teléfono</label>
                   <input
                     type="text"
                     className="form-control"
-                    id="phone_number"
                     name="phone_number"
                     value={formData.phone_number}
                     onChange={handleInputChange}
@@ -251,7 +243,7 @@ const ProviderProfile = ({ userData }) => {
               </div>
             </div>
 
-            <hr className="my-4" />
+            <hr className="my-3" />
 
             <h5 className="border-start border-3 border-primary ps-3 mb-3 fw-semibold">Dirección</h5>
             <AddressForm
@@ -264,12 +256,12 @@ const ProviderProfile = ({ userData }) => {
               onDepartmentChange={handleDepartmentChange}
             />
 
-            <hr className="my-4" />
+            <hr className="my-3" />
 
             <h5 className="border-start border-3 border-primary ps-3 mb-3 fw-semibold">Categorías</h5>
-            <div className="d-flex flex-wrap">
+            <div className="d-flex flex-column flex-md-row flex-wrap">
               {categories.map((cat, i) => (
-                <div key={cat.id_category ?? i} className="form-check form-check-inline me-3 mb-2">
+                <div key={cat.id_category ?? i} className="form-check me-3 mb-2">
                   <input
                     className="form-check-input"
                     type="checkbox"
@@ -285,14 +277,13 @@ const ProviderProfile = ({ userData }) => {
               ))}
             </div>
 
-            <hr className="my-4" />
+            <hr className="my-3" />
 
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <label htmlFor="type_provider" className="form-label fw-semibold">Tipo de Proveedor</label>
+            <div className="row g-3">
+              <div className="col-12 col-md-6">
+                <label className="form-label fw-semibold">Tipo de Proveedor</label>
                 <select
-                  className="form-select"
-                  id="type_provider"
+                  className="form-select w-100"
                   name="type_provider"
                   value={formData.type_provider}
                   onChange={handleInputChange}
@@ -306,11 +297,10 @@ const ProviderProfile = ({ userData }) => {
                 </select>
               </div>
 
-              <div className="col-md-6 mb-3">
-                <label htmlFor="profession" className="form-label fw-semibold">Profesión</label>
+              <div className="col-12 col-md-6">
+                <label className="form-label fw-semibold">Profesión</label>
                 <select
-                  className="form-select"
-                  id="profession"
+                  className="form-select w-100"
                   name="profession"
                   value={formData.profession}
                   onChange={handleInputChange}
@@ -325,14 +315,14 @@ const ProviderProfile = ({ userData }) => {
               </div>
             </div>
 
-            <div className="text-end mt-4">
-              <button type="submit" className="btn btn-success me-2 px-4 rounded-pill">
+            <div className="d-grid d-md-flex justify-content-md-end gap-2 mt-4">
+              <button type="submit" className="btn btn-success rounded-pill px-4">
                 <i className="bi bi-check-circle me-2"></i>Guardar Cambios
               </button>
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="btn btn-secondary px-4 rounded-pill"
+                className="btn btn-secondary rounded-pill px-4"
               >
                 Cancelar
               </button>

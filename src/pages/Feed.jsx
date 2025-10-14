@@ -33,99 +33,119 @@ const Feed = () => {
       }
     };
 
-    if (!authLoading) {
-      fetchCustomerOffers();
-    }
+    if (!authLoading) fetchCustomerOffers();
   }, [profile, authLoading]);
 
   const renderFeedContent = () => {
-    if (authLoading) {
-      return <p>Cargando perfil de usuario...</p>;
+    if (authLoading) return <p>Cargando perfil de usuario...</p>;
+
+    if (profile?.role === 'provider') {
+      return (
+        <div className="feed-card">
+          <h2 className="feed-title">Peticiones para Proveedores</h2>
+          {error && <div className="alert alert-danger">{error}</div>}
+          {loadingPetitions ? (
+            <p>Cargando peticiones...</p>
+          ) : (
+            <PetitionList petitions={providerPetitions} profile={profile} />
+          )}
+        </div>
+      );
     }
 
-    if (profile && profile.role === 'provider') {
+    if (profile?.role === 'customer') {
       return (
-        <div className="card shadow rounded-3">
-          <div className="card-body p-4">
-            <h1 className="card-title mb-4">Peticiones para Proveedores</h1>
-            {error && <div className="alert alert-danger">{error}</div>}
-            {loadingPetitions ? (
-              <p>Cargando peticiones...</p>
-            ) : ( 
-              <PetitionList petitions={providerPetitions} profile={profile} />
-            )}
-          </div>
-        </div>
-      );
-    } else if (profile && profile.role === 'customer') {
-      return (
-        <div className="card shadow rounded-3">
-          <div className="card-body p-4">
-            <h1 className="card-title mb-4">Ofertas para ti</h1>  
-            {offerError && <div className="alert alert-danger">{offerError}</div>}
-            {loadingOffers ? (
-              <p>Cargando ofertas...</p>
-            ) : (
-              <OfferList offers={customerOffers} />
-            )}
-          </div>
-        </div>
-      );
-    } else {
-      return (
-        <div className="card shadow rounded-3">
-          <div className="card-body p-4">
-            <h1 className="card-title mb-4">Feed Principal</h1>
-            <p className="text-muted">
-              Este es el espacio principal donde irá el contenido del feed.
-              Aquí se mostrarán las publicaciones, noticias y actualizaciones.
-            </p>
-          </div>
+        <div className="feed-card">
+          <h2 className="feed-title">Ofertas para ti</h2>
+          {offerError && <div className="alert alert-danger">{offerError}</div>}
+          {loadingOffers ? <p>Cargando ofertas...</p> : <OfferList offers={customerOffers} />}
         </div>
       );
     }
+
+    return (
+      <div className="feed-card">
+        <h2 className="feed-title">Feed Principal</h2>
+        <p className="text-muted mb-0">
+          Aquí se mostrarán publicaciones, noticias y actualizaciones relevantes.
+        </p>
+      </div>
+    );
   };
 
   return (
-    <div className="min-vh-100 bg-light">
-      <Sidebar />
-      <div 
-        className="container-fluid feed-container"
-        style={{
-          paddingTop: '10px', 
-          paddingLeft: '280px', 
-          paddingRight: '10px',
-          marginLeft: '0',
-          marginRight: '0',
-          width: '100%',
-          maxWidth: 'none'
-        }}
-      >
-        <div className="row">
-          <div className="col-12">
-            {renderFeedContent()}
-          </div>
+    <div className="feed-layout">
+      <Sidebar className="feed-sidebar" />
+
+      <main className="feed-main">
+        <div className="feed-content">
+          {renderFeedContent()}
         </div>
-      </div>
-      
+      </main>
+
       <style>{`
-        @media (max-width: 767.98px) {
-          .feed-container {
-            padding-left: 10px !important;
-            padding-right: 10px !important;
-            padding-top: 10px !important;
-            width: 100% !important;
-            max-width: none !important;
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-          }
+        /* 🔹 Estructura base */
+        .feed-layout {
+          display: flex;
+          flex-direction: row;
+          min-height: 100vh;
+          background-color: #f8f9fa;
         }
-        @media (min-width: 768px) {
-          .feed-container {
-            width: 100% !important;
-            max-width: none !important;
-            margin-left: 0 !important;
-            margin-right: 0 !important;
+
+        .feed-sidebar {
+          flex-shrink: 0;
+        }
+
+        .feed-main {
+          flex-grow: 1;
+          display: flex;
+          justify-content: center;
+          align-items: flex-start;
+          padding: 2rem 1rem;
+        }
+
+        /* 🔹 Contenedor centrado */
+        .feed-content {
+          width: 100%;
+          max-width: 1100px;
+        }
+
+        /* 🔹 Card principal */
+        .feed-card {
+          background: #fff;
+          border-radius: 1rem;
+          padding: 2rem;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .feed-title {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #0d6efd;
+          margin-bottom: 1.5rem;
+        }
+
+        /* 🔹 Mobile */
+        @media (max-width: 768px) {
+          .feed-layout {
+            flex-direction: column;
+          }
+
+          .feed-main {
+            padding: 1rem;
+          }
+
+          .feed-content {
+            max-width: 100%;
+          }
+
+          .feed-card {
+            padding: 1rem;
+            border-radius: 0.75rem;
+          }
+
+          .feed-title {
+            font-size: 1.25rem;
           }
         }
       `}</style>
