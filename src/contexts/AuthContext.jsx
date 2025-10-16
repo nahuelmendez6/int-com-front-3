@@ -1,6 +1,7 @@
 // src/context/AuthContext.jsx
 import { createContext, useState, useEffect, useCallback } from "react";
 import api from "../services/api";
+import { useNotificationContext } from './NotificationContext.jsx';
 
 export const AuthContext = createContext();
 
@@ -16,6 +17,7 @@ export const AuthProvider = ({ children }) => {
   });
 
   const [loading, setLoading] = useState(true);
+  const { connectSocket } = useNotificationContext();
 
   // 🔹 Función auxiliar: guarda todo el estado persistente
   const persistSession = useCallback((userData, profileData) => {
@@ -58,23 +60,26 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const init = async () => {
       const token = localStorage.getItem("token");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        await fetchUserProfile(token);
-      } catch {
-        const newToken = await refreshToken();
-        if (newToken) await fetchUserProfile(newToken);
-      } finally {
+      if (token) {
+        try {
+          await fetchUserProfile(token);
+          connectSocket(); // Conectar si ya hay sesión
+        } catch {
+          const newToken = await refreshToken();
+          if (newToken) {
+            await fetchUserProfile(newToken);
+            connectSocket(); // Conectar si ya hay sesión
+          }
+        } finally {
+          setLoading(false);
+        }
+      } else {
         setLoading(false);
       }
     };
 
     init();
-  }, [fetchUserProfile, refreshToken]);
+  }, [fetchUserProfile, refreshToken, connectSocket]);
 
   // 🔹 Iniciar sesión
   const login = async (email, password) => {
@@ -96,6 +101,7 @@ export const AuthProvider = ({ children }) => {
 
       setUser(userData);
       await fetchUserProfile(access);
+      connectSocket(); // Conectar al WebSocket de notificaciones
     } catch (err) {
       console.error("❌ Error al iniciar sesión:", err);
       throw err;

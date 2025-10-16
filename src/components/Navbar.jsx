@@ -50,7 +50,14 @@ const Navbar = () => {
         </Link>
 
         {/* Contenido del navbar */}
-        <div className="navbar-nav ms-auto">
+        <div className="navbar-nav ms-auto d-flex flex-row align-items-center">
+          {/* Icono de Notificaciones */}
+          <div className="nav-item me-3">
+            <NotificationIcon onClick={togglePanel} />
+            <NotificationPanel isOpen={isPanelOpen} />
+          </div>
+
+          {/* Dropdown de usuario */}
           {/* Dropdown de usuario */}
           <div className="nav-item dropdown">
             <button
