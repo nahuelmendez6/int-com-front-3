@@ -47,7 +47,7 @@ export const getUserProfile = async ({id_customer, id_provider}) => {
     if (id_customer) params.id_customer = id_customer;
     if (id_provider) params.id_provider = id_provider;
 
-    const { data } = await api.get("/profiles/user-detail", { params });
+    const { data } = await api.get("/profiles/user-detail/", { params });
 
     return data;
 
@@ -55,6 +55,10 @@ export const getUserProfile = async ({id_customer, id_provider}) => {
     console.error("Error obteniendo perfil de usuario:", error);
     throw error;
   }
+};
+
+export const getProviderProfileById = async (providerId) => {
+  return getUserProfile({ id_provider: providerId });
 };
 
 export const profileService = {
