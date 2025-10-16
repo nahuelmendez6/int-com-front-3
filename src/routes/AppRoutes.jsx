@@ -1,7 +1,8 @@
 // src/routes/AppRoutes.jsx
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import { useAuth } from "../hooks/useAuth.js";
+import MainLayout from "../components/MainLayout.jsx";
 
 // 🔹 Lazy load de las páginas para mejorar rendimiento
 const LoginPage = lazy(() => import("../pages/LoginPage.jsx"));
@@ -55,6 +56,13 @@ const Loader = ({ children }) => (
   </Suspense>
 );
 
+// New component to wrap MainLayout and Outlet
+const LayoutWrapper = () => (
+  <MainLayout>
+    <Outlet />
+  </MainLayout>
+);
+
 const AppRoutes = () => {
   return (
     <Loader>
@@ -64,87 +72,18 @@ const AppRoutes = () => {
         <Route path="/register-provider" element={<ProviderRegistrationForm />} />
         <Route path="/register-customer" element={<CustomerRegistrationForm />} />
 
-        {/* 🔐 Rutas privadas */}
-        <Route
-          path="/feed"
-          element={
-            <PrivateRoute>
-              <Feed />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/profile"
-          element={
-            <PrivateRoute>
-              <Profile />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/availability"
-          element={
-            <PrivateRoute>
-              <AvailabilityPage />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/offers"
-          element={
-            <PrivateRoute>
-              <OffersPage />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/service-area"
-          element={
-            <PrivateRoute>
-              <ServiceAreaPage />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/petitions"
-          element={
-            <PrivateRoute>
-              <PetitionsPage />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/interests"
-          element={
-            <PrivateRoute>
-              <InterestsPage />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/petitions/:id/apply"
-          element={
-            <PrivateRoute>
-              <PostulationPage />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/provider/:providerId"
-          element={
-            <PrivateRoute>
-              <ProviderPublicProfilePage />
-            </PrivateRoute>
-          }
-        />
+        {/* 🔐 Rutas privadas - Envueltas por MainLayout */}
+        <Route element={<PrivateRoute><LayoutWrapper /></PrivateRoute>}>
+          <Route path="/feed" element={<Feed />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/availability" element={<AvailabilityPage />} />
+          <Route path="/offers" element={<OffersPage />} />
+          <Route path="/service-area" element={<ServiceAreaPage />} />
+          <Route path="/petitions" element={<PetitionsPage />} />
+          <Route path="/interests" element={<InterestsPage />} />
+          <Route path="/petitions/:id/apply" element={<PostulationPage />} />
+          <Route path="/provider/:providerId" element={<ProviderPublicProfilePage />} />
+        </Route>
 
         {/* 🧭 Ruta por defecto */}
         <Route path="*" element={<Navigate to="/login" replace />} />

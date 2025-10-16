@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from 'react-bootstrap';
-import Sidebar from '../components/Sidebar';
 import OfferForm from '../components/offers/OfferForm';
 import OfferList from '../components/offers/OfferList';
 import { getOffers, createOffer, updateOffer, deleteOffer, getOfferTypes } from '../services/offers.service.js';
@@ -71,56 +70,31 @@ const OffersPage = () => {
   };
 
   return (
-    <div className="min-vh-100 bg-light">
-      <Sidebar />
-      <div 
-        className="container-fluid main-content"
-        style={{
-          paddingTop: '10px',
-          paddingLeft: '280px',
-          paddingRight: '10px',
-        }}
-      >
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h1>Mis Ofertas</h1>
-          <Button variant="primary" onClick={handleShowCreateModal}>
-            <i className="bi bi-plus-lg me-2"></i>
-            Crear Nueva Oferta
-          </Button>
-        </div>
-        
-        <OfferForm 
-          show={showModal} 
-          onHide={() => setShowModal(false)} 
-          onSubmit={handleSubmit} 
-          initialData={editingOffer}
-          offerTypes={offerTypes}
-        />
+    <div className="offers-page">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h1>Mis Ofertas</h1>
+        <Button variant="primary" onClick={handleShowCreateModal}>
+          <i className="bi bi-plus-lg me-2"></i>
+          Crear Nueva Oferta
+        </Button>
+      </div>
+      
+      <OfferForm 
+        show={showModal} 
+        onHide={() => setShowModal(false)} 
+        onSubmit={handleSubmit} 
+        initialData={editingOffer}
+        offerTypes={offerTypes}
+      />
 
-        <div className="card shadow-sm">
-          <div className="card-body">
-            <h5 className="card-title mb-3">Ofertas Activas</h5>
-            {loading && <p>Cargando ofertas...</p>}
-            {error && <div className="alert alert-danger">{error}</div>}
-            {!loading && !error && <OfferList offers={offers} onEdit={handleShowEditModal} onDelete={handleDelete} />}
-          </div>
+      <div className="card shadow-sm">
+        <div className="card-body">
+          <h5 className="card-title mb-3">Ofertas Activas</h5>
+          {loading && <p>Cargando ofertas...</p>}
+          {error && <div className="alert alert-danger">{error}</div>}
+          {!loading && !error && <OfferList offers={offers} onEdit={handleShowEditModal} onDelete={handleDelete} />}
         </div>
       </div>
-      <style>{`
-        .main-content {
-            width: 100%;
-            max-width: none;
-            margin-left: 0;
-            margin-right: 0;
-        }
-        @media (max-width: 767.98px) {
-          .main-content {
-            padding-left: 10px !important;
-            padding-right: 10px !important;
-            padding-top: 10px !important;
-          }
-        }
-      `}</style>
     </div>
   );
 };

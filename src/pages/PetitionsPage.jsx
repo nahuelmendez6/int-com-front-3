@@ -4,7 +4,6 @@ import PetitionList from '../components/petitions/PetitionList';
 import CreatePetitionForm from '../components/petitions/CreatePetitionForm';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import { useAuth } from '../hooks/useAuth.js';
-import Sidebar from '../components/Sidebar';
 import { Button, Card } from 'react-bootstrap';
 
 const PetitionsPage = () => {
@@ -71,75 +70,49 @@ const PetitionsPage = () => {
   };
 
   return (
-    <div className="min-vh-100 bg-light">
-        <Sidebar />
-        <div 
-            className="container-fluid main-content"
-            style={{
-                paddingTop: '10px',
-                paddingLeft: '280px',
-                paddingRight: '10px',
-            }}
-        >
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h1>Mis Peticiones</h1>
-                <Button variant="primary" onClick={handleShowCreatePetitionModal}>
-                    <i className="bi bi-plus-lg me-2"></i>
-                    Crear Nueva Petición
-                </Button>
-            </div>
-            
-            {error && <div className="alert alert-danger">{error}</div>}
-            
-            <Card className="shadow-sm">
-                <Card.Body>
-                    <Card.Title className="mb-3">Peticiones Activas</Card.Title>
-                    {loading ? (
-                        <p>Cargando peticiones...</p>
-                    ) : (
-                        <PetitionList 
-                            petitions={petitions} 
-                            onEdit={handleShowEditModal} 
-                            onDelete={handleDeletePetition} 
-                            profile={profile}
-                        />
-                    )}
-                </Card.Body>
-            </Card>
-
-            <CreatePetitionForm
-                show={showCreatePetitionModal}
-                onHide={handleCloseCreatePetitionModal}
-                petitionToEdit={editingPetition}
-                customerProfile={profile}
-                onPetitionCreatedOrUpdated={handlePetitionCreatedOrUpdated}
+    <div className="petitions-page">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h1>Mis Peticiones</h1>
+        <Button variant="primary" onClick={handleShowCreatePetitionModal}>
+          <i className="bi bi-plus-lg me-2"></i>
+          Crear Nueva Petición
+        </Button>
+      </div>
+      
+      {error && <div className="alert alert-danger">{error}</div>}
+      
+      <Card className="shadow-sm">
+        <Card.Body>
+          <Card.Title className="mb-3">Peticiones Activas</Card.Title>
+          {loading ? (
+            <p>Cargando peticiones...</p>
+          ) : (
+            <PetitionList 
+              petitions={petitions} 
+              onEdit={handleShowEditModal} 
+              onDelete={handleDeletePetition} 
+              profile={profile}
             />
+          )}
+        </Card.Body>
+      </Card>
 
-            <ConfirmationModal
-                show={showDeleteConfirmation}
-                onHide={() => setShowDeleteConfirmation(false)}
-                onConfirm={confirmDeletePetition}
-                title="Confirmar Eliminación"
-                body="¿Estás seguro de que quieres eliminar esta petición? Esta acción no se puede deshacer."
-            />
-        </div>
-        <style>{`
-            .main-content {
-                width: 100%;
-                max-width: none;
-                margin-left: 0;
-                margin-right: 0;
-            }
-            @media (max-width: 767.98px) {
-              .main-content {
-                padding-left: 10px !important;
-                padding-right: 10px !important;
-                padding-top: 10px !important;
-              }
-            }
-        `}</style>
+      <CreatePetitionForm
+        show={showCreatePetitionModal}
+        onHide={handleCloseCreatePetitionModal}
+        petitionToEdit={editingPetition}
+        customerProfile={profile}
+        onPetitionCreatedOrUpdated={handlePetitionCreatedOrUpdated}
+      />
+
+      <ConfirmationModal
+        show={showDeleteConfirmation}
+        onHide={() => setShowDeleteConfirmation(false)}
+        onConfirm={confirmDeletePetition}
+        title="Confirmar Eliminación"
+        body="¿Estás seguro de que quieres eliminar esta petición? Esta acción no se puede deshacer."
+      />
     </div>
   );
-};
-
+}
 export default PetitionsPage;

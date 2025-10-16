@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Sidebar from '../components/Sidebar';
 import { useAuth } from '../hooks/useAuth.js';
 import { usePetitions } from '../hooks/usePetitions.js';
 import PetitionList from '../components/petitions/PetitionList';
@@ -74,40 +73,18 @@ const Feed = () => {
   };
 
   return (
-    <div className="feed-layout">
-      <Sidebar className="feed-sidebar" />
-
-      <main className="feed-main">
-        <div className="feed-content">
-          {renderFeedContent()}
-        </div>
-      </main>
+    <div className="feed-page">
+      <div className="feed-content">
+        {renderFeedContent()}
+      </div>
 
       <style>{`
-        /* 🔹 Estructura base */
-        .feed-layout {
-          display: flex;
-          flex-direction: row;
-          min-height: 100vh;
-          background-color: #f8f9fa;
+        .feed-page {
+          width: 100%;
         }
 
-        .feed-sidebar {
-          flex-shrink: 0;
-        }
-
-        .feed-main {
-          flex-grow: 1;
-          display: flex;
-          justify-content: center;
-          align-items: flex-start;
-          padding: 2rem 1rem;
-        }
-
-        /* 🔹 Contenedor centrado */
         .feed-content {
           width: 100%;
-          max-width: 1100px;
         }
 
         /* 🔹 Card principal */
@@ -127,18 +104,6 @@ const Feed = () => {
 
         /* 🔹 Mobile */
         @media (max-width: 768px) {
-          .feed-layout {
-            flex-direction: column;
-          }
-
-          .feed-main {
-            padding: 1rem;
-          }
-
-          .feed-content {
-            max-width: 100%;
-          }
-
           .feed-card {
             padding: 1rem;
             border-radius: 0.75rem;
