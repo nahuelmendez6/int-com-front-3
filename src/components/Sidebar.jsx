@@ -40,6 +40,7 @@ const Sidebar = () => {
       { to: '/availability', label: 'Disponibilidad', icon: 'bi-calendar-check'},
       { to: '/offers', label: 'Ofertas', icon: 'bi-tag'},
       { to: '/service-area', label: 'Área de servicio', icon: 'bi-geo-alt'},
+      { to: '/portfolio', label: 'Mi Portfolio', icon: 'bi-briefcase'},
     ]
   }
 

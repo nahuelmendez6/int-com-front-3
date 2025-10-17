@@ -17,6 +17,8 @@ const PostulationPage = lazy(() => import("../pages/PostulationPage.jsx"));
 const ProviderRegistrationForm = lazy(() => import("../pages/ProviderRegistrationForm.jsx"));
 const CustomerRegistrationForm = lazy(() => import("../pages/CustomerRegistrationForm.jsx"));
 const ProviderPublicProfilePage = lazy(() => import("../pages/ProviderPublicProfilePage.jsx")); // Componente de perfil público del proveedor
+const PortfolioPage = lazy(() => import("../pages/PortfolioPage.jsx"));
+const PortfolioDetailPage = lazy(() => import("../pages/PortfolioDetailPage.jsx"));
 
 // 🔒 Componente para proteger rutas privadas
 const PrivateRoute = ({ children }) => {
@@ -83,6 +85,8 @@ const AppRoutes = () => {
           <Route path="/interests" element={<InterestsPage />} />
           <Route path="/petitions/:id/apply" element={<PostulationPage />} />
           <Route path="/provider/:providerId" element={<ProviderPublicProfilePage />} />
+          <Route path="/portfolio" element={<PortfolioPage />} />
+          <Route path="/portfolio/:id" element={<PortfolioDetailPage />} />
         </Route>
 
         {/* 🧭 Ruta por defecto */}
