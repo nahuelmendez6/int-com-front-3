@@ -17,6 +17,9 @@ const portfolioService = {
   deletePortfolio: (id) => {
     return api.delete(`/portfolios/${id}/`);
   },
+  softDeletePortfolio: (id) => {
+    return api.patch(`/portfolios/${id}/`, { is_deleted: true });
+  },
 
   // CRUD for Attachments
   createAttachment: (portfolioId, file) => {
