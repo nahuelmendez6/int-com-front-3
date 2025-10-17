@@ -30,34 +30,59 @@ const ProviderPublicProfilePage = () => {
   if (!provider) return null;
 
   return (
-    <div className="provider-public-profile-page">
-      {loading ? (
-        <div className="text-center mt-5">Cargando perfil...</div>
-      ) : error ? (
-        <div className="alert alert-danger mt-5">{error}</div>
-      ) : provider ? (
+    <div className="container mt-5">
         <div className="card">
-          <div className="card-body text-center">
-            <img 
-              src={provider.profile_image 
-                    ? `http://localhost:8000${provider.profile_image}` 
+          <div className="card-header text-center">
+            <h3>Perfil de {provider.user.name} {provider.user.lastname}</h3>
+          </div>
+          <div className="card-body">
+            <div className="row">
+              <div className="col-md-4 text-center">
+                <img
+                  src={provider.user.profile_image
+                    ? `http://localhost:8000${provider.user.profile_image}`
                     : 'https://via.placeholder.com/150'}
-              alt={`${provider.name} ${provider.lastname}`}
-              className="rounded-circle mb-3" 
-              style={{ width: '150px', height: '150px', objectFit: 'cover' }}
-            />
-            <h2 className="card-title">{provider.name} {provider.lastname}</h2>
-            <p className="text-muted">{provider.email}</p>
-
-            {provider.bio && (
-              <div className="mt-4">
-                <h4>Biografía</h4>
-                <p>{provider.bio}</p>
+                  alt={`${provider.user.name} ${provider.user.lastname}`}
+                  className="rounded-circle img-fluid mb-3"
+                  style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                />
+                <h4 className="card-title">{provider.user.name} {provider.user.lastname}</h4>
+                <p className="text-muted">{provider.user.email}</p>
+                <p className="text-muted">{provider.type_provider}</p>
               </div>
-            )}
+              <div className="col-md-8">
+                <div className="mb-3">
+                  <h5>Profesión</h5>
+                  <p>{provider.profession}</p>
+                </div>
+                <div className="mb-3">
+                  <h5>Descripción</h5>
+                  <p>{provider.description}</p>
+                </div>
+                <div className="mb-3">
+                  <h5>Dirección</h5>
+                  <p>{provider.address}</p>
+                </div>
+                <div className="mb-3">
+                  <h5>Categorías</h5>
+                  {provider.categories && provider.categories.length > 0 ? (
+                    <div>
+                      {provider.categories.map((category, index) => (
+                        <span key={index} className="badge bg-secondary me-1">{category}</span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p>No hay categorías especificadas.</p>
+                  )}
+                </div>
+                <div className="mb-3">
+                  <h5>Ciudades de Servicio</h5>
+                  <p>{provider.cities !== "locations.City.None" ? provider.cities : "No especificado"}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      ) : null}
     </div>
   );
 };
