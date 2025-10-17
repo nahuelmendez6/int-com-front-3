@@ -34,17 +34,17 @@ const PostulationsList = ({ postulations, loading, error, onUpdate, petitionId }
               <div className="d-flex w-100 justify-content-between align-items-center pe-3">
                 <div className="d-flex align-items-center">
                   <Link to={`/provider/${post.id_provider}`} className="text-decoration-none text-dark">
-                    {post.provider_user?.profile_image ? (
-                      <Image src={`${API_URL}${post.provider_user.profile_image}`} roundedCircle style={{ width: '40px', height: '40px', objectFit: 'cover' }} />
+                    {post.provider_user?.user?.profile_image ? (
+                      <Image src={`${API_URL}${post.provider_user.user.profile_image}`} roundedCircle style={{ width: '40px', height: '40px', objectFit: 'cover' }} />
                     ) : (
                       <div style={{ width: '40px', height: '40px' }} className="bg-secondary rounded-circle"></div>
                     )}
                   </Link>
                   <div className="ms-3">
                     <Link to={`/provider/${post.id_provider}`} className="text-decoration-none text-dark">
-                      <h6 className="mb-0">{post.provider_user ? `${post.provider_user.name} ${post.provider_user.lastname}` : `Proveedor #${post.id_provider}`}</h6>
+                      <h6 className="mb-0">{post.provider_user?.user?.name && post.provider_user?.user?.lastname ? `${post.provider_user.user.name} ${post.provider_user.user.lastname}` : ''}</h6>
                     </Link>
-                    <small className="text-muted">{post.provider_user?.email}</small>
+                    <small className="text-muted">{post.provider_user?.user?.email}</small>
                   </div>
                 </div>
                 <Badge pill bg={currentState.variant} style={{ fontSize: '0.9em' }}>
