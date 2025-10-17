@@ -8,6 +8,9 @@ const portfolioService = {
   getPortfolioById: (id) => {
     return api.get(`/portfolios/${id}/`);
   },
+  getPortfoliosByProvider: (providerId) => {
+    return api.get(`/portfolios/?id_provider=${providerId}`);
+  },
   createPortfolio: (data) => {
     return api.post('/portfolios/', data);
   },
