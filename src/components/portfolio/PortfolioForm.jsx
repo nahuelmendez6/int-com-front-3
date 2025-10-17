@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth'
 const PortfolioForm = ({ onSuccess, portfolio = null }) => {
   const [name, setName] = useState(portfolio?.name || '');
   const [description, setDescription] = useState(portfolio?.description || '');
+  const [files, setFiles] = useState([]);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -24,11 +25,23 @@ const PortfolioForm = ({ onSuccess, portfolio = null }) => {
 
     try {
       if (portfolio) {
+        // Update logic: attachments are handled separately in the detail page
         await portfolioService.updatePortfolio(portfolio.id_portfolio, portfolioData);
+        onSuccess();
+
       } else {
-        await portfolioService.createPortfolio(portfolioData);
+        // Create logic: first create portfolio, then upload attachments
+        const newPortfolioResponse = await portfolioService.createPortfolio(portfolioData);
+        const newPortfolioId = newPortfolioResponse.data.id_portfolio;
+
+        if (files.length > 0) {
+          const uploadPromises = Array.from(files).map(file => 
+            portfolioService.createAttachment(newPortfolioId, file)
+          );
+          await Promise.all(uploadPromises);
+        }
+        onSuccess();
       }
-      onSuccess();
     } catch (err) {
       if (err.response && err.response.data) {
         // The backend sent back validation errors
@@ -70,6 +83,19 @@ const PortfolioForm = ({ onSuccess, portfolio = null }) => {
           required
         />
       </Form.Group>
+
+      {/* File Input for Attachments - Only on Create */}
+      {!portfolio && (
+        <Form.Group className="mb-3">
+          <Form.Label>Archivos Adjuntos</Form.Label>
+          <Form.Control 
+            type="file" 
+            multiple 
+            onChange={(e) => setFiles(e.target.files)}
+          />
+        </Form.Group>
+      )}
+
       <Button variant="primary" type="submit" disabled={submitting}>
         {submitting ? 'Guardando...' : 'Guardar Proyecto'}
       </Button>

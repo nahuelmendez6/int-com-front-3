@@ -24,14 +24,14 @@ const portfolioService = {
     formData.append('id_portfolio', portfolioId);
     formData.append('file', file);
     
-    return api.post('/portfolio-attachments/', formData, {
+    return api.post('/portfolios/attachments/', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
   },
   deleteAttachment: (id) => {
-    return api.delete(`/portfolio-attachments/${id}/`);
+    return api.delete(`/portfolios/attachments/${id}/`);
   },
 };
 
