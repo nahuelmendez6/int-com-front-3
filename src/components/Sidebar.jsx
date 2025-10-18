@@ -33,6 +33,7 @@ const Sidebar = () => {
       { to: '/petitions', label: 'Peticiones', icon: 'bi-card-list'},
       { to: '/interests', label: 'Intereses', icon: 'bi-heart'},
       { to: '/messages', label: 'Mensajes', icon: 'bi-chat-dots'},
+      { to: '/contrataciones', label: 'Mis Contrataciones', icon: 'bi-check2-square'},
     ],
     provider: [
       { to: '/feed', label: 'Inicio', icon: 'bi-house-door'},
@@ -41,6 +42,7 @@ const Sidebar = () => {
       { to: '/offers', label: 'Ofertas', icon: 'bi-tag'},
       { to: '/service-area', label: 'Área de servicio', icon: 'bi-geo-alt'},
       { to: '/portfolio', label: 'Mi Portfolio', icon: 'bi-briefcase'},
+      { to: '/contrataciones', label: 'Trabajos Aprobados', icon: 'bi-check2-square'},
     ]
   }
 
