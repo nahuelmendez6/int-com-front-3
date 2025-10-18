@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getProviderProfileById } from '../services/profile.service';
 import portfolioService from '../services/portfolio.service';
+import gradesService from '../services/grades.service.js';
 import PortfolioList from '../components/portfolio/PortfolioList';
+import GradeList from '../components/grades/GradeList';
 
 const ProviderPublicProfilePage = () => {
   const { providerId } = useParams();
   const [provider, setProvider] = useState(null);
   const [portfolio, setPortfolio] = useState([]);
+  const [grades, setGrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -15,14 +18,15 @@ const ProviderPublicProfilePage = () => {
     const fetchProfileData = async () => {
       try {
         setLoading(true);
-        // Obtener perfil y portfolio en paralelo
-        const [profileData, portfolioData] = await Promise.all([
+        const [profileData, portfolioData, gradesData] = await Promise.all([
           getProviderProfileById(providerId),
-          portfolioService.getPortfoliosByProvider(providerId)
+          portfolioService.getPortfoliosByProvider(providerId),
+          gradesService.getGradesByProvider(providerId)
         ]);
         
         setProvider(profileData);
         setPortfolio(portfolioData.data);
+        setGrades(gradesData);
 
       } catch (err) {
         setError('No se pudo cargar el perfil completo del proveedor.');
@@ -93,6 +97,11 @@ const ProviderPublicProfilePage = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* --- Sección de Calificaciones --- */}
+      <div className="mb-5">
+        <GradeList grades={grades} />
       </div>
 
       {/* --- Sección de Portfolio --- */}

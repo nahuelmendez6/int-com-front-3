@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Row, Col, Badge, Image, ListGroup } from 'react-bootstrap';
 import { useAuth } from '../../hooks/useAuth';
+import RatingForm from './RatingForm';
 
 const ContratacionList = ({ contrataciones }) => {
   const { profile } = useAuth();
@@ -63,6 +64,11 @@ const ContratacionList = ({ contrataciones }) => {
                     </ListGroup>
                   </Col>
                 </Row>
+                {profile.role === 'customer' && (
+                  <Card.Footer className="bg-white mt-3">
+                    <RatingForm providerId={item.provider.id} id_postulation={item.id_postulation} />
+                  </Card.Footer>
+                )}
               </Card.Body>
             </Card>
           </Col>
