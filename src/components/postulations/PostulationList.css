@@ -17,3 +17,14 @@
     padding-top: 0.75rem;
     margin-top: 0.75rem;
 }
+
+.provider-profile-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.provider-profile-link:hover {
+  color: inherit;
+  opacity: 0.8;
+  transition: opacity 0.2s ease-in-out;
+}

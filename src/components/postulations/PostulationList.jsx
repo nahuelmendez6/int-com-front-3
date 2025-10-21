@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Image, Badge } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import './PostulationList.css';
 
 const PostulationList = ({ postulations, loading, error, onUpdate, petitionId }) => {
@@ -35,18 +36,20 @@ const PostulationList = ({ postulations, loading, error, onUpdate, petitionId })
                 return (
                     <li key={postulation.id_postulation} className="list-group-item">
                         <div className="d-flex w-100 justify-content-between mb-2">
-                            <div className="d-flex align-items-center">
-                                <Image
-                                    src={`http://127.0.0.1:8000/${postulation.provider_user?.user.profile_image}`}
-                                    roundedCircle
-                                    style={{ width: '40px', height: '40px', objectFit: 'cover' }}
-                                    />
+                            <Link to={`/provider/${postulation.id_provider}`} className="provider-profile-link">
+                                <div className="d-flex align-items-center">
+                                    <Image
+                                        src={`http://127.0.0.1:8000/${postulation.provider_user?.user.profile_image}`}
+                                        roundedCircle
+                                        style={{ width: '40px', height: '40px', objectFit: 'cover' }}
+                                        />
 
-                                <div className="ms-3">
-                                    <h6 className="mb-0">{postulation.provider_user?.user.name} {postulation.provider_user?.user.lastname}</h6>
-                                    <small className="text-muted">{postulation.provider_user?.user.email}</small>
+                                    <div className="ms-3">
+                                        <h6 className="mb-0">{postulation.provider_user?.user.name} {postulation.provider_user?.user.lastname}</h6>
+                                        <small className="text-muted">{postulation.provider_user?.user.email}</small>
+                                    </div>
                                 </div>
-                            </div>
+                            </Link>
                             <Badge bg={status.variant}>{status.text}</Badge>
                         </div>
 
