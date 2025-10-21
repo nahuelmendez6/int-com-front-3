@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import PostulationList from '../components/postulations/PostulationList';
+import ProviderPostulationList from '../components/postulations/ProviderPostulationList';
 import PostulationForm from '../components/postulations/PostulationForm';
 import { getProviderPostulations, updatePostulation } from '../services/postulation.service.js';
 
@@ -78,7 +78,7 @@ const PostulationsPage = () => {
           {loading && <p>Cargando postulaciones...</p>}
           {error && <div className="alert alert-danger">{error}</div>}
           {!loading && !error && 
-            <PostulationList 
+            <ProviderPostulationList 
               postulations={postulations} 
               onEdit={handleShowEditModal} 
               onDelete={handleDelete} 

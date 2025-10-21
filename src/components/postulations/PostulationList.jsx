@@ -1,75 +1,77 @@
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Image, Badge } from 'react-bootstrap';
 import './PostulationList.css';
 
-const PostulationList = ({ postulations, onEdit, onDelete }) => {
+const PostulationList = ({ postulations, loading, error, onUpdate, petitionId }) => {
 
     const getStatusInfo = (id_state) => {
         switch (id_state) {
-            case 1:
-                return { text: 'Pendiente', className: 'pending' };
-            case 2:
-                return { text: 'Aprobada', className: 'approved' };
-            case 3:
-                return { text: 'Rechazada', className: 'rejected' };
-            case 4:
-                return { text: 'Ganadora', className: 'winner' };
-            default:
-                return { text: 'Desconocido', className: 'unknown' };
+            case 1: return { text: 'Pendiente', variant: 'warning' };
+            case 2: return { text: 'Aprobada', variant: 'success' };
+            case 3: return { text: 'Rechazada', variant: 'danger' };
+            case 4: return { text: 'Ganadora', variant: 'primary' };
+            default: return { text: 'Desconocido', variant: 'secondary' };
         }
     };
 
+    if (loading) {
+        return <p>Cargando postulaciones...</p>;
+    }
+
+    if (error) {
+        return <div className="alert alert-danger">{error}</div>;
+    }
+
     if (!postulations || postulations.length === 0) {
-        return <div className="alert alert-info">No has realizado ninguna postulación aún.</div>;
+        return <div className="alert alert-info">Esta petición aún no tiene postulaciones.</div>;
     }
 
     return (
-        <div className="postulations-grid">
+        <ul className="list-group postulation-customer-list">
             {postulations.map((postulation) => {
-                const statusInfo = getStatusInfo(postulation.id_state);
-                const canBeModified = postulation.id_state === 1; // Only pending postulations can be edited/deleted
+                const status = getStatusInfo(postulation.id_state);
+                const isActionable = postulation.id_state === 1; // Can only accept/reject pending
 
                 return (
-                    <div key={postulation.id_postulation} className="postulation-card">
-                        <div className="card-header">
-                            <h3>Postulación a Petición #{postulation.id_petition}</h3>
-                            <span className={`status ${statusInfo.className}`}>
-                                {statusInfo.text}
-                            </span>
-                        </div>
-                        <div className="card-body">
-                            <p><strong>Propuesta:</strong> {postulation.proposal}</p>
-                            {postulation.budgets && postulation.budgets.length > 0 && (
-                                <div className="budget-info">
-                                    <h4>Presupuesto</h4>
-                                    <p><strong>Monto:</strong> ${parseFloat(postulation.budgets[0].amount).toLocaleString()}</p>
-                                    <p><strong>Tipo:</strong> {postulation.budgets[0].cost_type.replace('_', ' ')}</p>
+                    <li key={postulation.id_postulation} className="list-group-item">
+                        <div className="d-flex w-100 justify-content-between mb-2">
+                            <div className="d-flex align-items-center">
+                                <Image
+                                    src={`http://127.0.0.1:8000/${postulation.provider_user?.user.profile_image}`}
+                                    roundedCircle
+                                    style={{ width: '40px', height: '40px', objectFit: 'cover' }}
+                                    />
+
+                                <div className="ms-3">
+                                    <h6 className="mb-0">{postulation.provider_user?.user.name} {postulation.provider_user?.user.lastname}</h6>
+                                    <small className="text-muted">{postulation.provider_user?.user.email}</small>
                                 </div>
-                            )}
-                        </div>
-                        <div className="card-footer d-flex justify-content-between align-items-center">
-                            <small className="text-muted">Creado: {new Date(postulation.date_create).toLocaleDateString()}</small>
-                            <div className="d-flex gap-2">
-                                {canBeModified ? (
-                                    <>
-                                        <Button variant="outline-primary" size="sm" onClick={() => onEdit(postulation)}>
-                                            <i className="bi bi-pencil-square me-1"></i>
-                                            Editar
-                                        </Button>
-                                        <Button variant="outline-danger" size="sm" onClick={() => onDelete(postulation.id_postulation)}>
-                                            <i className="bi bi-trash me-1"></i>
-                                            Eliminar
-                                        </Button>
-                                    </>
-                                ) : (
-                                    <small className="text-muted">No se puede modificar</small>
-                                )}
                             </div>
+                            <Badge bg={status.variant}>{status.text}</Badge>
                         </div>
-                    </div>
-                )
+
+                        <p className="mb-2"><strong>Propuesta:</strong> {postulation.proposal}</p>
+
+                        {postulation.budgets && postulation.budgets.length > 0 && (
+                            <div className="budget-info-customer mb-2">
+                                <strong>Presupuesto:</strong> ${parseFloat(postulation.budgets[0].amount).toLocaleString()} ({postulation.budgets[0].cost_type.replace('_', ' ')})
+                            </div>
+                        )}
+
+                        {isActionable && (
+                            <div className="actions-footer text-end">
+                                <Button variant="outline-danger" size="sm" className="me-2" onClick={() => onUpdate(postulation.id_postulation, 3, petitionId)}>
+                                    Rechazar
+                                </Button>
+                                <Button variant="success" size="sm" onClick={() => onUpdate(postulation.id_postulation, 2, petitionId)}>
+                                    Aprobar
+                                </Button>
+                            </div>
+                        )}
+                    </li>
+                );
             })}
-        </div>
+        </ul>
     );
 };
 
