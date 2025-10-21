@@ -1,59 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { getCategories, saveInterest, getInterestsByCustomer, deleteInterest } from '../services/interest.service.js';
+import React from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { useCustomerInterests } from '../hooks/useCustomerInterests';
 
 const InterestsPage = () => {
-  const [categories, setCategories] = useState([]);
-  const [customerInterests, setCustomerInterests] = useState([]);
-  const [categoryMap, setCategoryMap] = useState(new Map());
   const { profile } = useAuth();
+  const customerId = profile?.profile?.id_customer;
 
-  useEffect(() => {
-    if (profile && profile.profile.id_customer) {
-      Promise.all([
-        getCategories(),
-        getInterestsByCustomer(profile.profile.id_customer)
-      ])
-      .then(([categoriesResponse, interestsResponse]) => {
-        const cats = categoriesResponse.data;
-        setCategories(cats);
-        setCustomerInterests(interestsResponse.data);
-        setCategoryMap(new Map(cats.map(c => [c.id_category, c.name])));
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
-    }
-  }, [profile]);
+  const {
+    categories,
+    interests,
+    categoryMap,
+    loading,
+    error,
+    addInterest,
+    removeInterest,
+  } = useCustomerInterests(customerId);
 
-  const handleAddInterest = (categoryId) => {
-    if (!profile || !profile.profile.id_customer) return;
-    
-    saveInterest(profile.profile.id_customer, categoryId)
-      .then(response => {
-        // Add the new interest to the local state to update the UI instantly
-        setCustomerInterests(prevInterests => [...prevInterests, response.data]);
-      })
-      .catch(error => {
-        console.error('Error adding interest:', error);
-        alert('Hubo un error al añadir el interés.');
-      });
-  };
-
-  const handleDeleteInterest = (interestId) => {
-    deleteInterest(interestId)
-      .then(() => {
-        // Remove the interest from the local state to update the UI instantly
-        setCustomerInterests(prevInterests => prevInterests.filter(interest => interest.id_interest !== interestId));
-      })
-      .catch(error => {
-        console.error('Error deleting interest:', error);
-        alert('Hubo un error al eliminar el interés.');
-      });
-  };
-
-  const selectedCategoryIds = new Set(customerInterests.map(i => i.id_category));
+  const selectedCategoryIds = new Set(interests.map(i => i.id_category));
   const availableCategories = categories.filter(c => !selectedCategoryIds.has(c.id_category));
+
+  if (loading) return <p>Cargando intereses...</p>;
+  if (error) return <p className="text-danger">{error}</p>;
 
   return (
     <div className="interests-page">
@@ -66,16 +33,19 @@ const InterestsPage = () => {
 
           <h4>Mis Intereses</h4>
           <div className="d-flex flex-wrap align-items-center mb-3">
-            {customerInterests.length > 0 ? (
-              customerInterests.map(interest => (
-                <span key={`selected-${interest.id_interest}`} className="badge bg-primary fs-6 me-2 mb-2 d-flex align-items-center">
+            {interests.length > 0 ? (
+              interests.map(interest => (
+                <span
+                  key={`selected-${interest.id_interest}`}
+                  className="badge bg-primary fs-6 me-2 mb-2 d-flex align-items-center"
+                >
                   {categoryMap.get(interest.id_category) || 'Cargando...'}
                   <button
                     type="button"
                     className="btn-close btn-close-white ms-2"
                     aria-label="Remove"
-                    onClick={() => handleDeleteInterest(interest.id_interest)}
-                  ></button>
+                    onClick={() => removeInterest(interest.id_interest)}
+                  />
                 </span>
               ))
             ) : (
@@ -96,9 +66,12 @@ const InterestsPage = () => {
                     id={`category-${category.id_category}`}
                     value={category.id_category}
                     checked={false}
-                    onChange={() => handleAddInterest(category.id_category)}
+                    onChange={() => addInterest(category.id_category)}
                   />
-                  <label className="form-check-label" htmlFor={`category-${category.id_category}`}>
+                  <label
+                    className="form-check-label"
+                    htmlFor={`category-${category.id_category}`}
+                  >
                     {category.name}
                   </label>
                 </div>
