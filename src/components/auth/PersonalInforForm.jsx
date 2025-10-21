@@ -12,7 +12,7 @@ const PersonalInfoForm = ({ formData, handleChange }) => (
           name="email"
           value={formData.email}
           onChange={handleChange}
-          className="form-control"
+          className="form-control input"
         />
       </Col>
     </Form.Group>
@@ -25,7 +25,7 @@ const PersonalInfoForm = ({ formData, handleChange }) => (
           name="name"
           value={formData.name}
           onChange={handleChange}
-          className="form-control"
+          className="form-control input"
         />
       </Col>
     </Form.Group>
@@ -38,7 +38,7 @@ const PersonalInfoForm = ({ formData, handleChange }) => (
           name="lastname"
           value={formData.lastname}
           onChange={handleChange}
-          className="form-control"
+          className="form-control input"
         />
       </Col>
     </Form.Group>
@@ -51,7 +51,7 @@ const PersonalInfoForm = ({ formData, handleChange }) => (
           name="password"
           value={formData.password}
           onChange={handleChange}
-          className="form-control"
+          className="form-control input"
           placeholder="6 o más caracteres"
         />
       </Col>
@@ -65,7 +65,7 @@ const PersonalInfoForm = ({ formData, handleChange }) => (
           name="confirmPassword"
           value={formData.confirmPassword}
           onChange={handleChange}
-          className="form-control"
+          className="form-control input"
         />
       </Col>
     </Form.Group>
