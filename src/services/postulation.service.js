@@ -5,7 +5,11 @@ export const createPostulation = async (postulationData) => {
     const response = await api.post('/postulations/', postulationData);
     return response.data;
   } catch (error) {
-    console.error('Error creating postulation:', error.response.data);
+    if (error.response) {
+      console.error('Error creating postulation:', error.response.data);
+    } else {
+      console.error('Error creating postulation:', error.message);
+    }
     throw error;
   }
 };
@@ -15,7 +19,11 @@ export const getPostulationsByPetition = async (petitionId) => {
     const response = await api.get(`/petitions/${petitionId}/postulations/`);
     return response.data;
   } catch (error) {
-    console.error('Error fetching postulations:', error.response.data);
+    if (error.response) {
+      console.error('Error fetching postulations:', error.response.data);
+    } else {
+      console.error('Error fetching postulations:', error.message);
+    }
     throw error;
   }
 };
@@ -25,7 +33,11 @@ export const getProviderPostulations = async () => {
     const response = await api.get('/postulations/');
     return response.data;
   } catch (error) {
-    console.error('Error fetching provider postulations:', error.response.data);
+    if (error.response) {
+      console.error('Error fetching provider postulations:', error.response.data);
+    } else {
+      console.error('Error fetching provider postulations:', error.message);
+    }
     throw error;
   }
 };
@@ -35,7 +47,11 @@ export const updatePostulation = async (postulationId, data) => {
     const response = await api.patch(`/postulations/${postulationId}/`, data);
     return response.data;
   } catch (error) {
-    console.error('Error updating postulation:', error.response.data);
+    if (error.response) {
+      console.error('Error updating postulation:', error.response.data);
+    } else {
+      console.error('Error updating postulation:', error.message);
+    }
     throw error;
   }
 };
@@ -45,7 +61,11 @@ export const acceptPostulation = async (postulationId) => {
     const response = await api.post(`/postulations/${postulationId}/accept/`);
     return response.data;
   } catch (error) {
-    console.error('Error accepting postulation:', error.response.data);
+    if (error.response) {
+      console.error('Error accepting postulation:', error.response.data);
+    } else {
+      console.error('Error accepting postulation:', error.message);
+    }
     throw error;
   }
 };

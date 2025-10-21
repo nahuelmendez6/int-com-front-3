@@ -64,6 +64,18 @@
     color: #333;
 }
 
+.status.approved {
+    background-color: #0d6efd; /* Azul */
+}
+
+.status.rejected {
+    background-color: #dc3545; /* Rojo */
+}
+
+.status.unknown {
+    background-color: #6c757d; /* Gris */
+}
+
 .card-body {
     padding: 1.5rem;
     flex-grow: 1;

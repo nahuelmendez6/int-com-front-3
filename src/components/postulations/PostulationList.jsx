@@ -1,58 +1,37 @@
-import React, { useState, useEffect } from 'react';
-import { getProviderPostulations } from '../../services/postulation.service';
-import { useAuth } from '../../hooks/useAuth';
+import React from 'react';
 import './PostulationList.css';
 
-const PostulationList = () => {
-    const { user } = useAuth();
-    const [postulations, setPostulations] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const PostulationList = ({ postulations }) => {
 
-    useEffect(() => {
-        const fetchPostulations = async () => {
-            if (!user) {
-                setError('Debes iniciar sesión para ver tus postulaciones.');
-                setLoading(false);
-                return;
-            }
+    const getStatusInfo = (id_state) => {
+        switch (id_state) {
+            case 1:
+                return { text: 'Pendiente', className: 'pending' };
+            case 2:
+                return { text: 'Aprobada', className: 'approved' };
+            case 3:
+                return { text: 'Rechazada', className: 'rejected' };
+            case 4:
+                return { text: 'Ganadora', className: 'winner' };
+            default:
+                return { text: 'Desconocido', className: 'unknown' };
+        }
+    };
 
-            try {
-                const data = await getProviderPostulations();
-                setPostulations(data);
-            } catch (err) {
-                setError('Error al cargar las postulaciones. Inténtalo de nuevo más tarde.');
-                console.error(err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchPostulations();
-    }, [user]);
-
-    if (loading) {
-        return <div className="postulation-list-container">Cargando postulaciones...</div>;
-    }
-
-    if (error) {
-        return <div className="postulation-list-container error">{error}</div>;
-    }
-
-    if (postulations.length === 0) {
-        return <div className="postulation-list-container">No has realizado ninguna postulación aún.</div>;
+    if (!postulations || postulations.length === 0) {
+        return <div className="alert alert-info">No has realizado ninguna postulación aún.</div>;
     }
 
     return (
-        <div className="postulation-list-container">
-            <h2>Mis Postulaciones</h2>
-            <div className="postulations-grid">
-                {postulations.map((postulation) => (
+        <div className="postulations-grid">
+            {postulations.map((postulation) => {
+                const statusInfo = getStatusInfo(postulation.id_state);
+                return (
                     <div key={postulation.id_postulation} className="postulation-card">
                         <div className="card-header">
                             <h3>Postulación a Petición #{postulation.id_petition}</h3>
-                            <span className={`status ${postulation.winner ? 'winner' : 'pending'}`}>
-                                {postulation.winner ? 'Ganadora' : 'Pendiente'}
+                            <span className={`status ${statusInfo.className}`}>
+                                {statusInfo.text}
                             </span>
                         </div>
                         <div className="card-body">
@@ -69,8 +48,8 @@ const PostulationList = () => {
                             <p>Fecha de creación: {new Date(postulation.date_create).toLocaleDateString()}</p>
                         </div>
                     </div>
-                ))}
-            </div>
+                )
+            })}
         </div>
     );
 };
