@@ -1,7 +1,8 @@
 import React from 'react';
+import { Button } from 'react-bootstrap';
 import './PostulationList.css';
 
-const PostulationList = ({ postulations }) => {
+const PostulationList = ({ postulations, onEdit, onDelete }) => {
 
     const getStatusInfo = (id_state) => {
         switch (id_state) {
@@ -26,6 +27,8 @@ const PostulationList = ({ postulations }) => {
         <div className="postulations-grid">
             {postulations.map((postulation) => {
                 const statusInfo = getStatusInfo(postulation.id_state);
+                const canBeModified = postulation.id_state === 1; // Only pending postulations can be edited/deleted
+
                 return (
                     <div key={postulation.id_postulation} className="postulation-card">
                         <div className="card-header">
@@ -44,8 +47,24 @@ const PostulationList = ({ postulations }) => {
                                 </div>
                             )}
                         </div>
-                        <div className="card-footer">
-                            <p>Fecha de creación: {new Date(postulation.date_create).toLocaleDateString()}</p>
+                        <div className="card-footer d-flex justify-content-between align-items-center">
+                            <small className="text-muted">Creado: {new Date(postulation.date_create).toLocaleDateString()}</small>
+                            <div className="d-flex gap-2">
+                                {canBeModified ? (
+                                    <>
+                                        <Button variant="outline-primary" size="sm" onClick={() => onEdit(postulation)}>
+                                            <i className="bi bi-pencil-square me-1"></i>
+                                            Editar
+                                        </Button>
+                                        <Button variant="outline-danger" size="sm" onClick={() => onDelete(postulation.id_postulation)}>
+                                            <i className="bi bi-trash me-1"></i>
+                                            Eliminar
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <small className="text-muted">No se puede modificar</small>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )
