@@ -1,71 +1,49 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { getPetitions, deletePetition } from '../services/petitions.service.js';
+import React, { useState } from 'react';
+import { Button, Card } from 'react-bootstrap';
 import PetitionList from '../components/petitions/PetitionList';
 import CreatePetitionForm from '../components/petitions/CreatePetitionForm';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import { useAuth } from '../hooks/useAuth.js';
-import { Button, Card } from 'react-bootstrap';
+import { usePetitions } from '../hooks/usePetitions.js';
+import { deletePetition } from '../services/petitions.service.js';
 
 const PetitionsPage = () => {
-  const [petitions, setPetitions] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [showCreatePetitionModal, setShowCreatePetitionModal] = useState(false);
-  const [editingPetition, setEditingPetition] = useState(null);
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [petitionToDeleteId, setPetitionToDeleteId] = useState(null);
   const { profile } = useAuth();
+  const { petitions, loading, error, refetch } = usePetitions(profile);
 
-  const fetchPetitions = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await getPetitions();
-      console.log("Fetched Petitions:", data);
-      setPetitions(data);
-      setError(null);
-    } catch (err) {
-      setError('Error al cargar las peticiones.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const [editingPetition, setEditingPetition] = useState(null);
+  const [showFormModal, setShowFormModal] = useState(false);
+  const [petitionToDeleteId, setPetitionToDeleteId] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [localError, setLocalError] = useState(null);
 
-  useEffect(() => {
-    fetchPetitions();
-  }, [fetchPetitions]);
-
-  const handleShowCreatePetitionModal = () => {
+  const handleCreateClick = () => {
     setEditingPetition(null);
-    setShowCreatePetitionModal(true);
-  };
-  const handleCloseCreatePetitionModal = () => setShowCreatePetitionModal(false);
-
-  const handlePetitionCreatedOrUpdated = () => {
-    handleCloseCreatePetitionModal();
-    fetchPetitions(); // Re-fetch petitions to update the list
+    setShowFormModal(true);
   };
 
-  const handleShowEditModal = (petition) => {
+  const handleEditClick = (petition) => {
     setEditingPetition(petition);
-    setShowCreatePetitionModal(true);
+    setShowFormModal(true);
   };
 
-  const handleDeletePetition = (petitionId) => {
-    setPetitionToDeleteId(petitionId);
-    setShowDeleteConfirmation(true);
+  const handleDeleteClick = (id) => {
+    setPetitionToDeleteId(id);
+    setShowDeleteModal(true);
   };
 
-  const confirmDeletePetition = async () => {
-    if (petitionToDeleteId) {
-      try {
-        await deletePetition(petitionToDeleteId);
-        fetchPetitions(); // Recargar lista
-      } catch (err) {
-        setError('Error al eliminar la petición.');
-      } finally {
-        setShowDeleteConfirmation(false);
-        setPetitionToDeleteId(null);
-      }
+  const confirmDelete = async () => {
+    if (!petitionToDeleteId) return;
+
+    try {
+      await deletePetition(petitionToDeleteId);
+      refetch(); // recarga las peticiones del customer
+    } catch (err) {
+      console.error(err);
+      setLocalError('Error al eliminar la petición.');
+    } finally {
+      setShowDeleteModal(false);
+      setPetitionToDeleteId(null);
     }
   };
 
@@ -73,24 +51,28 @@ const PetitionsPage = () => {
     <div className="petitions-page">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1>Mis Peticiones</h1>
-        <Button variant="primary" onClick={handleShowCreatePetitionModal}>
-          <i className="bi bi-plus-lg me-2"></i>
-          Crear Nueva Petición
+        <Button variant="primary" onClick={handleCreateClick}>
+          <i className="bi bi-plus-lg me-2"></i> Nueva Petición
         </Button>
       </div>
-      
-      {error && <div className="alert alert-danger">{error}</div>}
-      
+
+      {(error || localError) && (
+        <div className="alert alert-danger">{error || localError}</div>
+      )}
+
       <Card className="shadow-sm">
         <Card.Body>
           <Card.Title className="mb-3">Peticiones Activas</Card.Title>
+
           {loading ? (
             <p>Cargando peticiones...</p>
+          ) : petitions.length === 0 ? (
+            <p>No has publicado ninguna petición.</p>
           ) : (
-            <PetitionList 
-              petitions={petitions} 
-              onEdit={handleShowEditModal} 
-              onDelete={handleDeletePetition} 
+            <PetitionList
+              petitions={petitions}
+              onEdit={handleEditClick}
+              onDelete={handleDeleteClick}
               profile={profile}
             />
           )}
@@ -98,21 +80,22 @@ const PetitionsPage = () => {
       </Card>
 
       <CreatePetitionForm
-        show={showCreatePetitionModal}
-        onHide={handleCloseCreatePetitionModal}
+        show={showFormModal}
+        onHide={() => setShowFormModal(false)}
         petitionToEdit={editingPetition}
         customerProfile={profile}
-        onPetitionCreatedOrUpdated={handlePetitionCreatedOrUpdated}
+        onPetitionCreatedOrUpdated={() => refetch()}
       />
 
       <ConfirmationModal
-        show={showDeleteConfirmation}
-        onHide={() => setShowDeleteConfirmation(false)}
-        onConfirm={confirmDeletePetition}
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
         title="Confirmar Eliminación"
         body="¿Estás seguro de que quieres eliminar esta petición? Esta acción no se puede deshacer."
       />
     </div>
   );
-}
+};
+
 export default PetitionsPage;

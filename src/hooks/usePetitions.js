@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getProviderFeedPetitions } from '../services/petitions.service.js';
+import { getPetitions, getProviderFeedPetitions } from '../services/petitions.service.js';
 import { getUserProfile } from '../services/profile.service.js';
 
 export const usePetitions = (profile) => {
@@ -8,17 +8,26 @@ export const usePetitions = (profile) => {
   const [error, setError] = useState(null);
 
   const fetchPetitions = useCallback(async () => {
-    if (profile && profile.role === 'provider') {
-      setLoading(true);
-      setError(null);
-      try {
+    if (!profile) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      if (profile.role === 'customer') {
+        // Peticiones del customer
+        const data = await getPetitions(profile.id_customer);
+        setPetitions(data || []);
+      } else if (profile.role === 'provider') {
+        // Feed de peticiones para el provider
         const data = await getProviderFeedPetitions();
         if (!data || data.length === 0) {
           setPetitions([]);
           return;
         }
 
-        const uniqueCustomerIds = [...new Set(data.map((p) => p.id_customer))];
+        // Cargar información de los clientes
+        const uniqueCustomerIds = [...new Set(data.map(p => p.id_customer))];
         const customerMap = {};
         await Promise.all(
           uniqueCustomerIds.map(async (id_customer) => {
@@ -30,20 +39,20 @@ export const usePetitions = (profile) => {
             }
           })
         );
-        
-        const enrichedPetitions = data.map((p) => ({
+
+        const enrichedPetitions = data.map(p => ({
           ...p,
           customer_user: customerMap[p.id_customer] || null,
         }));
-        console.log(enrichedPetitions)
+
         setPetitions(enrichedPetitions);
-      } catch (err) {
-        console.error("Error fetching provider petitions:", err);
-        setError('Error al cargar las peticiones para proveedores.');
-      } finally {
-        setLoading(false);
+      } else {
+        setPetitions([]);
       }
-    } else {
+    } catch (err) {
+      console.error('Error fetching petitions:', err);
+      setError('Error al cargar las peticiones.');
+    } finally {
       setLoading(false);
     }
   }, [profile]);
@@ -52,5 +61,5 @@ export const usePetitions = (profile) => {
     fetchPetitions();
   }, [fetchPetitions]);
 
-  return { petitions, loading, error };
+  return { petitions, loading, error, refetch: fetchPetitions };
 };
