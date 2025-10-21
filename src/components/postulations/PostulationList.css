@@ -1,0 +1,100 @@
+.postulation-list-container {
+    padding: 2rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    max-width: 1200px;
+    margin: 2rem auto;
+}
+
+.postulation-list-container h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.postulations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.postulation-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+}
+
+.postulation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #0056b3;
+}
+
+.status {
+    padding: 0.3rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+.status.winner {
+    background-color: #28a745; /* Verde */
+}
+
+.status.pending {
+    background-color: #ffc107; /* Amarillo */
+    color: #333;
+}
+
+.card-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+}
+
+.card-body p {
+    margin: 0 0 1rem 0;
+}
+
+.budget-info {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.budget-info h4 {
+    margin: 0 0 0.5rem 0;
+    color: #555;
+}
+
+.card-footer {
+    padding: 1rem 1.5rem;
+    background-color: #f9f9f9;
+    border-top: 1px solid #eee;
+    text-align: right;
+    font-size: 0.8rem;
+    color: #777;
+}
+
+.error {
+    color: #dc3545; /* Rojo */
+    text-align: center;
+    font-size: 1.2rem;
+}

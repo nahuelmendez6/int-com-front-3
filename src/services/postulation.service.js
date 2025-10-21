@@ -5,28 +5,47 @@ export const createPostulation = async (postulationData) => {
     const response = await api.post('/postulations/', postulationData);
     return response.data;
   } catch (error) {
-    console.error('Error creating postulation:', error.response?.data || error.message);
+    console.error('Error creating postulation:', error.response.data);
     throw error;
   }
 };
 
 export const getPostulationsByPetition = async (petitionId) => {
   try {
-    const response = await api.get(`/postulations/by-petition/${petitionId}`);
+    const response = await api.get(`/petitions/${petitionId}/postulations/`);
     return response.data;
   } catch (error) {
-    console.error(`Error fetching postulations for petition ${petitionId}:`, error.response?.data || error.message);
+    console.error('Error fetching postulations:', error.response.data);
+    throw error;
+  }
+};
+
+export const getProviderPostulations = async () => {
+  try {
+    const response = await api.get('/postulations/');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching provider postulations:', error.response.data);
     throw error;
   }
 };
 
 export const updatePostulation = async (postulationId, data) => {
   try {
-    console.log('Sending data to update postulation:', JSON.stringify(data, null, 2));
     const response = await api.patch(`/postulations/${postulationId}/`, data);
     return response.data;
   } catch (error) {
-    console.error(`Error updating postulation ${postulationId}:`, error.response?.data || error.message);
+    console.error('Error updating postulation:', error.response.data);
+    throw error;
+  }
+};
+
+export const acceptPostulation = async (postulationId) => {
+  try {
+    const response = await api.post(`/postulations/${postulationId}/accept/`);
+    return response.data;
+  } catch (error) {
+    console.error('Error accepting postulation:', error.response.data);
     throw error;
   }
 };

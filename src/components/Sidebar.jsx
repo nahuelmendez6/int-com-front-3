@@ -42,7 +42,8 @@ const Sidebar = () => {
       { to: '/offers', label: 'Ofertas', icon: 'bi-tag'},
       { to: '/service-area', label: 'Área de servicio', icon: 'bi-geo-alt'},
       { to: '/portfolio', label: 'Mi Portfolio', icon: 'bi-briefcase'},
-      { to: '/contrataciones', label: 'Trabajos Aprobados', icon: 'bi-check2-square'},
+      { to: '/mis-postulaciones', label: 'Mis Postulaciones', icon: 'bi-journal-text' },
+      { to: '/contrataciones', label: 'Trabajos Aprobados', icon: 'bi-check2-square' },
     ]
   }
 

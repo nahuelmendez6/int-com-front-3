@@ -95,6 +95,14 @@ const Navbar = () => {
                   <i className="bi bi-person me-2"></i>
                   Perfil
                 </Link>
+                <Link
+                  to="/mis-postulaciones"
+                  className="dropdown-item d-flex align-items-center"
+                  onClick={closeDropdown}
+                >
+                  <i className="bi bi-journal-text me-2"></i>
+                  Mis Postulaciones
+                </Link>
                 <button
                   className="dropdown-item d-flex align-items-center"
                   onClick={handleLogout}
