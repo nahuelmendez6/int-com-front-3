@@ -20,6 +20,16 @@ const gradesService = {
       throw error;
     }
   },
+
+  getAverageRatingByProvider: async (providerId) => {
+    try {
+      const response = await api.get(`/grades/average-rating/${providerId}/`);
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener la calificación promedio", error.response?.data || error.message);
+      throw error;
+    }
+  },
 };
 
 export default gradesService;

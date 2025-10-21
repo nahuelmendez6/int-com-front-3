@@ -8,12 +8,16 @@ import {
 import AddressForm from './AddressForm.jsx';
 import ImageUpload from './ImageUpload.jsx';
 import './ProviderProfile.css';
+import useAverageRating from '../hooks/useAverageRating';
+import StarRating from './common/StarRating';
 
 const ProviderProfile = ({ userData }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState(userData);
   const [formData, setFormData] = useState({});
   const [imageFile, setImageFile] = useState(null);
+
+  const { averageRating, loading: loadingRating, error: errorRating } = useAverageRating(profile?.user?.id);
 
   // Opciones de perfil
   const [categories, setCategories] = useState([]);
@@ -167,7 +171,14 @@ const ProviderProfile = ({ userData }) => {
                   disabled
                   className="img-fluid rounded-circle mb-3"
                 />
-                <h4 className="mb-1">{user.name} {user.lastname}</h4>
+                <h4 className="mb-1">
+                  {user.name} {user.lastname}
+                  {averageRating !== null && !loadingRating && (
+                    <span className="ms-2">
+                      <StarRating rating={averageRating} />
+                    </span>
+                  )}
+                </h4>
                 <p className="text-muted mb-2">{user.email}</p>
               </div>
 

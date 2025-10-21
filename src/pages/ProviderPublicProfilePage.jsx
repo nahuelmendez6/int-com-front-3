@@ -5,6 +5,8 @@ import portfolioService from '../services/portfolio.service';
 import gradesService from '../services/grades.service.js';
 import PortfolioList from '../components/portfolio/PortfolioList';
 import GradeList from '../components/grades/GradeList';
+import useAverageRating from '../hooks/useAverageRating';
+import StarRating from '../components/common/StarRating';
 
 const ProviderPublicProfilePage = () => {
   const { providerId } = useParams();
@@ -13,6 +15,8 @@ const ProviderPublicProfilePage = () => {
   const [grades, setGrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const { averageRating, loading: loadingRating, error: errorRating } = useAverageRating(providerId);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -39,8 +43,8 @@ const ProviderPublicProfilePage = () => {
     fetchProfileData();
   }, [providerId]);
 
-  if (loading) return <div className="text-center mt-5">Cargando perfil...</div>;
-  if (error) return <div className="alert alert-danger mt-5">{error}</div>;
+  if (loading || loadingRating) return <div className="text-center mt-5">Cargando perfil...</div>;
+  if (error || errorRating) return <div className="alert alert-danger mt-5">{error || errorRating}</div>;
   if (!provider) return null;
 
   return (
@@ -48,7 +52,14 @@ const ProviderPublicProfilePage = () => {
       {/* --- Perfil Principal --- */}
       <div className="card mb-5">
         <div className="card-header text-center">
-          <h3>Perfil de {provider.user.name} {provider.user.lastname}</h3>
+          <h3>
+            Perfil de {provider.user.name} {provider.user.lastname}
+            {averageRating !== null && (
+              <span className="ms-3">
+                <StarRating rating={averageRating} />
+              </span>
+            )}
+          </h3>
         </div>
         <div className="card-body">
           <div className="row">
