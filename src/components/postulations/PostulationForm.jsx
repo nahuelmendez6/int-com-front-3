@@ -76,7 +76,130 @@ const PostulationForm = ({ show, handleClose, onSubmit, error, submitting, initi
   };
 
   const renderBudgetFields = (item, index) => {
-    // ... (same as before)
+    switch (item.cost_type) {
+      case 'por_proyecto':
+        return (
+          <React.Fragment>
+            <Col md={3}>
+              <Form.Group>
+                <Form.Label>Monto</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Monto total"
+                  value={item.amount || ''}
+                  onChange={(e) => handleBudgetChange(index, 'amount', e.target.value)}
+                  required
+                />
+              </Form.Group>
+            </Col>
+            <Col md={4}>
+              <Form.Group>
+                <Form.Label>Notas</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Notas"
+                  value={item.notes || ''}
+                  onChange={(e) => handleBudgetChange(index, 'notes', e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+          </React.Fragment>
+        );
+      case 'por_hora':
+        return (
+          <React.Fragment>
+            <Col md={2}>
+              <Form.Group>
+                <Form.Label>Horas</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Horas"
+                  value={item.hours || ''}
+                  onChange={(e) => handleBudgetChange(index, 'hours', e.target.value)}
+                  required
+                />
+              </Form.Group>
+            </Col>
+            <Col md={2}>
+              <Form.Group>
+                <Form.Label>Precio/Hora</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Precio por hora"
+                  value={item.unit_price || ''}
+                  onChange={(e) => handleBudgetChange(index, 'unit_price', e.target.value)}
+                  required
+                />
+              </Form.Group>
+            </Col>
+            <Col md={3}>
+              <Form.Group>
+                <Form.Label>Notas</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Notas"
+                  value={item.notes || ''}
+                  onChange={(e) => handleBudgetChange(index, 'notes', e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+          </React.Fragment>
+        );
+      case 'por_item':
+        return (
+          <React.Fragment>
+            <Col md={3}>
+              <Form.Group>
+                <Form.Label>Descripción</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Descripción del ítem"
+                  value={item.item_description || ''}
+                  onChange={(e) => handleBudgetChange(index, 'item_description', e.target.value)}
+                  required
+                />
+              </Form.Group>
+            </Col>
+            <Col md={2}>
+              <Form.Group>
+                <Form.Label>Cantidad</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Cantidad"
+                  value={item.quantity || ''}
+                  onChange={(e) => handleBudgetChange(index, 'quantity', e.target.value)}
+                  required
+                />
+              </Form.Group>
+            </Col>
+            <Col md={2}>
+              <Form.Group>
+                <Form.Label>Precio Unit.</Form.Label>
+                <Form.Control
+                  type="number"
+                  placeholder="Precio por unidad"
+                  value={item.unit_price || ''}
+                  onChange={(e) => handleBudgetChange(index, 'unit_price', e.target.value)}
+                  required
+                />
+              </Form.Group>
+            </Col>
+            <Col md={2}>
+              <Form.Group>
+                <Form.Label>Notas</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Notas"
+                  value={item.notes || ''}
+                  onChange={(e) => handleBudgetChange(index, 'notes', e.target.value)}
+                />
+              </Form.Group>
+            </Col>
+          </React.Fragment>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
