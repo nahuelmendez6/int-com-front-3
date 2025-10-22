@@ -158,7 +158,7 @@ const ProviderProfile = ({ userData }) => {
     : 'No especificada';
 
   return (
-    <div className="card shadow-sm border-0 rounded-4 overflow-hidden provider-profile-container">
+    <div className="social-card provider-profile-container">
       <div className="card-body p-3 p-md-4">
 
         {/* 🔹 Vista normal */}
@@ -199,7 +199,8 @@ const ProviderProfile = ({ userData }) => {
                 <div>
                   {(profileDetails?.categories || []).length > 0 ? (
                     profileDetails.categories.map((cat, i) => (
-                      <span key={cat.id_category ?? i} className="badge bg-secondary me-1 mb-1">
+                      <span key={cat.id_category ?? i} className="badge badge-social bg-primary me-1 mb-1">
+                        <i className="bi bi-tag me-1"></i>
                         {cat.name}
                       </span>
                     ))
@@ -211,7 +212,7 @@ const ProviderProfile = ({ userData }) => {
             </div>
 
             <div className="d-grid d-md-flex justify-content-md-end mt-4 gap-2">
-              <button onClick={startEditing} className="btn btn-primary rounded-pill px-4">
+              <button onClick={startEditing} className="btn btn-social btn-primary-social">
                 <i className="bi bi-pencil-square me-2"></i>Editar Perfil
               </button>
             </div>
@@ -234,7 +235,7 @@ const ProviderProfile = ({ userData }) => {
                 <div className="mb-3">
                   <label className="form-label fw-semibold">Descripción</label>
                   <textarea
-                    className="form-control"
+                    className="form-control form-control-social"
                     name="description"
                     rows="3"
                     value={formData.description}
@@ -246,7 +247,7 @@ const ProviderProfile = ({ userData }) => {
                   <label className="form-label fw-semibold">Teléfono</label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control form-control-social"
                     name="phone_number"
                     value={formData.phone_number}
                     onChange={handleInputChange}
@@ -271,7 +272,7 @@ const ProviderProfile = ({ userData }) => {
             <hr className="my-3" />
 
             <h5 className="border-start border-3 border-primary ps-3 mb-3 fw-semibold">Categorías</h5>
-            <div className="d-flex flex-column flex-md-row flex-wrap">
+                <div className="d-flex flex-column flex-md-row flex-wrap">
               {categories.map((cat, i) => (
                 <div key={cat.id_category ?? i} className="form-check me-3 mb-2">
                   <input
@@ -281,8 +282,9 @@ const ProviderProfile = ({ userData }) => {
                     value={cat.id_category}
                     checked={(formData.categories || []).includes(cat.id_category)}
                     onChange={handleCategoryChange}
+                    style={{ transform: 'scale(1.2)' }}
                   />
-                  <label className="form-check-label" htmlFor={`category-${cat.id_category ?? i}`}>
+                  <label className="form-check-label fw-semibold" htmlFor={`category-${cat.id_category ?? i}`}>
                     {cat.name}
                   </label>
                 </div>
@@ -295,7 +297,7 @@ const ProviderProfile = ({ userData }) => {
               <div className="col-12 col-md-6">
                 <label className="form-label fw-semibold">Tipo de Proveedor</label>
                 <select
-                  className="form-select w-100"
+                  className="form-select form-control-social w-100"
                   name="type_provider"
                   value={formData.type_provider}
                   onChange={handleInputChange}
@@ -312,7 +314,7 @@ const ProviderProfile = ({ userData }) => {
               <div className="col-12 col-md-6">
                 <label className="form-label fw-semibold">Profesión</label>
                 <select
-                  className="form-select w-100"
+                  className="form-select form-control-social w-100"
                   name="profession"
                   value={formData.profession}
                   onChange={handleInputChange}
@@ -328,13 +330,13 @@ const ProviderProfile = ({ userData }) => {
             </div>
 
             <div className="d-grid d-md-flex justify-content-md-end gap-2 mt-4">
-              <button type="submit" className="btn btn-success rounded-pill px-4">
+              <button type="submit" className="btn btn-social btn-success-social">
                 <i className="bi bi-check-circle me-2"></i>Guardar Cambios
               </button>
               <button
                 type="button"
                 onClick={() => setIsEditing(false)}
-                className="btn btn-secondary rounded-pill px-4"
+                className="btn btn-social btn-secondary"
               >
                 Cancelar
               </button>

@@ -69,7 +69,7 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
   return (
     <>
       <div className="petition-list-container">
-        {petitions.map((petition) => {
+        {petitions.map((petition, index) => {
           const isVisible = visiblePetition === petition.id_petition;
           const hasPostulated = providerPostulations.some(
             (p) => p.id_petition === petition.id_petition && !p.is_deleted
@@ -78,22 +78,26 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
           return (
             <Card
               key={petition.id_petition}
-              className="petition-card shadow-sm border rounded-4 overflow-hidden bg-white"
+              className="petition-card social-card mb-4"
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
               {/* Encabezado */}
               {petition.customer_user && (
-                <div className="card-header d-flex align-items-center gap-3 bg-white">
+                <div className="card-header d-flex align-items-center gap-3" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
                   <Image
                     src={`http://localhost:8000${petition.customer_user.profile_image}`}
                     roundedCircle
                     className="profile-image"
+                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                   />
                   <div>
                     <h6 className="mb-0 fw-semibold">
+                      <i className="bi bi-person-circle me-2"></i>
                       {petition.customer_user.name}{" "}
                       {petition.customer_user.lastname}
                     </h6>
-                    <small className="text-muted">
+                    <small className="opacity-75">
+                      <i className="bi bi-envelope me-1"></i>
                       {petition.customer_user.email}
                     </small>
                   </div>
@@ -103,7 +107,7 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
               {/* Cuerpo */}
               <Card.Body className="p-4">
                 <div className="border-start border-3 border-primary ps-3 mb-3">
-                  <p className="fs-5 mb-0">{petition.description}</p>
+                  <p className="fs-5 mb-0 text-dark">{petition.description}</p>
                 </div>
 
                 {/* Galería */}
@@ -123,11 +127,12 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
               </Card.Body>
 
               {/* Pie de acciones */}
-              <div className="border-top d-flex flex-wrap justify-content-between align-items-center px-4 py-3 bg-light">
-                <small className="text-muted">
+              <div className="border-top d-flex flex-wrap justify-content-between align-items-center px-4 py-3" style={{ background: 'rgba(248, 249, 250, 0.8)' }}>
+                <small className="text-muted d-flex align-items-center">
                   <i className="bi bi-calendar-range me-2"></i>
-                  {new Date(petition.date_since).toLocaleDateString()} -{" "}
-                  {new Date(petition.date_until).toLocaleDateString()}
+                  <span>Desde: {new Date(petition.date_since).toLocaleDateString()}</span>
+                  <span className="mx-2">•</span>
+                  <span>Hasta: {new Date(petition.date_until).toLocaleDateString()}</span>
                 </small>
 
                 <div className="d-flex align-items-center gap-2 flex-wrap">
@@ -135,21 +140,28 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
                     <>
                       <Button
                         variant="link"
-                        className="text-secondary p-1"
+                        className="text-secondary p-2 rounded-circle"
                         onClick={() => onEdit(petition)}
+                        style={{ transition: 'all 0.3s ease' }}
+                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
+                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                       >
                         <i className="bi bi-pencil-square fs-5"></i>
                       </Button>
                       <Button
                         variant="link"
-                        className="text-danger p-1"
+                        className="text-danger p-2 rounded-circle"
                         onClick={() => onDelete(petition.id_petition)}
+                        style={{ transition: 'all 0.3s ease' }}
+                        onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
+                        onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                       >
                         <i className="bi bi-trash fs-5"></i>
                       </Button>
                       <Button
                         variant="outline-primary"
                         size="sm"
+                        className="btn-social btn-primary-social"
                         onClick={() => togglePostulations(petition.id_petition)}
                         disabled={loading && isVisible}
                       >
@@ -168,8 +180,8 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
                       <Button
                         variant="success"
                         size="sm"
-                        className="d-flex align-items-center"
-                        disabled={true} // Always disabled if already postulated
+                        className="btn-social btn-success-social d-flex align-items-center"
+                        disabled={true}
                       >
                         <i className="bi bi-send-check me-1"></i>
                         Ya Postulado
@@ -182,8 +194,8 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
                         <Button
                           variant="success"
                           size="sm"
-                          className="d-flex align-items-center"
-                          disabled={loadingProviderPostulations} // Only disabled if still loading
+                          className="btn-social btn-success-social d-flex align-items-center"
+                          disabled={loadingProviderPostulations}
                         >
                           <i className="bi bi-send-check me-1"></i>
                           Postularse

@@ -3,31 +3,71 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  background-color: #f8f9fa;
-  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 16px 16px 0 0;
 }
 
 .petition-card .profile-image {
   width: 70px;
   height: 70px;
   object-fit: cover;
-  border: 3px solid #dee2e6;
+  border: 3px solid rgba(255, 255, 255, 0.3);
   margin-bottom: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.petition-card .profile-image:hover {
+  transform: scale(1.05);
+  border-color: rgba(255, 255, 255, 0.6);
 }
 
 .petition-card .user-info h6 {
   margin-bottom: 0.1rem;
+  font-weight: 600;
 }
 
 .petition-card .card-body p {
   text-align: justify;
   line-height: 1.6;
+  color: #333;
 }
 
+.petition-card .card-body {
+  background: white;
+  padding: 2rem;
+}
+
+.petition-card .post-image-gallery {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Animaciones */
+.petition-card {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
 @media (min-width: 768px) {
   .petition-card .card-header {
     flex-direction: row;
     text-align: left;
+    padding: 1.5rem 2rem;
   }
 
   .petition-card .profile-image {
@@ -35,5 +75,20 @@
     height: 55px;
     margin-bottom: 0;
     margin-right: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .petition-card .card-header {
+    padding: 1rem;
+  }
+  
+  .petition-card .card-body {
+    padding: 1rem;
+  }
+  
+  .petition-card .profile-image {
+    width: 50px;
+    height: 50px;
   }
 }

@@ -1,42 +1,334 @@
+/* Reset y estilos base */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+}
+
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  min-height: 100vh;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Estilos para tarjetas tipo redes sociales */
+.social-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  overflow: hidden;
 }
 
-@keyframes logo-spin {
+.social-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.social-card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.social-card-body {
+  padding: 1.5rem;
+}
+
+.social-card-footer {
+  padding: 1rem 1.5rem;
+  background: rgba(248, 249, 250, 0.8);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Botones estilo redes sociales */
+.btn-social {
+  border-radius: 25px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-social::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-social:hover::before {
+  left: 100%;
+}
+
+.btn-primary-social {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary-social:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-success-social {
+  background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+  color: white;
+}
+
+.btn-success-social:hover {
+  background: linear-gradient(135deg, #4a9a1f 0%, #96d4b8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(86, 171, 47, 0.4);
+}
+
+/* Formularios estilo redes sociales */
+.form-control-social {
+  border-radius: 12px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.form-control-social:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  background: white;
+}
+
+/* Badges y etiquetas */
+.badge-social {
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(30px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .social-card {
+    border-radius: 12px;
+    margin: 0.5rem;
+  }
+  
+  .social-card-header,
+  .social-card-body,
+  .social-card-footer {
+    padding: 1rem;
+  }
+  
+  .btn-social {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
   }
 }
 
-.card {
-  padding: 2em;
+@media (max-width: 576px) {
+  .social-card {
+    border-radius: 8px;
+    margin: 0.25rem;
+  }
+  
+  .social-card-header,
+  .social-card-body,
+  .social-card-footer {
+    padding: 0.75rem;
+  }
 }
 
-.read-the-docs {
-  color: #888;
+/* Estilos adicionales para componentes específicos */
+.profile-page {
+  padding: 1.5rem;
+  min-height: 100vh;
 }
+
+.provider-profile-container {
+  margin-bottom: 2rem;
+}
+
+/* Mejoras para formularios */
+.form-label {
+  color: #495057;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.form-check-label {
+  color: #495057;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.form-check-label:hover {
+  color: #667eea;
+}
+
+/* Mejoras para botones de acción */
+.btn-link {
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-link:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(1.1);
+}
+
+/* Mejoras para badges */
+.badge {
+  font-size: 0.75rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.bg-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.bg-success {
+  background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%) !important;
+}
+
+.bg-secondary {
+  background: linear-gradient(135deg, #6c757d 0%, #adb5bd 100%) !important;
+}
+
+/* Mejoras para imágenes */
+.profile-image {
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Mejoras para alertas */
+.alert {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.alert-danger {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ffa8a8 100%);
+  color: white;
+}
+
+.alert-info {
+  background: linear-gradient(135deg, #74b9ff 0%, #a8e6cf 100%);
+  color: white;
+}
+
+/* Mejoras para spinners */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.3rem;
+}
+
+/* Mejoras para texto */
+.text-muted {
+  color: #6c757d !important;
+}
+
+.fw-semibold {
+  font-weight: 600 !important;
+}
+
+.fw-bold {
+  font-weight: 700 !important;
+}
+
+/* Mejoras para bordes */
+.border-start {
+  border-left: 3px solid #667eea !important;
+}
+
+.border-primary {
+  border-color: #667eea !important;
+}
+
+/* Mejoras para iconos */
+.bi {
+  transition: all 0.3s ease;
+}
+
+.bi:hover {
+  transform: scale(1.1);
+}
+
+/* Mejoras para enlaces */
+.text-decoration-none {
+  transition: all 0.3s ease;
+}
+
+.text-decoration-none:hover {
+  text-decoration: underline !important;
+}
+
+/* Mejoras para contenedores */
+.container-fluid {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Mejoras para grid */
+.row {
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+}
+
+.col-12, .col-md-4, .col-md-6, .col-md-8 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+/* Mejoras para gap */
+.g-3 > * {
+  margin-bottom: 1rem;
+}
+
+.gap-2 > * {
+  margin-right: 0.5rem;
+}
+
+.gap-2 > *:last-child {
+  margin-right: 0;
+}
+

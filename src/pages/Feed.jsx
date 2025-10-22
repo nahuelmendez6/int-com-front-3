@@ -5,17 +5,28 @@ import { useCustomerOffers } from '../hooks/useCustomerOffers.js';
 import ProviderFeed from '../components/feed/ProviderFeed.jsx';
 import CustomerFeed from '../components/feed/CustomerFeed';
 import DefaultFeed from '../components/feed/DefaultFeed';
-import './pages-styles/Feed.css'; // estilos movidos
+import './pages-styles/Feed.css';
 
 const Feed = () => {
   const { profile, loading: authLoading } = useAuth();
   const { petitions, loading: petitionsLoading, error: petitionsError } = usePetitions(profile);
   const { offers, loading: offersLoading, error: offersError } = useCustomerOffers(profile, authLoading);
-  console.log('peticiones para proveedor', petitions)
-  if (authLoading) return <p>Cargando perfil de usuario...</p>;
+  
+  if (authLoading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Cargando...</span>
+          </div>
+          <p className="mt-3 text-muted">Cargando tu feed...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="feed-page">
+    <div className="feed-page fade-in-up">
       <div className="feed-content">
         {profile?.role === 'provider' && (
           <ProviderFeed

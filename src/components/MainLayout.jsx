@@ -15,7 +15,9 @@ const MainLayout = ({ children }) => {
       <Sidebar />
       <main className="main-content">
         <div className="page-container">
-          {children}
+          <div className="content-wrapper">
+            {children}
+          </div>
         </div>
       </main>
       
@@ -23,7 +25,8 @@ const MainLayout = ({ children }) => {
         .main-layout {
           display: flex;
           min-height: 100vh;
-          background-color: #f8f9fa;
+          background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         .main-content {
@@ -31,6 +34,7 @@ const MainLayout = ({ children }) => {
           margin-left: 280px; /* Espacio para el sidebar fijo */
           padding: 20px;
           min-height: 100vh;
+          transition: margin-left 0.3s ease;
         }
         
         .page-container {
@@ -38,12 +42,39 @@ const MainLayout = ({ children }) => {
           margin: 0 auto;
           width: 100%;
         }
+
+        .content-wrapper {
+          background: rgba(255, 255, 255, 0.95);
+          border-radius: 20px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          min-height: calc(100vh - 40px);
+          padding: 0;
+          overflow: hidden;
+        }
         
         /* Responsive para móviles */
         @media (max-width: 768px) {
           .main-content {
             margin-left: 0;
             padding: 10px;
+          }
+          
+          .content-wrapper {
+            border-radius: 15px;
+            min-height: calc(100vh - 20px);
+          }
+        }
+
+        @media (max-width: 576px) {
+          .main-content {
+            padding: 5px;
+          }
+          
+          .content-wrapper {
+            border-radius: 10px;
+            min-height: calc(100vh - 10px);
           }
         }
       `}</style>

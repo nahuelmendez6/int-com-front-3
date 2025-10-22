@@ -106,65 +106,93 @@ const CustomerProfile = ({ userData }) => {
       : 'No registrada';
 
     return (
-      <div>
-        <div className="row">
+      <div className="social-card">
+        <div className="row g-3">
           <div className="col-md-4 text-center">
             <ImageUpload currentImage={user.profile_image} disabled />
-            <h4 className="mt-3">{user.first_name} {user.last_name}</h4>
-            <p className="text-muted">{user.email}</p>
-            <p><strong>Teléfono:</strong> {profileData.phone_number || 'No registrado'}</p>
+            <h4 className="mt-3 fw-bold">
+              <i className="bi bi-person-circle me-2"></i>
+              {user.first_name} {user.last_name}
+            </h4>
+            <p className="text-muted">
+              <i className="bi bi-envelope me-1"></i>
+              {user.email}
+            </p>
+            <p className="text-muted">
+              <i className="bi bi-telephone me-1"></i>
+              <strong>Teléfono:</strong> {profileData.phone_number || 'No registrado'}
+            </p>
           </div>
           <div className="col-md-8">
-            <h5>Dirección</h5>
-            <p>{fullAddress}</p>
+            <h5 className="border-start border-3 border-primary ps-3 mb-3 fw-semibold">
+              <i className="bi bi-geo-alt me-2"></i>
+              Dirección
+            </h5>
+            <p className="text-muted">{fullAddress}</p>
           </div>
         </div>
-        <button onClick={() => setIsEditing(true)} className="btn btn-primary mt-4">Editar Perfil</button>
+        <div className="d-grid d-md-flex justify-content-md-end mt-4">
+          <button onClick={() => setIsEditing(true)} className="btn btn-social btn-primary-social">
+            <i className="bi bi-pencil-square me-2"></i>Editar Perfil
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="row mb-3">
-        <div className="col-md-4 text-center">
-          <ImageUpload currentImage={user.profile_image} onFileSelect={setImageFile} />
+    <div className="social-card">
+      <form onSubmit={handleSubmit}>
+        <div className="row mb-3">
+          <div className="col-md-4 text-center">
+            <ImageUpload currentImage={user.profile_image} onFileSelect={setImageFile} />
+          </div>
+          <div className="col-md-8">
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Nombre</label>
+              <input className="form-control form-control-social" name="first_name" value={formData.first_name} onChange={handleInputChange} />
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Apellido</label>
+              <input className="form-control form-control-social" name="last_name" value={formData.last_name} onChange={handleInputChange} />
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Email</label>
+              <input className="form-control form-control-social" name="email" value={formData.email} onChange={handleInputChange} />
+            </div>
+            <div className="mb-3">
+              <label className="form-label fw-semibold">Teléfono</label>
+              <input className="form-control form-control-social" name="phone_number" value={formData.phone_number} onChange={handleInputChange} />
+            </div>
+          </div>
         </div>
-        <div className="col-md-8">
-          <div className="mb-3">
-            <label className="form-label">Nombre</label>
-            <input className="form-control" name="first_name" value={formData.first_name} onChange={handleInputChange} />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Apellido</label>
-            <input className="form-control" name="last_name" value={formData.last_name} onChange={handleInputChange} />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Email</label>
-            <input className="form-control" name="email" value={formData.email} onChange={handleInputChange} />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Teléfono</label>
-            <input className="form-control" name="phone_number" value={formData.phone_number} onChange={handleInputChange} />
-          </div>
+
+        <h5 className="border-start border-3 border-primary ps-3 mb-3 fw-semibold">
+          <i className="bi bi-geo-alt me-2"></i>
+          Dirección
+        </h5>
+        <AddressForm
+          addressData={formData.address}
+          provinces={provinces}
+          departments={departments}
+          cities={cities}
+          onAddressChange={handleAddressChange}
+          onProvinceChange={handleProvinceChange}
+          onDepartmentChange={handleDepartmentChange}
+        />
+
+        <div className="d-grid d-md-flex justify-content-md-end gap-2 mt-4">
+          <button type="submit" className="btn btn-social btn-success-social">
+            <i className="bi bi-check-circle me-2"></i>Guardar Cambios
+          </button>
+          <button type="button" onClick={() => setIsEditing(false)} className="btn btn-social btn-secondary">
+            Cancelar
+          </button>
         </div>
-      </div>
-
-      <h5>Dirección</h5>
-      <AddressForm
-        addressData={formData.address}
-        provinces={provinces}
-        departments={departments}
-        cities={cities}
-        onAddressChange={handleAddressChange}
-        onProvinceChange={handleProvinceChange}
-        onDepartmentChange={handleDepartmentChange}
-      />
-
-      <button type="submit" className="btn btn-success me-2 mt-3">Guardar Cambios</button>
-      <button type="button" onClick={() => setIsEditing(false)} className="btn btn-secondary mt-3">Cancelar</button>
-    </form>
+      </form>
+    </div>
   );
 };
 
 export default CustomerProfile;
+
