@@ -13,12 +13,14 @@ export const usePostulations = () => {
     setError(null);
     try {
       const data = await getPostulationsByPetition(petitionId);
-      if (!data || data.length === 0) {
+      const activePostulations = data.filter(p => !p.is_deleted); // Filter out soft-deleted postulations
+
+      if (!activePostulations || activePostulations.length === 0) {
         setPostulations([]);
         return;
       }
 
-      const uniqueProviderIds = [...new Set(data.map((p) => p.id_provider))];
+      const uniqueProviderIds = [...new Set(activePostulations.map((p) => p.id_provider))];
       const providerMap = {};
       await Promise.all(
         uniqueProviderIds.map(async (id_provider) => {
@@ -31,7 +33,7 @@ export const usePostulations = () => {
         })
       );
 
-      const enrichedPostulations = data.map((p) => ({
+      const enrichedPostulations = activePostulations.map((p) => ({
         ...p,
         provider_user: providerMap[p.id_provider] || null,
       }));
