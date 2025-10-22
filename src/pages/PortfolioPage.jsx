@@ -36,28 +36,68 @@ const PortfolioPage = () => {
     handleCloseModal();
   };
 
-  if (loading) return <p>Cargando portfolio...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) {
+    return (
+      <div className="portfolio-page">
+        <div className="card shadow rounded-3">
+          <div className="card-body p-4">
+            <div className="text-center py-4">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
+              <p className="mt-3 text-muted">Cargando portfolio...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="portfolio-page">
+        <div className="card shadow rounded-3">
+          <div className="card-body p-4">
+            <div className="alert alert-danger d-flex align-items-center">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              {error}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Mi Portfolio</h1>
-        <Button variant="primary" onClick={handleShowModal}>
-          Crear Nuevo Proyecto
-        </Button>
-      </div>
-      
-      <PortfolioList portfolios={portfolios} refreshPortfolios={fetchPortfolios} />
+    <div className="portfolio-page">
+      <div className="card shadow rounded-3">
+        <div className="card-body p-4">
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h1 className="card-title mb-0">
+              <i className="bi bi-briefcase me-2"></i>
+              Mi Portfolio
+            </h1>
+            <Button variant="primary" className="btn-social btn-primary-social" onClick={handleShowModal}>
+              <i className="bi bi-plus-lg me-2"></i>
+              Crear Nuevo Proyecto
+            </Button>
+          </div>
+          <p className="text-muted mb-4">
+            Muestra tu trabajo y experiencia a través de proyectos que demuestren tus habilidades y servicios.
+          </p>
+          
+          <PortfolioList portfolios={portfolios} refreshPortfolios={fetchPortfolios} />
 
-      <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Nuevo Proyecto de Portfolio</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <PortfolioForm onSuccess={handleSuccess} />
-        </Modal.Body>
-      </Modal>
+          <Modal show={showModal} onHide={handleCloseModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>Nuevo Proyecto de Portfolio</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <PortfolioForm onSuccess={handleSuccess} />
+            </Modal.Body>
+          </Modal>
+        </div>
+      </div>
     </div>
   );
 };

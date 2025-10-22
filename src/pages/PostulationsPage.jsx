@@ -67,34 +67,55 @@ const PostulationsPage = () => {
   };
 
   return (
-    <div className="offers-page"> 
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Mis Postulaciones</h1>
-      </div>
-      
-      <div className="card shadow-sm">
-        <div className="card-body">
-          <h5 className="card-title mb-3">Postulaciones Realizadas</h5>
-          {loading && <p>Cargando postulaciones...</p>}
-          {error && <div className="alert alert-danger">{error}</div>}
-          {!loading && !error && 
+    <div className="postulations-page">
+      <div className="card shadow rounded-3">
+        <div className="card-body p-4">
+          <h1 className="card-title mb-4">
+            <i className="bi bi-journal-text me-2"></i>
+            Mis Postulaciones
+          </h1>
+          <p className="text-muted mb-4">
+            Gestiona las postulaciones que has realizado a peticiones de clientes. Puedes editar o eliminar tus postulaciones.
+          </p>
+          
+          {loading ? (
+            <div className="text-center py-4">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
+              <p className="mt-3 text-muted">Cargando postulaciones...</p>
+            </div>
+          ) : error ? (
+            <div className="alert alert-danger d-flex align-items-center">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              {error}
+            </div>
+          ) : postulations.length === 0 ? (
+            <div className="text-center py-5">
+              <div className="mb-3">
+                <i className="bi bi-journal-text" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
+              </div>
+              <h5 className="text-muted mb-3">No tienes postulaciones</h5>
+              <p className="text-muted mb-0">Postúlate a peticiones de clientes para comenzar a ofrecer tus servicios.</p>
+            </div>
+          ) : (
             <ProviderPostulationList 
               postulations={postulations} 
               onEdit={handleShowEditModal} 
               onDelete={handleDelete} 
             />
-          }
+          )}
+
+          <PostulationForm 
+            show={showModal}
+            handleClose={handleCloseModal}
+            onSubmit={handleSubmit}
+            initialData={editingPostulation}
+            submitting={submitting}
+            error={error}
+          />
         </div>
       </div>
-
-      <PostulationForm 
-        show={showModal}
-        handleClose={handleCloseModal}
-        onSubmit={handleSubmit}
-        initialData={editingPostulation}
-        submitting={submitting}
-        error={error}
-      />
     </div>
   );
 };

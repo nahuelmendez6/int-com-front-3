@@ -24,15 +24,44 @@ const ContratacionesPage = () => {
     fetchData();
   }, []);
 
-  if (loading) return <p className="text-center mt-5">Cargando contrataciones...</p>;
+  if (loading) {
+    return (
+      <div className="contrataciones-page">
+        <div className="card shadow rounded-3">
+          <div className="card-body p-4">
+            <div className="text-center py-4">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
+              <p className="mt-3 text-muted">Cargando contrataciones...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Mis Contrataciones</h1>
+    <div className="contrataciones-page">
+      <div className="card shadow rounded-3">
+        <div className="card-body p-4">
+          <h1 className="card-title mb-4">
+            <i className="bi bi-check2-square me-2"></i>
+            Mis Contrataciones
+          </h1>
+          <p className="text-muted mb-4">
+            Gestiona tus contrataciones activas y el historial de servicios contratados.
+          </p>
+          
+          {error && (
+            <Alert variant="danger" className="d-flex align-items-center">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              {error}
+            </Alert>
+          )}
+          {!error && <ContratacionList contrataciones={contrataciones} />}
+        </div>
       </div>
-      {error && <Alert variant="danger">{error}</Alert>}
-      {!error && <ContratacionList contrataciones={contrataciones} />}
     </div>
   );
 };

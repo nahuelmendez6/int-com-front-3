@@ -71,28 +71,53 @@ const OffersPage = () => {
 
   return (
     <div className="offers-page">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Mis Ofertas</h1>
-        <Button variant="primary" onClick={handleShowCreateModal}>
-          <i className="bi bi-plus-lg me-2"></i>
-          Crear Nueva Oferta
-        </Button>
-      </div>
-      
-      <OfferForm 
-        show={showModal} 
-        onHide={() => setShowModal(false)} 
-        onSubmit={handleSubmit} 
-        initialData={editingOffer}
-        offerTypes={offerTypes}
-      />
+      <div className="card shadow rounded-3">
+        <div className="card-body p-4">
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h1 className="card-title mb-0">
+              <i className="bi bi-tag me-2"></i>
+              Mis Ofertas
+            </h1>
+            <Button variant="primary" className="btn-social btn-primary-social" onClick={handleShowCreateModal}>
+              <i className="bi bi-plus-lg me-2"></i>
+              Crear Nueva Oferta
+            </Button>
+          </div>
+          <p className="text-muted mb-4">
+            Gestiona tus ofertas de servicios. Crea nuevas ofertas, edita las existentes o elimina las que ya no estén activas.
+          </p>
+          
+          <OfferForm 
+            show={showModal} 
+            onHide={() => setShowModal(false)} 
+            onSubmit={handleSubmit} 
+            initialData={editingOffer}
+            offerTypes={offerTypes}
+          />
 
-      <div className="card shadow-sm">
-        <div className="card-body">
-          <h5 className="card-title mb-3">Ofertas Activas</h5>
-          {loading && <p>Cargando ofertas...</p>}
-          {error && <div className="alert alert-danger">{error}</div>}
-          {!loading && !error && <OfferList offers={offers} onEdit={handleShowEditModal} onDelete={handleDelete} />}
+          {loading ? (
+            <div className="text-center py-4">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
+              <p className="mt-3 text-muted">Cargando ofertas...</p>
+            </div>
+          ) : error ? (
+            <div className="alert alert-danger d-flex align-items-center">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              {error}
+            </div>
+          ) : offers.length === 0 ? (
+            <div className="text-center py-5">
+              <div className="mb-3">
+                <i className="bi bi-tag" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
+              </div>
+              <h5 className="text-muted mb-3">No tienes ofertas</h5>
+              <p className="text-muted mb-0">Crea tu primera oferta para comenzar a ofrecer tus servicios.</p>
+            </div>
+          ) : (
+            <OfferList offers={offers} onEdit={handleShowEditModal} onDelete={handleDelete} />
+          )}
         </div>
       </div>
     </div>

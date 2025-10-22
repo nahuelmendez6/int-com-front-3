@@ -35,15 +35,16 @@ const Profile = () => {
   };
 
   return (
-    <div className="profile-page fade-in-up">
-      <div className="social-card">
-        <div className="feed-card-header">
-          <h1 className="feed-title">
+    <div className="profile-page">
+      <div className="card shadow rounded-3">
+        <div className="card-body p-4">
+          <h1 className="card-title mb-4">
             <i className="bi bi-person-circle me-2"></i>
             Mi Perfil
           </h1>
-        </div>
-        <div className="feed-card-body">
+          <p className="text-muted mb-4">
+            Gestiona tu información personal, configuración de cuenta y preferencias de la plataforma.
+          </p>
           {renderContent()}
         </div>
       </div>

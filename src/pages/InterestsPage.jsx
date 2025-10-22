@@ -19,15 +19,49 @@ const InterestsPage = () => {
   const selectedCategoryIds = new Set(interests.map(i => i.id_category));
   const availableCategories = categories.filter(c => !selectedCategoryIds.has(c.id_category));
 
-  if (loading) return <p>Cargando intereses...</p>;
-  if (error) return <p className="text-danger">{error}</p>;
+  if (loading) {
+    return (
+      <div className="interests-page">
+        <div className="card shadow rounded-3">
+          <div className="card-body p-4">
+            <div className="text-center py-4">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
+              <p className="mt-3 text-muted">Cargando intereses...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="interests-page">
+        <div className="card shadow rounded-3">
+          <div className="card-body p-4">
+            <div className="alert alert-danger d-flex align-items-center">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              {error}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="interests-page">
       <div className="card shadow rounded-3">
         <div className="card-body p-4">
-          <h1>Gestiona tus Intereses</h1>
-          <p>Añade o elimina categorías de servicios para personalizar tu experiencia. Los cambios se guardan automáticamente.</p>
+          <h1 className="card-title mb-4">
+            <i className="bi bi-heart me-2"></i>
+            Mis Intereses
+          </h1>
+          <p className="text-muted mb-4">
+            Añade o elimina categorías de servicios para personalizar tu experiencia. Los cambios se guardan automáticamente.
+          </p>
           
           <hr />
 

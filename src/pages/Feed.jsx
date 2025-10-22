@@ -26,26 +26,37 @@ const Feed = () => {
   }
 
   return (
-    <div className="feed-page fade-in-up">
-      <div className="feed-content">
-        {profile?.role === 'provider' && (
-          <ProviderFeed
-            petitions={petitions}
-            loading={petitionsLoading}
-            error={petitionsError}
-            profile={profile}
-          />
-        )}
+    <div className="feed-page">
+      <div className="card shadow rounded-3">
+        <div className="card-body p-4">
+          <h1 className="card-title mb-4">
+            <i className="bi bi-house-door me-2"></i>
+            Feed Principal
+          </h1>
+          <p className="text-muted mb-4">
+            Aquí encontrarás las últimas peticiones y ofertas disponibles según tu rol en la plataforma.
+          </p>
+          <div className="feed-content">
+            {profile?.role === 'provider' && (
+              <ProviderFeed
+                petitions={petitions}
+                loading={petitionsLoading}
+                error={petitionsError}
+                profile={profile}
+              />
+            )}
 
-        {profile?.role === 'customer' && (
-          <CustomerFeed
-            offers={offers}
-            loading={offersLoading}
-            error={offersError}
-          />
-        )}
+            {profile?.role === 'customer' && (
+              <CustomerFeed
+                offers={offers}
+                loading={offersLoading}
+                error={offersError}
+              />
+            )}
 
-        {!profile?.role && <DefaultFeed />}
+            {!profile?.role && <DefaultFeed />}
+          </div>
+        </div>
       </div>
     </div>
   );

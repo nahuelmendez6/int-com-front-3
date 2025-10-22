@@ -10,12 +10,18 @@ const ServiceAreaPage = () => {
 
     return (
         <div className="service-area-page">
-            <Row>
-                <Col>
-                    <h1>Área de Servicio</h1>
+            <div className="card shadow rounded-3">
+                <div className="card-body p-4">
+                    <h1 className="card-title mb-4">
+                        <i className="bi bi-geo-alt me-2"></i>
+                        Área de Servicio
+                    </h1>
+                    <p className="text-muted mb-4">
+                        Define las áreas geográficas donde ofreces tus servicios. Esto ayudará a los clientes a encontrar proveedores en su zona.
+                    </p>
                     <ProviderServiceArea providerId={id_provider} />
-                </Col>
-            </Row>
+                </div>
+            </div>
         </div>
     );
 };

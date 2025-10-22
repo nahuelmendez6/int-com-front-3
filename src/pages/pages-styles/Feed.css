@@ -1,13 +1,10 @@
 .feed-page {
   width: 100%;
-  padding: 1.5rem;
   min-height: 100vh;
 }
 
 .feed-content {
   width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
 }
 
 .feed-card {
