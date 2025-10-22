@@ -11,7 +11,7 @@ const Feed = () => {
   const { profile, loading: authLoading } = useAuth();
   const { petitions, loading: petitionsLoading, error: petitionsError } = usePetitions(profile);
   const { offers, loading: offersLoading, error: offersError } = useCustomerOffers(profile, authLoading);
-
+  console.log('peticiones para proveedor', petitions)
   if (authLoading) return <p>Cargando perfil de usuario...</p>;
 
   return (
