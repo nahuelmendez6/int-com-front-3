@@ -1,16 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Card, Image } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { usePostulations } from "../../hooks/usePostulations.js";
+import { getProviderPostulations } from "../../services/postulation.service.js"; // Import the service
 import AttachmentsGallery from "../attachments/AttachmentsGallery.jsx";
 import ImageModal from "../attachments/ImageModal.jsx";
 import PostulationsList from "../postulations/PostulationList.jsx";
+import { useAuth } from "../../hooks/useAuth.js"; // Add this import
 import "./PetitionList.css";
 
 const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
   const [showModal, setShowModal] = useState(false);
   const [attachments, setAttachments] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [providerPostulations, setProviderPostulations] = useState([]); // New state for provider's postulations
+  const [loadingProviderPostulations, setLoadingProviderPostulations] = useState(true); // New state for loading
+
+  const { user } = useAuth(); // Get user from useAuth()
 
   const {
     postulations,
@@ -20,6 +26,28 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
     togglePostulations,
     handleUpdatePostulation,
   } = usePostulations();
+
+  useEffect(() => {
+    const fetchProviderPostulations = async () => {
+      if (profile?.role === "provider" && user?.id) { // Use user.id instead of profile.id_user
+        setLoadingProviderPostulations(true);
+        try {
+          const data = await getProviderPostulations();
+          console.log('postulaciones',data)
+          setProviderPostulations(data);
+        } catch (err) {
+          console.error("Error fetching provider postulations:", err);
+        } finally {
+          setLoadingProviderPostulations(false);
+        }
+      } else {
+        setProviderPostulations([]);
+        setLoadingProviderPostulations(false);
+      }
+    };
+
+    fetchProviderPostulations();
+  }, [profile, user]); // Re-fetch when profile or user changes
 
   if (!petitions?.length) {
     return (
@@ -43,13 +71,16 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
       <div className="petition-list-container">
         {petitions.map((petition) => {
           const isVisible = visiblePetition === petition.id_petition;
+          const hasPostulated = providerPostulations.some(
+            (p) => p.id_petition === petition.id_petition && !p.is_deleted
+          );
 
           return (
             <Card
               key={petition.id_petition}
               className="petition-card shadow-sm border rounded-4 overflow-hidden bg-white"
             >
-              {/* 🟦 Encabezado */}
+              {/* Encabezado */}
               {petition.customer_user && (
                 <div className="card-header d-flex align-items-center gap-3 bg-white">
                   <Image
@@ -69,7 +100,7 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
                 </div>
               )}
 
-              {/* 🟩 Cuerpo */}
+              {/* Cuerpo */}
               <Card.Body className="p-4">
                 <div className="border-start border-3 border-primary ps-3 mb-3">
                   <p className="fs-5 mb-0">{petition.description}</p>
@@ -91,7 +122,7 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
                 )}
               </Card.Body>
 
-              {/* 🟥 Pie de acciones */}
+              {/* Pie de acciones */}
               <div className="border-top d-flex flex-wrap justify-content-between align-items-center px-4 py-3 bg-light">
                 <small className="text-muted">
                   <i className="bi bi-calendar-range me-2"></i>
@@ -133,24 +164,37 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
                   )}
 
                   {profile?.role === "provider" && (
-                    <Link
-                      to={`/petitions/${petition.id_petition}/apply`}
-                      className="text-decoration-none"
-                    >
+                    hasPostulated ? (
                       <Button
                         variant="success"
                         size="sm"
                         className="d-flex align-items-center"
+                        disabled={true} // Always disabled if already postulated
                       >
                         <i className="bi bi-send-check me-1"></i>
-                        Postularse
+                        Ya Postulado
                       </Button>
-                    </Link>
+                    ) : (
+                      <Link
+                        to={`/petitions/${petition.id_petition}/apply`}
+                        className="text-decoration-none"
+                      >
+                        <Button
+                          variant="success"
+                          size="sm"
+                          className="d-flex align-items-center"
+                          disabled={loadingProviderPostulations} // Only disabled if still loading
+                        >
+                          <i className="bi bi-send-check me-1"></i>
+                          Postularse
+                        </Button>
+                      </Link>
+                    )
                   )}
                 </div>
               </div>
 
-              {/* 🟨 Postulaciones */}
+              {/* Postulaciones */}
               {isVisible && (
                 <div className="px-4 py-3 border-top bg-white">
                   <h6 className="fw-semibold mb-3">Postulaciones recibidas</h6>
@@ -167,6 +211,13 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
           );
         })}
       </div>
+
+      <ImageModal
+        show={showModal}
+        handleClose={() => setShowModal(false)}
+        images={attachments}
+        currentIndex={currentIndex}
+      />
 
       <style>{`
   /* Sidebar fijo en escritorio */
