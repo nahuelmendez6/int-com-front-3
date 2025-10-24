@@ -58,7 +58,10 @@ const MaterialList = ({ materials, refreshMaterials, providerId }) => {
     }).format(price);
   };
 
-  if (!materials || materials.length === 0) {
+  // Filter out deleted materials
+  const activeMaterials = materials.filter(m => !m.is_deleted);
+
+  if (!materials || activeMaterials.length === 0) {
     return (
       <div className="text-center py-4">
         <i className="bi bi-box-seam display-4 text-muted"></i>
@@ -83,7 +86,7 @@ const MaterialList = ({ materials, refreshMaterials, providerId }) => {
             </tr>
           </thead>
           <tbody>
-            {materials.map((material) => (
+            {activeMaterials.map((material) => (
               <tr key={material.id_material}>
                 <td>
                   <strong>{material.name}</strong>
@@ -145,7 +148,7 @@ const MaterialList = ({ materials, refreshMaterials, providerId }) => {
         <Modal.Body>
           ¿Estás seguro de que quieres eliminar el material <strong>"{selectedMaterial?.name}"</strong>?
           <br />
-          <small className="text-muted">Esta acción no se puede deshacer.</small>
+          <small className="text-muted">El material se marcará como eliminado y no aparecerá en tu catálogo.</small>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={closeModals}>

@@ -13,10 +13,10 @@ const materialService = {
     return api.post('/portfolios/materials/', data);
   },
   updateMaterial: (id, data) => {
-    return api.put(`/portfolios/materials/${id}/`, data);
+    return api.patch(`/portfolios/materials/${id}/`, data);
   },
   deleteMaterial: (id) => {
-    return api.delete(`/portfolios/materials/${id}/`);
+    return api.patch(`/portfolios/materials/${id}/`, { is_deleted: true });
   },
 
   // CRUD for Material Attachments
