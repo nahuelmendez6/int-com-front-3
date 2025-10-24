@@ -61,6 +61,35 @@ const PostulationList = ({ postulations, loading, error, onUpdate, petitionId })
                             </div>
                         )}
 
+                        {postulation.materials && postulation.materials.length > 0 && (
+                            <div className="materials-info mt-3 mb-3">
+                                <h6>Materiales Cotizados</h6>
+                                <table className="table table-sm materials-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Material</th>
+                                            <th className="text-end">Cantidad</th>
+                                            <th className="text-end">Precio Unit.</th>
+                                            <th className="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {postulation.materials.map(material => (
+                                            <tr key={material.id_postulation_material}>
+                                                <td>
+                                                    {material.material_name}
+                                                    {material.notes && <small className="d-block text-muted">{material.notes}</small>}
+                                                </td>
+                                                <td className="text-end">{material.quantity}</td>
+                                                <td className="text-end">${parseFloat(material.unit_price).toLocaleString()}</td>
+                                                <td className="text-end">${parseFloat(material.total).toLocaleString()}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+
                         {isActionable && (
                             <div className="actions-footer text-end">
                                 <Button variant="outline-danger" size="sm" className="me-2" onClick={() => onUpdate(postulation.id_postulation, 3, petitionId)}>

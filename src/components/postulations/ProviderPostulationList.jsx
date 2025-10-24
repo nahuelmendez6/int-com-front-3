@@ -53,7 +53,7 @@ const PostulationList = ({ postulations, onEdit, onDelete }) => {
                                         {postulation.materials.map((material) => (
                                             <li key={material.id_postulation_material} className="list-group-item">
                                                 <div className="d-flex justify-content-between">
-                                                    <span><strong>Material ID:</strong> {material.id_material}</span>
+                                                    <span>{material.material_name}</span>
                                                     <span><strong>Cantidad:</strong> {material.quantity}</span>
                                                 </div>
                                                 <div className="d-flex justify-content-between">
@@ -68,7 +68,12 @@ const PostulationList = ({ postulations, onEdit, onDelete }) => {
                             )}
                         </div>
                         <div className="card-footer d-flex justify-content-between align-items-center">
-                            <small className="text-muted">Creado: {new Date(postulation.date_create).toLocaleDateString()}</small>
+                            <div>
+                                <small className="text-muted d-block">Creado: {new Date(postulation.date_create).toLocaleString()}</small>
+                                {postulation.date_update && new Date(postulation.date_create).getTime() !== new Date(postulation.date_update).getTime() && (
+                                    <small className="text-muted d-block">Actualizado: {new Date(postulation.date_update).toLocaleString()}</small>
+                                )}
+                            </div>
                             <div className="d-flex gap-2">
                                 {canBeModified ? (
                                     <>

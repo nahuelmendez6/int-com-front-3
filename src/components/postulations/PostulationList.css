@@ -28,3 +28,23 @@
   opacity: 0.8;
   transition: opacity 0.2s ease-in-out;
 }
+
+.materials-table {
+    font-size: 0.85rem;
+}
+
+.materials-table th {
+    font-weight: 600;
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
+.materials-table td, .materials-table th {
+    padding: 0.5rem;
+    vertical-align: middle;
+}
+
+.materials-info h6 {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
