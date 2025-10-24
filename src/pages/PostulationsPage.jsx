@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ProviderPostulationList from '../components/postulations/ProviderPostulationList';
 import PostulationForm from '../components/postulations/PostulationForm';
 import { getProviderPostulations, updatePostulation } from '../services/postulation.service.js';
+import { useAuth } from '../hooks/useAuth';
 
 const PostulationsPage = () => {
+  const { profile } = useAuth();
   const [postulations, setPostulations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -113,6 +115,7 @@ const PostulationsPage = () => {
             initialData={editingPostulation}
             submitting={submitting}
             error={error}
+            providerId={profile?.profile?.id_provider}
           />
         </div>
       </div>

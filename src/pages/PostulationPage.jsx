@@ -56,6 +56,7 @@ const PostulationPage = () => {
         onSubmit={handleSubmit}
         error={error}
         submitting={submitting}
+        providerId={profile?.profile?.id_provider}
       />
     </div>
   );

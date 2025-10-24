@@ -46,6 +46,26 @@ const PostulationList = ({ postulations, onEdit, onDelete }) => {
                                     <p><strong>Tipo:</strong> {postulation.budgets[0].cost_type.replace('_', ' ')}</p>
                                 </div>
                             )}
+                            {postulation.materials && postulation.materials.length > 0 && (
+                                <div className="materials-info mt-3">
+                                    <h5>Materiales</h5>
+                                    <ul className="list-group">
+                                        {postulation.materials.map((material) => (
+                                            <li key={material.id_postulation_material} className="list-group-item">
+                                                <div className="d-flex justify-content-between">
+                                                    <span><strong>Material ID:</strong> {material.id_material}</span>
+                                                    <span><strong>Cantidad:</strong> {material.quantity}</span>
+                                                </div>
+                                                <div className="d-flex justify-content-between">
+                                                    <span><strong>Precio Unitario:</strong> ${parseFloat(material.unit_price).toLocaleString()}</span>
+                                                    <span><strong>Total:</strong> ${parseFloat(material.total).toLocaleString()}</span>
+                                                </div>
+                                                {material.notes && <small className="text-muted"><strong>Notas:</strong> {material.notes}</small>}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
                         </div>
                         <div className="card-footer d-flex justify-content-between align-items-center">
                             <small className="text-muted">Creado: {new Date(postulation.date_create).toLocaleDateString()}</small>

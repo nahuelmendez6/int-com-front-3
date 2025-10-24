@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Row, Col, Card, Alert } from 'react-bootstrap';
+import materialService from '../../services/material.service';
 
-const PostulationForm = ({ show, handleClose, onSubmit, error, submitting, initialData }) => {
+const PostulationForm = ({ show, handleClose, onSubmit, error, submitting, initialData, providerId }) => {
   const [proposal, setProposal] = useState('');
   const [budgetItems, setBudgetItems] = useState([]);
   const [materials, setMaterials] = useState([]);
+  const [availableMaterials, setAvailableMaterials] = useState([]);
+  const [loadingMaterials, setLoadingMaterials] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -18,6 +21,27 @@ const PostulationForm = ({ show, handleClose, onSubmit, error, submitting, initi
       setMaterials([]);
     }
   }, [initialData, show]);
+
+  // Load available materials when component mounts or providerId changes
+  useEffect(() => {
+    const fetchMaterials = async () => {
+      if (!providerId) return;
+      
+      try {
+        setLoadingMaterials(true);
+        const response = await materialService.getMaterials(providerId);
+        setAvailableMaterials(response.data);
+      } catch (error) {
+        console.error('Error loading materials:', error);
+      } finally {
+        setLoadingMaterials(false);
+      }
+    };
+
+    if (show && providerId) {
+      fetchMaterials();
+    }
+  }, [show, providerId]);
 
   const handleBudgetChange = (index, field, value) => {
     const newBudgetItems = [...budgetItems];
@@ -37,16 +61,36 @@ const PostulationForm = ({ show, handleClose, onSubmit, error, submitting, initi
   const handleMaterialChange = (index, field, value) => {
     const newMaterials = [...materials];
     newMaterials[index][field] = value;
+    
     if (field === 'quantity' || field === 'unit_price') {
       const quantity = parseFloat(newMaterials[index].quantity) || 0;
       const unit_price = parseFloat(newMaterials[index].unit_price) || 0;
       newMaterials[index].total = (quantity * unit_price).toFixed(2);
     }
+    
+    if (field === 'id_material') {
+      handleMaterialSelection(index, value);
+    }
+    
     setMaterials(newMaterials);
   };
 
   const addMaterial = () => {
     setMaterials([...materials, { id_material: '', quantity: '', unit_price: '', total: '0.00', notes: '' }]);
+  };
+
+  const handleMaterialSelection = (index, materialId) => {
+    const selectedMaterial = availableMaterials.find(m => m.id_material === parseInt(materialId));
+    if (selectedMaterial) {
+      const newMaterials = [...materials];
+      newMaterials[index] = {
+        ...newMaterials[index],
+        id_material: materialId,
+        unit_price: selectedMaterial.unit_price,
+        total: (parseFloat(newMaterials[index].quantity) || 0) * parseFloat(selectedMaterial.unit_price)
+      };
+      setMaterials(newMaterials);
+    }
   };
 
   const removeMaterial = (index) => {
@@ -241,19 +285,103 @@ const PostulationForm = ({ show, handleClose, onSubmit, error, submitting, initi
           </Card>
 
           <Card>
-            <Card.Header>Materiales (Opcional)</Card.Header>
+            <Card.Header>
+              <div className="d-flex justify-content-between align-items-center">
+                <span>Materiales (Opcional)</span>
+                {loadingMaterials && (
+                  <small className="text-muted">
+                    <i className="bi bi-hourglass-split me-1"></i>
+                    Cargando materiales...
+                  </small>
+                )}
+              </div>
+            </Card.Header>
             <Card.Body>
               {materials.map((item, index) => (
                 <Row key={index} className="mb-3 align-items-end">
-                  <Col md={3}><Form.Group><Form.Label>Material</Form.Label><Form.Control type="text" placeholder="Nombre o ID" value={item.id_material} onChange={(e) => handleMaterialChange(index, 'id_material', e.target.value)} /></Form.Group></Col>
-                  <Col md={2}><Form.Group><Form.Label>Cantidad</Form.Label><Form.Control type="number" placeholder="0" value={item.quantity} onChange={(e) => handleMaterialChange(index, 'quantity', e.target.value)} /></Form.Group></Col>
-                  <Col md={2}><Form.Group><Form.Label>Precio Unit.</Form.Label><Form.Control type="number" placeholder="0.00" value={item.unit_price} onChange={(e) => handleMaterialChange(index, 'unit_price', e.target.value)} /></Form.Group></Col>
-                  <Col md={2}><Form.Group><Form.Label>Total</Form.Label><Form.Control type="text" readOnly value={item.total} /></Form.Group></Col>
-                  <Col md={2}><Form.Group><Form.Label>Notas</Form.Label><Form.Control type="text" placeholder="Notas" value={item.notes} onChange={(e) => handleMaterialChange(index, 'notes', e.target.value)} /></Form.Group></Col>
-                  <Col md={1}><Button variant="danger" size="sm" onClick={() => removeMaterial(index)}>X</Button></Col>
+                  <Col md={3}>
+                    <Form.Group>
+                      <Form.Label>Material</Form.Label>
+                      <Form.Select 
+                        value={item.id_material} 
+                        onChange={(e) => handleMaterialChange(index, 'id_material', e.target.value)}
+                        disabled={loadingMaterials}
+                      >
+                        <option value="">Seleccionar material...</option>
+                        {availableMaterials.map(material => (
+                          <option key={material.id_material} value={material.id_material}>
+                            {material.name} - ${material.unit_price} / {material.unit}
+                          </option>
+                        ))}
+                      </Form.Select>
+                    </Form.Group>
+                  </Col>
+                  <Col md={2}>
+                    <Form.Group>
+                      <Form.Label>Cantidad</Form.Label>
+                      <Form.Control 
+                        type="number" 
+                        step="0.01"
+                        placeholder="0" 
+                        value={item.quantity} 
+                        onChange={(e) => handleMaterialChange(index, 'quantity', e.target.value)} 
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={2}>
+                    <Form.Group>
+                      <Form.Label>Precio Unit.</Form.Label>
+                      <Form.Control 
+                        type="number" 
+                        step="0.01"
+                        placeholder="0.00" 
+                        value={item.unit_price} 
+                        onChange={(e) => handleMaterialChange(index, 'unit_price', e.target.value)} 
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={2}>
+                    <Form.Group>
+                      <Form.Label>Total</Form.Label>
+                      <Form.Control 
+                        type="text" 
+                        readOnly 
+                        value={`$${item.total || '0.00'}`}
+                        className="bg-light"
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={2}>
+                    <Form.Group>
+                      <Form.Label>Notas</Form.Label>
+                      <Form.Control 
+                        type="text" 
+                        placeholder="Notas" 
+                        value={item.notes} 
+                        onChange={(e) => handleMaterialChange(index, 'notes', e.target.value)} 
+                      />
+                    </Form.Group>
+                  </Col>
+                  <Col md={1}>
+                    <Button 
+                      variant="danger" 
+                      size="sm" 
+                      onClick={() => removeMaterial(index)}
+                      title="Eliminar material"
+                    >
+                      <i className="bi bi-trash"></i>
+                    </Button>
+                  </Col>
                 </Row>
               ))}
-              <Button variant="secondary" onClick={addMaterial}>+ Añadir Material</Button>
+              <Button 
+                variant="secondary" 
+                onClick={addMaterial}
+                disabled={loadingMaterials}
+              >
+                <i className="bi bi-plus-lg me-1"></i>
+                Añadir Material
+              </Button>
             </Card.Body>
           </Card>
 
