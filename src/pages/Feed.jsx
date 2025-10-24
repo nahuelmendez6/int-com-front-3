@@ -34,7 +34,7 @@ const Feed = () => {
             Feed Principal
           </h1>
           <p className="text-muted mb-4">
-            Aquí encontrarás las últimas peticiones y ofertas disponibles según tu rol en la plataforma.
+            {/* Aquí encontrarás las últimas peticiones y ofertas disponibles según tu rol en la plataforma. */}
           </p>
           <div className="feed-content">
             {profile?.role === 'provider' && (

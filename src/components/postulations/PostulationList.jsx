@@ -66,7 +66,7 @@ const PostulationList = ({ postulations, loading, error, onUpdate, petitionId })
                                 <Button variant="outline-danger" size="sm" className="me-2" onClick={() => onUpdate(postulation.id_postulation, 3, petitionId)}>
                                     Rechazar
                                 </Button>
-                                <Button variant="success" size="sm" onClick={() => onUpdate(postulation.id_postulation, 2, petitionId)}>
+                                <Button variant="success" size="sm" onClick={() => onUpdate(postulation.id_postulation, 4, petitionId)}>
                                     Aprobar
                                 </Button>
                             </div>

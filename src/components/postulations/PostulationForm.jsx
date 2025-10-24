@@ -62,14 +62,14 @@ const PostulationForm = ({ show, handleClose, onSubmit, error, submitting, initi
         ...item,
         amount: item.amount ? parseFloat(item.amount) : null,
         unit_price: item.unit_price ? parseFloat(item.unit_price) : null,
-        quantity: item.quantity ? parseInt(item.quantity) : null,
+        quantity: item.quantity ? parseInt(item.quantity, 10) : null,
         hours: item.hours ? parseFloat(item.hours) : null,
       })),
       materials: materials.map(item => ({
         ...item,
-        quantity: parseFloat(item.quantity),
-        unit_price: parseFloat(item.unit_price),
-        total: parseFloat(item.total),
+        quantity: item.quantity ? parseFloat(item.quantity) : null,
+        unit_price: item.unit_price ? parseFloat(item.unit_price) : null,
+        total: item.total ? parseFloat(item.total) : null,
       })),
     };
     onSubmit(postulationData);
