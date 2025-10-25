@@ -15,7 +15,7 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [providerPostulations, setProviderPostulations] = useState([]); // New state for provider's postulations
   const [loadingProviderPostulations, setLoadingProviderPostulations] = useState(true); // New state for loading
-
+  
   const { user } = useAuth(); // Get user from useAuth()
 
   const {
@@ -65,11 +65,13 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
     setCurrentIndex(idx);
     setShowModal(true);
   };
+  
 
   return (
     <>
       <div className="petition-list-container">
         {petitions.map((petition, index) => {
+          console.log('petition',petition)
           const isVisible = visiblePetition === petition.id_petition;
           const hasPostulated = providerPostulations.some(
             (p) => p.id_petition === petition.id_petition && !p.is_deleted
@@ -84,18 +86,38 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
               {/* Encabezado */}
               {petition.customer_user && (
                 <div className="card-header d-flex align-items-center gap-3" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
-                  <Image
-                    src={`http://localhost:8000${petition.customer_user.profile_image}`}
-                    roundedCircle
-                    className="profile-image"
-                    style={{ width: '50px', height: '50px', objectFit: 'cover' }}
-                  />
+                  <Link 
+                    to={`/customer/${petition.id_customer}`}
+                    className="text-decoration-none"
+                    style={{ color: 'inherit' }}
+                  >
+                    <Image
+                      src={`http://localhost:8000${petition.customer_user.profile_image}`}
+                      roundedCircle
+                      className="profile-image"
+                      style={{ 
+                        width: '50px', 
+                        height: '50px', 
+                        objectFit: 'cover',
+                        cursor: 'pointer',
+                        transition: 'transform 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
+                      onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                    />
+                  </Link>
                   <div>
-                    <h6 className="mb-0 fw-semibold">
-                      <i className="bi bi-person-circle me-2"></i>
-                      {petition.customer_user.name}{" "}
-                      {petition.customer_user.lastname}
-                    </h6>
+                    <Link 
+                      to={`/customer/${petition.id_customer}`}
+                      className="text-decoration-none"
+                      style={{ color: 'inherit' }}
+                    >
+                      <h6 className="mb-0 fw-semibold" style={{ cursor: 'pointer' }}>
+                        <i className="bi bi-person-circle me-2"></i>
+                        {petition.customer_user.name}{" "}
+                        {petition.customer_user.lastname}
+                      </h6>
+                    </Link>
                     <small className="opacity-75">
                       <i className="bi bi-envelope me-1"></i>
                       {petition.customer_user.email}

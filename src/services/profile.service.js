@@ -42,12 +42,18 @@ export const getProfessions = async () => {
 
 export const getUserProfile = async ({id_customer, id_provider}) => {
   try {
-    const params = {};
+    let url = "/profiles/user-detail";
+    
+    if (id_customer) {
+      url += `?id_customer=${id_customer}`;
+    } else if (id_provider) {
+      url += `?id_provider=${id_provider}`;
+    }
 
-    if (id_customer) params.id_customer = id_customer;
-    if (id_provider) params.id_provider = id_provider;
+    console.log('getUserProfile called with id_customer:', id_customer, 'id_provider:', id_provider);
+    console.log('Making request to:', url);
 
-    const { data } = await api.get("/profiles/user-detail/", { params });
+    const { data } = await api.get(url);
 
     return data;
 

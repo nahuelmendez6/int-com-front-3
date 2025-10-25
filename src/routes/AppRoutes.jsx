@@ -17,6 +17,7 @@ const PostulationPage = lazy(() => import("../pages/PostulationPage.jsx"));
 const ProviderRegistrationForm = lazy(() => import("../pages/ProviderRegistrationForm.jsx"));
 const CustomerRegistrationForm = lazy(() => import("../pages/CustomerRegistrationForm.jsx"));
 const ProviderPublicProfilePage = lazy(() => import("../pages/ProviderPublicProfilePage.jsx")); // Componente de perfil público del proveedor
+const CustomerPublicProfilePage = lazy(() => import("../pages/CustomerPublicProfilePage.jsx")); // Componente de perfil público del cliente
 const PortfolioPage = lazy(() => import("../pages/PortfolioPage.jsx"));
 const PortfolioDetailPage = lazy(() => import("../pages/PortfolioDetailPage.jsx"));
 const ContratacionesPage = lazy(() => import("../pages/ContratacionesPage.jsx"));
@@ -87,6 +88,7 @@ const AppRoutes = () => {
           <Route path="/interests" element={<InterestsPage />} />
           <Route path="/petitions/:id/apply" element={<PostulationPage />} />
           <Route path="/provider/:providerId" element={<ProviderPublicProfilePage />} />
+          <Route path="/customer/:customerId" element={<CustomerPublicProfilePage />} />
           <Route path="/portfolio" element={<PortfolioPage />} />
           <Route path="/portfolio/:id" element={<PortfolioDetailPage />} />
           <Route path="/contrataciones" element={<ContratacionesPage />} />
