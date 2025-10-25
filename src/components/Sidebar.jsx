@@ -2,10 +2,13 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 import { useAuth } from '../hooks/useAuth';
+import NotificationIcon from './notifications/NotificationIcon';
+import NotificationPanel from './notifications/NotificationPanel';
 
 const Sidebar = () => {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
   const [hoveredLink, setHoveredLink] = useState(null);
+  const [showNotifications, setShowNotifications] = useState(false);
   const { profile, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -22,6 +25,14 @@ const Sidebar = () => {
     logout();
     closeOffcanvas();
     navigate('/login');
+  }
+
+  const toggleNotifications = () => {
+    setShowNotifications(!showNotifications);
+  }
+
+  const closeNotifications = () => {
+    setShowNotifications(false);
   }
 
 
@@ -78,18 +89,24 @@ const Sidebar = () => {
   const renderSidebarFooter = () => (
     <div className="mt-auto">
         <div className="p-3 border-top" style={{borderColor: 'rgba(255,255,255,0.5)'}}>
-            <div className="d-flex align-items-center text-white">
-                {profile && profile.user && profile.user.profile_image ? (
-                    <img src={profile.user.profile_image} alt="Perfil" className="rounded-circle" style={{ width: '40px', height: '40px', objectFit: 'cover' }} />
-                ) : (
-                    <i className="bi bi-person-circle fs-2"></i>
-                )}
-                <span className="ms-2">
-                    {profile && profile.user ? profile.user.name : "Usuario"}
-                </span>
+            <div className="d-flex align-items-center justify-content-between text-white mb-3">
+                <div className="d-flex align-items-center">
+                    {profile && profile.user && profile.user.profile_image ? (
+                        <img src={profile.user.profile_image} alt="Perfil" className="rounded-circle" style={{ width: '40px', height: '40px', objectFit: 'cover' }} />
+                    ) : (
+                        <i className="bi bi-person-circle fs-2"></i>
+                    )}
+                    <span className="ms-2">
+                        {profile && profile.user ? profile.user.name : "Usuario"}
+                    </span>
+                </div>
+                <NotificationIcon 
+                    onClick={toggleNotifications}
+                    className="ms-2"
+                />
             </div>
             <button
-                className="btn btn-outline-light w-100 mt-3"
+                className="btn btn-outline-light w-100"
                 onClick={handleLogout}
             >
                 <i className="bi bi-box-arrow-right me-2"></i>
@@ -161,6 +178,12 @@ const Sidebar = () => {
           onClick={closeOffcanvas}
         ></div>
       )}
+
+      {/* Panel de notificaciones */}
+      <NotificationPanel 
+        isOpen={showNotifications} 
+        onClose={closeNotifications}
+      />
     </>
   );
 };

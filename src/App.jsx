@@ -6,6 +6,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 
 import { AuthProvider } from './contexts/AuthContext';
 import { NotificationProvider } from './contexts/NotificationContext.jsx';
+import NotificationManager from './components/NotificationManager';
 
 
 
@@ -14,11 +15,12 @@ import './App.css'
 function App() {
   return (
     <BrowserRouter>
-      <NotificationProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <NotificationProvider>
+          <NotificationManager />
           <AppRoutes />
-        </AuthProvider>
-      </NotificationProvider>
+        </NotificationProvider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

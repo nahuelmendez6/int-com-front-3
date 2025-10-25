@@ -1,7 +1,6 @@
 // src/context/AuthContext.jsx
 import { createContext, useState, useEffect, useCallback } from "react";
 import api from "../services/api";
-import { useNotificationContext } from './NotificationContext.jsx';
 
 export const AuthContext = createContext();
 
@@ -17,7 +16,6 @@ export const AuthProvider = ({ children }) => {
   });
 
   const [loading, setLoading] = useState(true);
-  const { connectSocket } = useNotificationContext();
 
   // 🔹 Función auxiliar: guarda todo el estado persistente
   const persistSession = useCallback((userData, profileData) => {
@@ -63,12 +61,10 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         try {
           await fetchUserProfile(token);
-          connectSocket(); // Conectar si ya hay sesión
         } catch {
           const newToken = await refreshToken();
           if (newToken) {
             await fetchUserProfile(newToken);
-            connectSocket(); // Conectar si ya hay sesión
           }
         } finally {
           setLoading(false);
@@ -79,7 +75,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     init();
-  }, [fetchUserProfile, refreshToken, connectSocket]);
+  }, [fetchUserProfile, refreshToken]);
 
   // 🔹 Iniciar sesión
   const login = async (email, password) => {
@@ -101,7 +97,6 @@ export const AuthProvider = ({ children }) => {
 
       setUser(userData);
       await fetchUserProfile(access);
-      connectSocket(); // Conectar al WebSocket de notificaciones
     } catch (err) {
       console.error("❌ Error al iniciar sesión:", err);
       throw err;
