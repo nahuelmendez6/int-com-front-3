@@ -29,7 +29,7 @@ const PostulationPage = () => {
       winner: false,
       proposal: formData.proposal,
       id_state: 1,
-      budgets: formData.budget,
+      budgets: formData.budgets,
       materials: formData.materials,
     };
 
