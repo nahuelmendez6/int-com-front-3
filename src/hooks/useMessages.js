@@ -32,6 +32,8 @@ export const useMessages = () => {
   // Cargar conversaciones
   const loadConversations = useCallback(async () => {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
       setLoading(true);
       const data = await messagesService.getConversations();
       const list = Array.isArray(data) ? data : (data.results || []);
@@ -39,6 +41,10 @@ export const useMessages = () => {
       const totalUnread = list.reduce((acc, c) => acc + (c.unread_count || 0), 0);
       setUnreadCount(totalUnread);
     } catch (error) {
+      if (error?.response?.status === 401) {
+        // usuario no autenticado; ignorar en logout
+        return;
+      }
       console.error('Error loading conversations:', error);
       toast.error('Error al cargar las conversaciones');
     } finally {
@@ -49,6 +55,8 @@ export const useMessages = () => {
   // Cargar mensajes de una conversación
   const loadMessages = useCallback(async (conversationId) => {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
       setLoading(true);
       const data = await messagesService.getMessages(conversationId);
       const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
@@ -60,6 +68,9 @@ export const useMessages = () => {
       }));
       setMessages(normalized);
     } catch (error) {
+      if (error?.response?.status === 401) {
+        return;
+      }
       console.error('Error loading messages:', error);
       toast.error('Error al cargar los mensajes');
     } finally {
@@ -79,6 +90,8 @@ export const useMessages = () => {
       console.error('openConversation: invalid conversation id', conversation);
       return;
     }
+    const token = localStorage.getItem('token');
+    if (!token) return;
     setCurrentConversation({ ...conversation, id: convId });
     await loadMessages(convId);
     
