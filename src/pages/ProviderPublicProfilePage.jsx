@@ -8,6 +8,7 @@ import GradeList from '../components/grades/GradeList';
 import useAverageRating from '../hooks/useAverageRating';
 import StarRating from '../components/common/StarRating';
 import { useMessageContext } from '../contexts/MessageContext';
+import PublicAvailability from '../components/availability/PublicAvailability';
 
 const ProviderPublicProfilePage = () => {
   const { providerId } = useParams();
@@ -133,6 +134,11 @@ const ProviderPublicProfilePage = () => {
       {/* --- Sección de Calificaciones --- */}
       <div className="mb-5">
         <GradeList grades={grades} />
+      </div>
+
+      {/* --- Disponibilidad del Proveedor (solo lectura) --- */}
+      <div className="mb-5">
+        <PublicAvailability providerId={providerId} />
       </div>
 
       {/* --- Sección de Portfolio --- */}
