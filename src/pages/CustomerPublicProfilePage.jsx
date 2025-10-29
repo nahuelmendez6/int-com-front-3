@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, Image, Spinner, Alert, Badge } from 'react-bootstrap';
 import { getUserProfile } from '../services/profile.service.js';
+import { useMessageContext } from '../contexts/MessageContext';
 
 const CustomerPublicProfilePage = () => {
   const { customerId } = useParams();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { createConversation } = useMessageContext();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -89,6 +91,26 @@ const CustomerPublicProfilePage = () => {
                   <i className="bi bi-person-circle me-1"></i>
                   Cliente
                 </Badge>
+                <div className="mt-3">
+                  <button
+                    className="btn btn-outline-primary"
+                    onClick={async () => {
+                      const targetUserId = profile?.id_user || profile?.id;
+                      if (!targetUserId) return;
+                      try {
+                        const conv = await createConversation(targetUserId);
+                        const conversationId = conv?.id || conv?.id_conversation || conv?.conversation_id;
+                        if (!conversationId) return;
+                        window.dispatchEvent(new CustomEvent('openMessages', { detail: { conversationId } }));
+                      } catch (e) {
+                        console.error(e);
+                      }
+                    }}
+                  >
+                    <i className="bi bi-chat-dots me-1"></i>
+                    Enviar mensaje
+                  </button>
+                </div>
               </div>
 
               {/* Profile details */}

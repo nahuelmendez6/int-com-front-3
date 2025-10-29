@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getProviderProfileById } from '../../services/profile.service';
+import { useMessageContext } from '../../contexts/MessageContext';
 
 const OfferList = ({ offers }) => {
   const [providerProfiles, setProviderProfiles] = useState({});
   const [loadingProfiles, setLoadingProfiles] = useState(true);
+  const { createConversation } = useMessageContext();
 
   useEffect(() => {
     const fetchProviderProfiles = async () => {
@@ -109,6 +111,25 @@ const OfferList = ({ offers }) => {
                       </small>
                     </div>
                   </Link>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-outline-primary ms-auto"
+                    onClick={async () => {
+                      const targetUserId = providerProfile?.user?.id_user || providerProfile?.user?.id;
+                      if (!targetUserId) return;
+                      try {
+                        const conv = await createConversation(targetUserId);
+                        const conversationId = conv?.id || conv?.id_conversation || conv?.conversation_id;
+                        if (!conversationId) return;
+                        window.dispatchEvent(new CustomEvent('openMessages', { detail: { conversationId } }));
+                      } catch (e) {
+                        console.error(e);
+                      }
+                    }}
+                  >
+                    <i className="bi bi-chat-dots me-1"></i>
+                    Mensaje
+                  </button>
                 </div>
 
                 {/* Offer Info */}

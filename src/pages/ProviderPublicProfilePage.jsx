@@ -7,6 +7,7 @@ import PortfolioList from '../components/portfolio/PortfolioList';
 import GradeList from '../components/grades/GradeList';
 import useAverageRating from '../hooks/useAverageRating';
 import StarRating from '../components/common/StarRating';
+import { useMessageContext } from '../contexts/MessageContext';
 
 const ProviderPublicProfilePage = () => {
   const { providerId } = useParams();
@@ -15,6 +16,7 @@ const ProviderPublicProfilePage = () => {
   const [grades, setGrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { createConversation } = useMessageContext();
 
   const { averageRating, loading: loadingRating, error: errorRating } = useAverageRating(providerId);
 
@@ -75,6 +77,24 @@ const ProviderPublicProfilePage = () => {
               <h4 className="card-title">{provider.user.name} {provider.user.lastname}</h4>
               <p className="text-muted">{provider.user.email}</p>
               <p className="text-muted">{provider.type_provider}</p>
+              <button
+                className="btn btn-outline-primary"
+                onClick={async () => {
+                  const targetUserId = provider?.user?.id_user || provider?.user?.id;
+                  if (!targetUserId) return;
+                  try {
+                    const conv = await createConversation(targetUserId);
+                    const conversationId = conv?.id || conv?.id_conversation || conv?.conversation_id;
+                    if (!conversationId) return;
+                    window.dispatchEvent(new CustomEvent('openMessages', { detail: { conversationId } }));
+                  } catch (e) {
+                    console.error(e);
+                  }
+                }}
+              >
+                <i className="bi bi-chat-dots me-1"></i>
+                Enviar mensaje
+              </button>
             </div>
             <div className="col-md-8">
               <div className="mb-3">

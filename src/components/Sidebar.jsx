@@ -1,14 +1,18 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { useAuth } from '../hooks/useAuth';
 import NotificationIcon from './notifications/NotificationIcon';
 import NotificationPanel from './notifications/NotificationPanel';
+import MessageIcon from './messages/MessageIcon';
+import MessagePanel from './messages/MessagePanel';
 
 const Sidebar = () => {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
   const [hoveredLink, setHoveredLink] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showMessages, setShowMessages] = useState(false);
+  const [initialConversationId, setInitialConversationId] = useState(null);
   const { profile, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -34,6 +38,25 @@ const Sidebar = () => {
   const closeNotifications = () => {
     setShowNotifications(false);
   }
+
+  const toggleMessages = () => {
+    setShowMessages(!showMessages);
+  }
+
+  const closeMessages = () => {
+    setShowMessages(false);
+    setInitialConversationId(null);
+  }
+
+  // Abrir panel de mensajes por evento global
+  useEffect(() => {
+    const handler = (e) => {
+      setInitialConversationId(e.detail?.conversationId || null);
+      setShowMessages(true);
+    };
+    window.addEventListener('openMessages', handler);
+    return () => window.removeEventListener('openMessages', handler);
+  }, []);
 
 
   // accesos por rol
@@ -102,6 +125,10 @@ const Sidebar = () => {
                 </div>
                 <NotificationIcon 
                     onClick={toggleNotifications}
+                    className="ms-2"
+                />
+                <MessageIcon 
+                    onClick={toggleMessages}
                     className="ms-2"
                 />
             </div>
@@ -183,6 +210,13 @@ const Sidebar = () => {
       <NotificationPanel 
         isOpen={showNotifications} 
         onClose={closeNotifications}
+      />
+
+      {/* Panel de mensajes */}
+      <MessagePanel
+        isOpen={showMessages}
+        onClose={closeMessages}
+        initialConversationId={initialConversationId}
       />
     </>
   );

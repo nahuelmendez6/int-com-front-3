@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import messagesService from '../services/messages.service';
 
@@ -9,119 +9,23 @@ export const useMessages = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState(null);
-  const socket = useRef(null);
-  const reconnectTimeout = useRef(null);
-
-  // Conectar WebSocket para mensajes
-  const connectSocket = useCallback((conversationId) => {
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
-    const userId = user?.id_user || user?.id;
-    
-    if (!token || !userId || !conversationId) {
-      return;
-    }
-
-    // Deshabilitar WebSocket temporalmente si el servidor no está disponible
-    const disableWebSocket = localStorage.getItem('disableWebSocket') === 'true';
-    if (disableWebSocket) {
-      console.log('💬 WebSocket disabled for development');
-      return;
-    }
-
-    // Cerrar conexión anterior si existe
-    if (socket.current) {
-      socket.current.close();
-    }
-
-    const wsUrl = `ws://127.0.0.1:8000/ws/chat/${conversationId}/`;
-    socket.current = new WebSocket(wsUrl);
-
-    socket.current.onopen = () => {
-      console.log('💬 Chat WebSocket connected');
-      if (reconnectTimeout.current) {
-        clearTimeout(reconnectTimeout.current);
-        reconnectTimeout.current = null;
-      }
-    };
-
-    socket.current.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log('📨 Received message:', data);
-        
-        if (data.message && data.sender) {
-          const newMessage = {
-            id: Date.now(), // ID temporal hasta que el backend devuelva el ID real
-            content: data.message,
-            sender: data.sender,
-            sender_id: data.sender_id,
-            created_at: new Date().toISOString(),
-            is_read: false,
-            is_own: data.sender_id === userId
-          };
-          
-          setMessages(prev => [...prev, newMessage]);
-          
-          // Mostrar toast si no es el usuario actual
-          if (!newMessage.is_own) {
-            toast.info(`💬 Nuevo mensaje de ${data.sender}`);
-          }
-        }
-      } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
-      }
-    };
-
-    socket.current.onclose = (event) => {
-      console.log('💬 Chat WebSocket disconnected:', event.code, event.reason);
-      
-      if (event.code !== 1000) {
-        reconnectTimeout.current = setTimeout(() => {
-          if (event.code !== 1006) {
-            console.log('🔄 Attempting to reconnect chat WebSocket...');
-            connectSocket(conversationId);
-          }
-        }, 3000);
-      }
-    };
-
-    socket.current.onerror = (error) => {
-      if (error.target.readyState === WebSocket.CLOSED) {
-        console.log('💬 Chat WebSocket server not available - messages will work when backend is ready');
-      } else {
-        console.error('💬 Chat WebSocket error:', error);
-      }
-    };
-  }, []);
-
-  // Desconectar WebSocket
-  const disconnectSocket = useCallback(() => {
-    if (socket.current) {
-      socket.current.close(1000, 'User logout');
-      socket.current = null;
-    }
-    if (reconnectTimeout.current) {
-      clearTimeout(reconnectTimeout.current);
-      reconnectTimeout.current = null;
-    }
-  }, []);
+  // Sin WebSocket: API REST únicamente
+  const connectSocket = useCallback(() => {}, []);
+  const disconnectSocket = useCallback(() => {}, []);
 
   // Enviar mensaje por WebSocket
   const sendMessage = useCallback(async (content) => {
-    if (socket.current && socket.current.readyState === WebSocket.OPEN) {
-      socket.current.send(JSON.stringify({
-        message: content
-      }));
-    } else {
-      // Fallback a API REST si WebSocket no está disponible
-      try {
-        await messagesService.sendMessage(currentConversation.id, content);
-        await loadMessages(currentConversation.id);
-      } catch (error) {
-        console.error('Error sending message:', error);
-        toast.error('Error al enviar el mensaje');
+    try {
+      const convId = currentConversation?.id || currentConversation?.id_conversation || currentConversation?.conversation_id;
+      if (!convId) {
+        toast.error('Conversación inválida');
+        return;
       }
+      await messagesService.sendMessage(convId, content);
+      await loadMessages(convId);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast.error('Error al enviar el mensaje');
     }
   }, [currentConversation]);
 
@@ -129,8 +33,11 @@ export const useMessages = () => {
   const loadConversations = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await messagesService.getConversations();
-      setConversations(response.results || response);
+      const data = await messagesService.getConversations();
+      const list = Array.isArray(data) ? data : (data.results || []);
+      setConversations(list);
+      const totalUnread = list.reduce((acc, c) => acc + (c.unread_count || 0), 0);
+      setUnreadCount(totalUnread);
     } catch (error) {
       console.error('Error loading conversations:', error);
       toast.error('Error al cargar las conversaciones');
@@ -140,11 +47,18 @@ export const useMessages = () => {
   }, []);
 
   // Cargar mensajes de una conversación
-  const loadMessages = useCallback(async (conversationId, page = 1) => {
+  const loadMessages = useCallback(async (conversationId) => {
     try {
       setLoading(true);
-      const response = await messagesService.getMessages(conversationId, page);
-      setMessages(response.results || response);
+      const data = await messagesService.getMessages(conversationId);
+      const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
+      const userId = user?.id_user || user?.id;
+      const list = Array.isArray(data) ? data : (data.results || []);
+      const normalized = list.map((m) => ({
+        ...m,
+        is_own: m?.sender?.id_user ? (m.sender.id_user === userId) : m?.sender_id ? (m.sender_id === userId) : false,
+      }));
+      setMessages(normalized);
     } catch (error) {
       console.error('Error loading messages:', error);
       toast.error('Error al cargar los mensajes');
@@ -155,33 +69,35 @@ export const useMessages = () => {
 
   // Cargar estadísticas
   const loadStats = useCallback(async () => {
-    try {
-      const statsData = await messagesService.getMessageStats();
-      setStats(statsData);
-      setUnreadCount(statsData.unread_messages || 0);
-    } catch (error) {
-      console.error('Error loading message stats:', error);
-    }
+    setStats(null);
   }, []);
 
   // Abrir conversación
   const openConversation = useCallback(async (conversation) => {
-    setCurrentConversation(conversation);
-    await loadMessages(conversation.id);
-    connectSocket(conversation.id);
+    const convId = conversation?.id || conversation?.id_conversation || conversation?.conversation_id;
+    if (!convId) {
+      console.error('openConversation: invalid conversation id', conversation);
+      return;
+    }
+    setCurrentConversation({ ...conversation, id: convId });
+    await loadMessages(convId);
     
     // Marcar mensajes como leídos
     try {
-      await messagesService.markMessagesAsRead(conversation.id);
+      await messagesService.markMessagesAsRead(convId);
+      await loadConversations();
     } catch (error) {
-      console.error('Error marking messages as read:', error);
+      // Puede fallar 404 si aún no está disponible; evitar ruido
+      if (error?.response?.status !== 404) {
+        console.error('Error marking messages as read:', error);
+      }
     }
-  }, [loadMessages, connectSocket]);
+  }, [loadMessages]);
 
   // Crear nueva conversación
   const createConversation = useCallback(async (participantId) => {
     try {
-      const conversation = await messagesService.createConversation(participantId);
+      const conversation = await messagesService.startConversation(participantId);
       await loadConversations();
       return conversation;
     } catch (error) {
@@ -218,6 +134,21 @@ export const useMessages = () => {
       disconnectSocket();
     };
   }, [disconnectSocket]);
+
+  // Polling simple cuando hay una conversación abierta (sin WebSockets)
+  useEffect(() => {
+    const convId = currentConversation?.id || currentConversation?.id_conversation || currentConversation?.conversation_id;
+    if (!convId) return;
+    const interval = setInterval(async () => {
+      try {
+        await loadMessages(convId);
+        await loadConversations();
+      } catch (_) {
+        // Evitar ruido; typical transient errors
+      }
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [currentConversation, loadMessages, loadConversations]);
 
   return {
     conversations,

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useMessageContext } from '../../contexts/MessageContext';
-import { useMessages } from '../../hooks/useMessages';
 import ChatWindow from './ChatWindow';
 import './Messages.css';
 
-const MessagePanel = ({ isOpen, onClose }) => {
+const MessagePanel = ({ isOpen, onClose, initialConversationId = null }) => {
   const { 
     conversations, 
     unreadCount, 
@@ -12,7 +11,7 @@ const MessagePanel = ({ isOpen, onClose }) => {
     openConversation,
     loadConversations,
     searchConversations
-  } = useMessages();
+  } = useMessageContext();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -25,6 +24,23 @@ const MessagePanel = ({ isOpen, onClose }) => {
       loadConversations();
     }
   }, [isOpen, conversations.length, loadConversations]);
+
+  // Abrir conversación inicial por id si se solicita
+  useEffect(() => {
+    if (!isOpen || !initialConversationId) return;
+    const conv = conversations.find(c => c.id === initialConversationId);
+    if (conv) {
+      setSelectedConversation(conv);
+      openConversation(conv);
+    } else {
+      // Abrir inmediatamente con objeto mínimo si aún no está en la lista
+      const minimal = { id: initialConversationId, participants: [] };
+      setSelectedConversation(minimal);
+      openConversation(minimal);
+      // Asegurar refresco de la lista
+      loadConversations();
+    }
+  }, [isOpen, initialConversationId, conversations, openConversation, loadConversations]);
 
   const handleSearch = async (query) => {
     if (query.trim()) {
@@ -62,31 +78,20 @@ const MessagePanel = ({ isOpen, onClose }) => {
   };
 
   const getConversationDisplayName = (conversation) => {
-    // El backend devuelve participans como un array de usuarios
-    if (conversation.participans && conversation.participans.length > 0) {
-      // Buscar el participante que no sea el usuario actual
+    // participants: [{ id_user, email, name, lastname }]
+    if (conversation.participants && conversation.participants.length > 0) {
       const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-      const otherParticipant = conversation.participans.find(p => p.id !== currentUser.id);
-      
+      const currentId = currentUser?.id_user || currentUser?.id;
+      const otherParticipant = conversation.participants.find(p => (p.id_user || p.id) !== currentId);
       if (otherParticipant) {
-        return `${otherParticipant.first_name || ''} ${otherParticipant.last_name || ''}`.trim() || otherParticipant.username || 'Usuario';
+        const full = `${otherParticipant.name || ''} ${otherParticipant.lastname || ''}`.trim();
+        return full || otherParticipant.email || 'Usuario';
       }
     }
     return 'Conversación';
   };
 
-  const getConversationAvatar = (conversation) => {
-    // El backend devuelve participans como un array de usuarios
-    if (conversation.participans && conversation.participans.length > 0) {
-      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-      const otherParticipant = conversation.participans.find(p => p.id !== currentUser.id);
-      
-      if (otherParticipant?.profile_image) {
-        return otherParticipant.profile_image;
-      }
-    }
-    return null;
-  };
+  const getConversationAvatar = () => null;
 
   if (!isOpen) return null;
 
@@ -153,9 +158,9 @@ const MessagePanel = ({ isOpen, onClose }) => {
           </div>
         ) : (
           <div className="conversations-list">
-            {(showSearch ? searchResults : conversations).map((conversation) => (
+            {(showSearch ? searchResults : conversations).map((conversation, index) => (
               <div 
-                key={conversation.id} 
+                key={conversation.id || `conv-${index}-${conversation?.last_message?.id || 'noid'}`}
                 className={`conversation-item ${conversation.unread_count > 0 ? 'unread' : ''}`}
                 onClick={() => handleConversationClick(conversation)}
               >

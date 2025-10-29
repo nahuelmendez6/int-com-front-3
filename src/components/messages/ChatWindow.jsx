@@ -42,30 +42,19 @@ const ChatWindow = ({ conversation, onBack, onClose }) => {
   };
 
   const getParticipantName = () => {
-    // El backend devuelve participans como un array de usuarios
-    if (conversation.participans && conversation.participans.length > 0) {
+    if (conversation.participants && conversation.participants.length > 0) {
       const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-      const otherParticipant = conversation.participans.find(p => p.id !== currentUser.id);
-      
+      const currentId = currentUser?.id_user || currentUser?.id;
+      const otherParticipant = conversation.participants.find(p => (p.id_user || p.id) !== currentId);
       if (otherParticipant) {
-        return `${otherParticipant.first_name || ''} ${otherParticipant.last_name || ''}`.trim() || otherParticipant.username || 'Usuario';
+        const full = `${otherParticipant.name || ''} ${otherParticipant.lastname || ''}`.trim();
+        return full || otherParticipant.email || 'Usuario';
       }
     }
     return 'Usuario';
   };
 
-  const getParticipantAvatar = () => {
-    // El backend devuelve participans como un array de usuarios
-    if (conversation.participans && conversation.participans.length > 0) {
-      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-      const otherParticipant = conversation.participans.find(p => p.id !== currentUser.id);
-      
-      if (otherParticipant?.profile_image) {
-        return otherParticipant.profile_image;
-      }
-    }
-    return null;
-  };
+  const getParticipantAvatar = () => null;
 
   return (
     <div className="chat-window">

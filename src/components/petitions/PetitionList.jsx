@@ -7,6 +7,7 @@ import AttachmentsGallery from "../attachments/AttachmentsGallery.jsx";
 import ImageModal from "../attachments/ImageModal.jsx";
 import PostulationsList from "../postulations/PostulationList.jsx";
 import { useAuth } from "../../hooks/useAuth.js"; // Add this import
+import { useMessageContext } from "../../contexts/MessageContext";
 import "./PetitionList.css";
 
 const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
@@ -17,6 +18,7 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
   const [loadingProviderPostulations, setLoadingProviderPostulations] = useState(true); // New state for loading
   
   const { user } = useAuth(); // Get user from useAuth()
+  const { createConversation } = useMessageContext();
 
   const {
     postulations,
@@ -224,6 +226,29 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
                         </Button>
                       </Link>
                     )
+                  )}
+
+                  {profile?.role === "provider" && (
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      className="btn-social d-flex align-items-center"
+                      onClick={async () => {
+                        const targetUserId = petition?.customer_user?.id_user || petition?.customer_user?.id;
+                        if (!targetUserId) return;
+                        try {
+                          const conv = await createConversation(targetUserId);
+                          const conversationId = conv?.id || conv?.id_conversation || conv?.conversation_id;
+                          if (!conversationId) return;
+                          window.dispatchEvent(new CustomEvent('openMessages', { detail: { conversationId } }));
+                        } catch (e) {
+                          console.error(e);
+                        }
+                      }}
+                    >
+                      <i className="bi bi-chat-dots me-1"></i>
+                      Mensaje
+                    </Button>
                   )}
                 </div>
               </div>
