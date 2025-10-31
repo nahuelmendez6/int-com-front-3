@@ -4,7 +4,7 @@ import materialService from '../../services/material.service';
 import MaterialForm from './MaterialForm';
 import MaterialAttachmentManager from './MaterialAttachmentManager';
 
-const MaterialList = ({ materials, refreshMaterials, providerId }) => {
+const MaterialList = ({ materials, isPublicView = false, onEdit, onDelete, providerId, refreshMaterials }) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAttachmentsModal, setShowAttachmentsModal] = useState(false);
@@ -81,8 +81,12 @@ const MaterialList = ({ materials, refreshMaterials, providerId }) => {
               <th>Descripción</th>
               <th>Precio Unitario</th>
               <th>Unidad</th>
-              <th>Adjuntos</th>
-              <th>Acciones</th>
+              {!isPublicView && (
+                <>
+                  <th>Adjuntos</th>
+                  <th>Acciones</th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -104,36 +108,40 @@ const MaterialList = ({ materials, refreshMaterials, providerId }) => {
                 <td>
                   <span className="text-muted">{material.unit}</span>
                 </td>
-                <td>
-                  <Button
-                    variant="outline-info"
-                    size="sm"
-                    onClick={() => openAttachmentsModal(material)}
-                    title="Gestionar adjuntos"
-                  >
-                    <i className="bi bi-paperclip"></i>
-                  </Button>
-                </td>
-                <td>
-                  <div className="d-flex gap-1">
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={() => openEditModal(material)}
-                      title="Editar material"
-                    >
-                      <i className="bi bi-pencil"></i>
-                    </Button>
-                    <Button
-                      variant="outline-danger"
-                      size="sm"
-                      onClick={() => openDeleteModal(material)}
-                      title="Eliminar material"
-                    >
-                      <i className="bi bi-trash"></i>
-                    </Button>
-                  </div>
-                </td>
+                {!isPublicView && (
+                  <>
+                    <td>
+                      <Button
+                        variant="outline-info"
+                        size="sm"
+                        onClick={() => openAttachmentsModal(material)}
+                        title="Gestionar adjuntos"
+                      >
+                        <i className="bi bi-paperclip"></i>
+                      </Button>
+                    </td>
+                    <td>
+                      <div className="d-flex gap-1">
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          onClick={() => openEditModal(material)}
+                          title="Editar material"
+                        >
+                          <i className="bi bi-pencil"></i>
+                        </Button>
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          onClick={() => openDeleteModal(material)}
+                          title="Eliminar material"
+                        >
+                          <i className="bi bi-trash"></i>
+                        </Button>
+                      </div>
+                    </td>
+                  </>
+                )}
               </tr>
             ))}
           </tbody>

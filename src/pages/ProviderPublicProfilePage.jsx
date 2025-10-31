@@ -155,7 +155,7 @@ const ProviderPublicProfilePage = () => {
       {/* --- Sección de Materiales --- */}
       <div className="materials-section">
         <h3 className="mb-4">Materiales Ofrecidos</h3>
-        <MaterialList materials={materials} />
+        <MaterialList materials={materials} isPublicView={true} providerId={providerId} />
       </div>
     </div>
   );
