@@ -3,7 +3,9 @@ import { useParams } from 'react-router-dom';
 import { getProviderProfileById } from '../services/profile.service';
 import portfolioService from '../services/portfolio.service';
 import gradesService from '../services/grades.service.js';
+import materialService from '../services/material.service.js';
 import PortfolioList from '../components/portfolio/PortfolioList';
+import MaterialList from '../components/portfolio/MaterialList';
 import GradeList from '../components/grades/GradeList';
 import useAverageRating from '../hooks/useAverageRating';
 import StarRating from '../components/common/StarRating';
@@ -14,6 +16,7 @@ const ProviderPublicProfilePage = () => {
   const { providerId } = useParams();
   const [provider, setProvider] = useState(null);
   const [portfolio, setPortfolio] = useState([]);
+  const [materials, setMaterials] = useState([]);
   const [grades, setGrades] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,15 +28,17 @@ const ProviderPublicProfilePage = () => {
     const fetchProfileData = async () => {
       try {
         setLoading(true);
-        const [profileData, portfolioData, gradesData] = await Promise.all([
+        const [profileData, portfolioData, gradesData, materialsData] = await Promise.all([
           getProviderProfileById(providerId),
           portfolioService.getPortfoliosByProvider(providerId),
-          gradesService.getGradesByProvider(providerId)
+          gradesService.getGradesByProvider(providerId),
+          materialService.getMaterialsByProvider(providerId)
         ]);
         
         setProvider(profileData);
         setPortfolio(portfolioData.data);
         setGrades(gradesData);
+        setMaterials(materialsData.data);
 
       } catch (err) {
         setError('No se pudo cargar el perfil completo del proveedor.');
@@ -142,9 +147,15 @@ const ProviderPublicProfilePage = () => {
       </div>
 
       {/* --- Sección de Portfolio --- */}
-      <div className="portfolio-section">
+      <div className="portfolio-section mb-5">
         <h3 className="mb-4">Portfolio de Proyectos</h3>
         <PortfolioList portfolios={portfolio} isPublicView={true} />
+      </div>
+
+      {/* --- Sección de Materiales --- */}
+      <div className="materials-section">
+        <h3 className="mb-4">Materiales Ofrecidos</h3>
+        <MaterialList materials={materials} />
       </div>
     </div>
   );
