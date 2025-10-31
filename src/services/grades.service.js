@@ -30,6 +30,26 @@ const gradesService = {
       throw error;
     }
   },
+
+  createGradeForCustomer: async (gradeData) => {
+    try {
+      const response = await api.post('/grades/grades-customer/', gradeData);
+      return response.data;
+    } catch (error) {
+      console.error("Error al enviar la calificación para el cliente", error.response?.data || error.message);
+      throw error;
+    }
+  },
+
+  getGradesByCustomer: async (customerId) => {
+    try {
+      const response = await api.get(`/grades/grades-customer/?customer=${customerId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener las calificaciones del cliente", error.response?.data || error.message);
+      throw error;
+    }
+  },
 };
 
 export default gradesService;

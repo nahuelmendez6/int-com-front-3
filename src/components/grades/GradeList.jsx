@@ -15,6 +15,7 @@ const StarRating = ({ rating }) => {
 
 const GradeList = ({ grades }) => {
   const baseURL = "http://127.0.0.1:8000";
+  console.log(grades)
 
   if (!grades || grades.length === 0) {
     return <p>Este proveedor aún no tiene calificaciones.</p>;
@@ -35,7 +36,7 @@ const GradeList = ({ grades }) => {
                   style={{ width: '80px', height: '80px', objectFit: 'cover' }}
                   alt={`Foto de ${grade.customer.first_name}`}
                 />
-                <p className="mt-2 mb-0 fw-bold">{`${grade.customer.first_name} ${grade.customer.last_name}`}</p>
+                <p className="mt-2 mb-0 fw-bold">{`${grade.customer.name} ${grade.customer.lastname}`}</p>
               </Col>
               <Col md={10}>
                 <div className="d-flex justify-content-between">

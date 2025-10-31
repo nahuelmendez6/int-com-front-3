@@ -1,25 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, Image, Spinner, Alert, Badge } from 'react-bootstrap';
 import { getUserProfile } from '../services/profile.service.js';
 import { useMessageContext } from '../contexts/MessageContext';
+import gradesService from '../services/grades.service.js';
+import CustomerGradeList from '../components/grades/CustomerGradeList';
+import RatingCustomerForm from '../components/grades/RatingCustomerForm';
+import StarRating from '../components/common/StarRating';
+import { useAuth } from '../hooks/useAuth';
 
 const CustomerPublicProfilePage = () => {
   const { customerId } = useParams();
   const [profile, setProfile] = useState(null);
+  const [grades, setGrades] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { createConversation } = useMessageContext();
+  const { user } = useAuth();
+  console.log("Renderizando página de perfil de cliente:", {
+    user,
+    customerId
+  });
+
+  const fetchGrades = useCallback(async () => {
+    try {
+      const response = await gradesService.getGradesByCustomer(customerId);
+      console.log('Respuesta del servicio de calificaciones:', response);
+
+      const gradesData = response.results || response; // Handle paginated or direct array response
+      setGrades(gradesData);
+      if (gradesData.length > 0) {
+        const totalRating = gradesData.reduce((acc, grade) => acc + grade.rating, 0);
+        setAverageRating(totalRating / gradesData.length);
+      } else {
+        setAverageRating(0);
+      }
+    } catch (err) {
+      console.error('Error fetching customer grades:', err);
+      setError('Error al cargar las calificaciones del cliente');
+    }
+  }, [customerId]);
 
   useEffect(() => {
-    const fetchProfile = async () => {
+    const fetchProfileAndGrades = async () => {
       try {
         setLoading(true);
         setError(null);
-        console.log('Fetching profile for customer ID:', customerId);
+        
         const profileData = await getUserProfile({ id_customer: customerId });
-        console.log('Profile data received:', profileData);
         setProfile(profileData);
+        
+        await fetchGrades();
+
       } catch (err) {
         console.error('Error fetching customer profile:', err);
         setError('Error al cargar el perfil del cliente');
@@ -29,9 +62,9 @@ const CustomerPublicProfilePage = () => {
     };
 
     if (customerId) {
-      fetchProfile();
+      fetchProfileAndGrades();
     }
-  }, [customerId]);
+  }, [customerId, fetchGrades]);
 
   if (loading) {
     return (
@@ -44,7 +77,7 @@ const CustomerPublicProfilePage = () => {
     );
   }
 
-  if (error) {
+  if (error && !profile) {
     return (
       <div className="container mt-4">
         <Alert variant="danger">
@@ -72,7 +105,6 @@ const CustomerPublicProfilePage = () => {
         <div className="col-lg-8">
           <Card className="shadow-sm">
             <Card.Body className="p-4">
-              {/* Header with profile image and basic info */}
               <div className="text-center mb-4">
                 <Image
                   src={`http://localhost:8000${profile.profile_image}`}
@@ -87,6 +119,10 @@ const CustomerPublicProfilePage = () => {
                   <i className="bi bi-envelope me-2"></i>
                   {profile.email}
                 </p>
+                <div className="d-flex justify-content-center align-items-center mb-3">
+                    <StarRating rating={averageRating} readOnly />
+                    <span className="ms-2 text-muted">({grades.length} calificaciones)</span>
+                </div>
                 <Badge bg="primary" className="fs-6">
                   <i className="bi bi-person-circle me-1"></i>
                   Cliente
@@ -113,7 +149,6 @@ const CustomerPublicProfilePage = () => {
                 </div>
               </div>
 
-              {/* Profile details */}
               <div className="row">
                 <div className="col-md-6">
                   <Card className="h-100">
@@ -181,7 +216,7 @@ const CustomerPublicProfilePage = () => {
                         <div className="mb-3">
                           <strong>Último acceso:</strong>
                           <p className="text-muted mb-0">
-                            {new Date(profile.last_login).toLocaleDateString('es-ES', {
+                            {new Date(profile.last_.login).toLocaleDateString('es-ES', {
                               year: 'numeric',
                               month: 'long',
                               day: 'numeric',
@@ -196,7 +231,6 @@ const CustomerPublicProfilePage = () => {
                 </div>
               </div>
 
-              {/* Additional information if available */}
               {profile.bio && (
                 <Card className="mt-4">
                   <Card.Header className="bg-light">
@@ -210,6 +244,15 @@ const CustomerPublicProfilePage = () => {
                   </Card.Body>
                 </Card>
               )}
+
+              {error && <Alert variant="danger" className="mt-4">{error}</Alert>}
+
+              <CustomerGradeList grades={grades} />
+
+              {user && user.role === 'provider' && (
+                <RatingCustomerForm customerId={customerId} onRatingSuccess={fetchGrades} />
+              )}
+
             </Card.Body>
           </Card>
         </div>
