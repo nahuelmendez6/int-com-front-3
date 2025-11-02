@@ -3,7 +3,7 @@ import { Form, Row, Col } from 'react-bootstrap';
 
 const PersonalInfoForm = ({ formData, handleChange }) => (
   <>
-    <Form.Group as={Row} className="mb-3">
+    <Form.Group as={Row} className="mb-2">
       <Form.Label column sm={4} className="form-label text-sm-end">Email</Form.Label>
       <Col sm={8}>
         <Form.Control
@@ -16,7 +16,7 @@ const PersonalInfoForm = ({ formData, handleChange }) => (
         />
       </Col>
     </Form.Group>
-    <Form.Group as={Row} className="mb-3">
+    <Form.Group as={Row} className="mb-2">
       <Form.Label column sm={4} className="form-label text-sm-end">Nombre</Form.Label>
       <Col sm={8}>
         <Form.Control
@@ -29,7 +29,7 @@ const PersonalInfoForm = ({ formData, handleChange }) => (
         />
       </Col>
     </Form.Group>
-    <Form.Group as={Row} className="mb-3">
+    <Form.Group as={Row} className="mb-2">
       <Form.Label column sm={4} className="form-label text-sm-end">Apellido</Form.Label>
       <Col sm={8}>
         <Form.Control
@@ -42,7 +42,7 @@ const PersonalInfoForm = ({ formData, handleChange }) => (
         />
       </Col>
     </Form.Group>
-    <Form.Group as={Row} className="mb-3">
+    <Form.Group as={Row} className="mb-2">
       <Form.Label column sm={4} className="form-label text-sm-end">Contraseña</Form.Label>
       <Col sm={8}>
         <Form.Control
@@ -56,7 +56,7 @@ const PersonalInfoForm = ({ formData, handleChange }) => (
         />
       </Col>
     </Form.Group>
-    <Form.Group as={Row} className="mb-3">
+    <Form.Group as={Row} className="mb-2">
       <Form.Label column sm={4} className="form-label text-sm-end">Confirmar</Form.Label>
       <Col sm={8}>
         <Form.Control

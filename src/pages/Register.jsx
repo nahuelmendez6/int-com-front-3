@@ -27,14 +27,14 @@ const Register = () => {
         <div className="row justify-content-center">
           <div className="col-md-6 col-lg-4">
             <div className="card shadow rounded-3">
-              <div className="card-body p-4">
-                <div className="text-center mb-4">
+              <div className="card-body p-3"> {/* smaller padding */
+                <div className="text-center mb-3"> {/* smaller margin */
                   <h2 className="card-title fw-bold">Registro</h2>
                   <p className="text-muted">Crea tu cuenta</p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                  <div className="mb-3">
+                  <div className="mb-2"> {/* smaller margin */
                     <label htmlFor="name" className="form-label">
                       Nombre
                     </label>
@@ -50,7 +50,7 @@ const Register = () => {
                     />
                   </div>
 
-                  <div className="mb-3">
+                  <div className="mb-2"> {/* smaller margin */
                     <label htmlFor="email" className="form-label">
                       Email
                     </label>
@@ -66,7 +66,7 @@ const Register = () => {
                     />
                   </div>
 
-                  <div className="mb-4">
+                  <div className="mb-3"> {/* smaller margin, but larger than others */
                     <label htmlFor="password" className="form-label">
                       Contraseña
                     </label>
@@ -89,7 +89,7 @@ const Register = () => {
                   </div>
                 </form>
 
-                <div className="text-center mt-4">
+                <div className="text-center mt-3"> {/* smaller margin */
                   <p className="mb-0">
                     ¿Ya tienes cuenta?{' '}
                     <Link to="/login" className="text-decoration-none fw-semibold">

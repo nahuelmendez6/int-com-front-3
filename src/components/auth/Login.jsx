@@ -25,7 +25,7 @@ const Login = () => {
 
   return (
     <div className="form-container">
-      <p className="title">Bienvenido de vuelta</p>
+      <p className="title">Integración Comunitaria</p>
       <form className="form" onSubmit={handleSubmit}>
         <input
           type="email"

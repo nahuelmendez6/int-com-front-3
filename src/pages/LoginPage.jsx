@@ -1,11 +1,13 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-
 import Login from '../components/auth/Login';
+import './pages-styles/LoginPage.css';
 
 const LoginPage = () => {
 
-  return <Login />;
+  return (
+    <div className="login-page-container">
+      <Login />
+    </div>
+  );
 
 };
 
