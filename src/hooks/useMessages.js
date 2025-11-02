@@ -1,19 +1,41 @@
+// Importa hooks de React para manejar estado, efectos y memorizar funciones.
 import { useState, useEffect, useCallback } from 'react';
+
+// Importa toast para mostrar notificaciones al usuario.
 import { toast } from 'react-toastify';
+
+
+// Importa el servicio que maneja todas las operaciones relacionadas con mensajes y conversaciones.
 import messagesService from '../services/messages.service';
 
+
+// Hook personalizado: useMessages
+// Este hook gestiona todo el flujo de mensajes y conversaciones para un usuario.
+// Incluye: lista de conversaciones, mensajes por conversación, envío, lectura,
+// búsqueda, estadísticas y polling simple para actualizaciones.
 export const useMessages = () => {
+  // Lista de conversaciones del usuario.
   const [conversations, setConversations] = useState([]);
+  
+  // Conversación actualmente abierta.
   const [currentConversation, setCurrentConversation] = useState(null);
+
+  // Lista de mensajes de la conversación abierta.
   const [messages, setMessages] = useState([]);
+
+  // Cantidad total de mensajes no leídos en todas las conversaciones.
   const [unreadCount, setUnreadCount] = useState(0);
+
+   // Estado de carga para mostrar spinner o bloquear UI.
   const [loading, setLoading] = useState(false);
+
+  // Estadísticas adicionales (pueden ser usadas para dashboards, badges, etc.).
   const [stats, setStats] = useState(null);
-  // Sin WebSocket: API REST únicamente
+   // WebSocket no implementado: funciones vacías para compatibilidad.
   const connectSocket = useCallback(() => {}, []);
   const disconnectSocket = useCallback(() => {}, []);
 
-  // Enviar mensaje por WebSocket
+  // Función para enviar un mensaje en la conversación abierta.
   const sendMessage = useCallback(async (content) => {
     try {
       const convId = currentConversation?.id || currentConversation?.id_conversation || currentConversation?.conversation_id;
@@ -29,15 +51,19 @@ export const useMessages = () => {
     }
   }, [currentConversation]);
 
-  // Cargar conversaciones
+  // Función para cargar todas las conversaciones del usuario.
   const loadConversations = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
       setLoading(true);
       const data = await messagesService.getConversations();
+
+      // Normaliza el formato de la lista de conversaciones.
       const list = Array.isArray(data) ? data : (data.results || []);
       setConversations(list);
+
+       // Calcula la cantidad total de mensajes no leídos.
       const totalUnread = list.reduce((acc, c) => acc + (c.unread_count || 0), 0);
       setUnreadCount(totalUnread);
     } catch (error) {
@@ -52,13 +78,15 @@ export const useMessages = () => {
     }
   }, []);
 
-  // Cargar mensajes de una conversación
+  // Función para cargar mensajes de una conversación específica.
   const loadMessages = useCallback(async (conversationId) => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
       setLoading(true);
       const data = await messagesService.getMessages(conversationId);
+
+      // Identifica el usuario actual para marcar mensajes propios
       const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
       const userId = user?.id_user || user?.id;
       const list = Array.isArray(data) ? data : (data.results || []);
@@ -78,12 +106,13 @@ export const useMessages = () => {
     }
   }, []);
 
-  // Cargar estadísticas
+  // Función para cargar estadísticas (placeholder, puede ser extendida).
   const loadStats = useCallback(async () => {
     setStats(null);
   }, []);
 
-  // Abrir conversación
+  // Abrir una conversación específica.
+  // Carga los mensajes, marca como leídos y actualiza la lista de conversaciones.
   const openConversation = useCallback(async (conversation) => {
     const convId = conversation?.id || conversation?.id_conversation || conversation?.conversation_id;
     if (!convId) {
