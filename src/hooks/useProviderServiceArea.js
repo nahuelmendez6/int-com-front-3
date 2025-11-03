@@ -1,4 +1,20 @@
 // src/hooks/useProviderServiceArea.js
+
+
+/**
+ * Custom Hook: useProviderServiceArea
+ *
+ * Este hook encapsula toda la lógica necesaria para gestionar el área de servicio de un proveedor.
+ * 
+ * Se encarga de:
+ * - Obtener el área de servicio actual del proveedor (ciudades donde trabaja).
+ * - Permitir agregar o eliminar ciudades del área de servicio.
+ * - Cargar jerárquicamente provincias, departamentos y ciudades desde los servicios de ubicación.
+ * - Controlar los estados de carga, error y eliminación.
+ * 
+ * 👉 Centraliza la lógica compleja relacionada con la gestión geográfica,
+ * permitiendo mantener los componentes de interfaz más simples, reutilizables y mantenibles.
+ */
 import { useState, useEffect } from 'react';
 import {
   getProviderArea,
@@ -22,7 +38,13 @@ export function useProviderServiceArea({ token, providerId, id_provider }) {
     serviceArea: { province: '', departments: [], cities: [] },
   });
 
-  // Cargar área actual
+  /**
+   * fetchServiceArea
+   * Obtiene el área de servicio actual del proveedor desde la API.
+   * 
+   * - Actualiza `serviceArea` con las ciudades registradas.
+   * - Sincroniza el formulario (`formData`) con los IDs de las ciudades.
+   */
   const fetchServiceArea = async () => {
     if (!providerId) return;
     try {
@@ -46,7 +68,13 @@ export function useProviderServiceArea({ token, providerId, id_provider }) {
     fetchServiceArea();
   }, [providerId]);
 
-  // Eliminar ciudad
+  /**
+   * deleteCity
+   * Elimina una ciudad del área de servicio del proveedor.
+   * 
+   * - Muestra un estado de eliminación (`deletingCity`).
+   * - Refresca los datos tras la eliminación.
+   */
   const deleteCity = async (cityId) => {
     try {
       setDeletingCity(cityId);
@@ -65,6 +93,12 @@ export function useProviderServiceArea({ token, providerId, id_provider }) {
     setProvinces(data);
   };
 
+  /**
+   * handleProvinceChange
+   * Maneja el cambio de provincia:
+   * - Limpia departamentos y ciudades previas.
+   * - Carga los departamentos correspondientes a la provincia seleccionada.
+   */  
   const handleProvinceChange = async (provinceId) => {
     setFormData(prev => ({
       ...prev,
@@ -82,6 +116,12 @@ export function useProviderServiceArea({ token, providerId, id_provider }) {
     }
   };
 
+  /**
+   * handleDepartmentCheckbox
+   * Maneja la selección de departamentos:
+   * - Actualiza la lista de departamentos seleccionados.
+   * - Carga todas las ciudades pertenecientes a los departamentos marcados.
+   */  
   const handleDepartmentCheckbox = async (deptId, checked) => {
     const currentDepts = formData.serviceArea.departments;
     const newDepts = checked
@@ -108,7 +148,11 @@ export function useProviderServiceArea({ token, providerId, id_provider }) {
       console.error('Error cargando ciudades:', err);
     }
   };
-
+  /**
+   * handleCityCheckbox
+   * Maneja la selección de ciudades dentro del formulario.
+   * Agrega o quita la ciudad del arreglo `formData.serviceArea.cities`.
+   */
   const handleCityCheckbox = (cityId, checked) => {
     setFormData(prev => {
       const cities = checked
@@ -117,7 +161,13 @@ export function useProviderServiceArea({ token, providerId, id_provider }) {
       return { ...prev, serviceArea: { ...prev.serviceArea, cities } };
     });
   };
-
+  /**
+   * submitChanges
+   * Envía las modificaciones del área de servicio al backend.
+   * - Verifica que haya al menos una ciudad seleccionada.
+   * - Actualiza las ciudades del proveedor mediante `updateProviderCities`.
+   * - Refresca los datos tras la actualización.
+   */
   const submitChanges = async () => {
     if (formData.serviceArea.cities.length === 0) {
       alert('Debe seleccionar al menos una ciudad.');
