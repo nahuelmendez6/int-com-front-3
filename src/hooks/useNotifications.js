@@ -1,13 +1,32 @@
+// Importa hooks de React para manejar estado, referencias y memorizar funciones.
 import { useState, useEffect, useRef, useCallback } from 'react';
+
+// Importa toast para mostrar notificaciones visuales.
 import { toast } from 'react-toastify';
+
+// Importa el servicio que maneja todas las operaciones relacionadas con notificaciones.
 import notificationsService from '../services/notifications.service';
 
+// Hook personalizado: useNotifications
+// Gestiona todas las notificaciones de un usuario, incluyendo WebSocket en tiempo real,
+// carga desde la API, conteo de no leídas, marcarlas como leídas y mostrar toasts.
 export const useNotifications = () => {
+  // Lista de notificaciones.
   const [notifications, setNotifications] = useState([]);
+
+  // Cantidad de notificaciones no leídas.
   const [unreadCount, setUnreadCount] = useState(0);
+
+  // Estado de carga para mostrar spinner o bloquear UI.
   const [loading, setLoading] = useState(false);
+
+  // Estadísticas relacionadas con notificaciones (p. ej., cantidad no leídas).
   const [stats, setStats] = useState(null);
+
+  // Referencia al WebSocket para mantener conexión persistente.
   const socket = useRef(null);
+
+  // Timeout para reconexión automática del WebSocket.
   const reconnectTimeout = useRef(null);
 
   // Conectar WebSocket
@@ -19,7 +38,7 @@ export const useNotifications = () => {
     // Deshabilitar WebSocket temporalmente si el servidor no está disponible
     const disableWebSocket = localStorage.getItem('disableWebSocket') === 'true';
     if (disableWebSocket) {
-      console.log('🔔 WebSocket disabled for development');
+      console.log('WebSocket disabled for development');
       return;
     }
     
@@ -36,7 +55,7 @@ export const useNotifications = () => {
     socket.current = new WebSocket(wsUrl);
 
     socket.current.onopen = () => {
-      console.log('🔔 Notification WebSocket connected');
+      console.log('Notification WebSocket connected');
       // Limpiar timeout de reconexión si existe
       if (reconnectTimeout.current) {
         clearTimeout(reconnectTimeout.current);
@@ -91,10 +110,11 @@ export const useNotifications = () => {
       }
     };
 
+     // Cierre del WebSocket
     socket.current.onclose = (event) => {
       // Solo mostrar logs en desarrollo si el servidor está disponible
       if (event.code !== 1000 && event.code !== 1006) {
-        console.log('🔔 Notification WebSocket disconnected:', event.code, event.reason);
+        console.log('Notification WebSocket disconnected:', event.code, event.reason);
       }
       
       // Reconectar automáticamente después de 3 segundos si no fue un cierre intencional
@@ -109,6 +129,7 @@ export const useNotifications = () => {
       }
     };
 
+    // Manejo de errores del WebSocket
     socket.current.onerror = (error) => {
       // Solo mostrar errores si no es un error de conexión (servidor no disponible)
       if (error.target.readyState === WebSocket.CLOSED) {
