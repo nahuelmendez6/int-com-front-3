@@ -1,7 +1,33 @@
+// src/components/RatingForm.jsx
+// =====================================================
+// Componente: RatingForm
+// -----------------------------------------------------
+// Permite al cliente calificar a un proveedor luego de una
+// contratación aprobada. Incluye selección de estrellas (1–5),
+// comentario opcional y validación básica.
+//
+// Se comunica con el backend a través de `gradesService`
+// para guardar la calificación.
+//
+// Dependencias:
+//  - React y React-Bootstrap para la interfaz
+//  - gradesService: servicio HTTP para manejar calificaciones
+// =====================================================
+
 import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import gradesService from '../../services/grades.service.js';
 
+
+/**
+ * Componente visual para representar una estrella dentro del sistema de calificación.
+ *
+ * @component
+ * @param {Object} props - Propiedades del componente.
+ * @param {boolean} props.marked - Indica si la estrella está seleccionada.
+ * @param {number} props.starId - Número de la estrella (1 a 5).
+ * @param {function} props.onClick - Función manejadora al hacer clic.
+ */
 const Star = ({ marked, starId, onClick }) => (
   <span 
     style={{ cursor: 'pointer', fontSize: '2rem', color: marked ? '#ffc107' : '#e4e5e9' }} 
@@ -12,19 +38,49 @@ const Star = ({ marked, starId, onClick }) => (
   </span>
 );
 
-const RatingForm = ({ providerId, id_postulation }) => {
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
 
+/**
+ * Formulario de calificación del proveedor.
+ * Permite al cliente seleccionar estrellas, escribir un comentario
+ * y enviar la información al servidor mediante el servicio `gradesService`.
+ *
+ * @component
+ * @param {Object} props - Propiedades del componente.
+ * @param {number} props.providerId - ID del proveedor a calificar.
+ * @param {number} props.id_postulation - ID de la contratación (postulación) relacionada.
+ *
+ * @example
+ * <RatingForm providerId={12} id_postulation={45} />
+ */
+const RatingForm = ({ providerId, id_postulation }) => {
+
+  // Estado local del formulario
+  const [rating, setRating] = useState(0);  // número de estrellas seleccionadas
+  const [comment, setComment] = useState(''); // comentario textual
+  const [error, setError] = useState(null);   // mensaje de error
+  const [success, setSuccess] = useState(null); // mensaje de éxito
+  const [submitting, setSubmitting] = useState(false);  // control de envío
+
+
+    /**
+   * Maneja el clic sobre una estrella, actualizando la calificación seleccionada.
+   * @param {number} starId - Valor de la estrella seleccionada (1–5)
+   */
   const handleRatingClick = (starId) => {
     setRating(starId);
   };
 
+    /**
+   * Maneja el envío del formulario de calificación.
+   * Valida los campos, construye el objeto `gradeData` y
+   * llama al servicio `gradesService.createGrade()`.
+   *
+   * @param {Event} e - Evento de formulario
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validación: se debe seleccionar al menos una estrella
     if (rating === 0) {
       setError('Por favor, selecciona una calificación de estrellas.');
       return;
@@ -34,6 +90,7 @@ const RatingForm = ({ providerId, id_postulation }) => {
     setError(null);
     setSuccess(null);
 
+    // Datos enviados al backend
     const gradeData = {
       provider: providerId,
       grade: rating, // Asumiendo que grade y rating son lo mismo
@@ -45,7 +102,6 @@ const RatingForm = ({ providerId, id_postulation }) => {
     try {
       await gradesService.createGrade(gradeData);
       setSuccess('¡Gracias por tu calificación!');
-      // Opcional: deshabilitar el formulario o esconderlo
     } catch (err) {
       setError('Hubo un error al enviar tu calificación. Inténtalo de nuevo.');
     } finally {
