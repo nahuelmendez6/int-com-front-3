@@ -1,12 +1,50 @@
+// src/components/ContratacionList.jsx
+// =====================================================
+// Componente: ContratacionList
+// -----------------------------------------------------
+// Renderiza una lista de contrataciones aprobadas entre
+// clientes y proveedores, mostrando los datos del trabajo,
+// las partes involucradas, el precio y la fecha de aprobación.
+//
+// Si el usuario autenticado es un cliente, también permite
+// calificar al proveedor mediante el componente RatingForm.
+//
+// Dependencias:
+//  - React y React-Bootstrap para la UI
+//  - useAuth (hook personalizado para obtener datos del perfil)
+//  - RatingForm (formulario de calificación)
+// =====================================================
+
 import React from 'react';
 import { Card, Row, Col, Badge, Image, ListGroup } from 'react-bootstrap';
 import { useAuth } from '../../hooks/useAuth';
 import RatingForm from './RatingForm';
 
+
+/**
+ * Lista las contrataciones aprobadas para el usuario autenticado.
+ *
+ * @component
+ * @param {Object} props - Propiedades del componente.
+ * @param {Array} props.contrataciones - Arreglo de objetos de contrataciones aprobadas.
+ *
+ * Cada elemento del arreglo debe contener:
+ * - `id_postulation`: ID único de la contratación.
+ * - `petition`: Objeto con los datos de la petición (ej. `title`).
+ * - `provider`: Objeto del proveedor (nombre, apellido, imagen, profesión, etc.).
+ * - `customer`: Objeto del cliente.
+ * - `proposal`: Texto con la propuesta aceptada.
+ * - `final_price`: Precio acordado final.
+ * - `approved_at`: Fecha de aprobación del trabajo.
+ *
+ * @example
+ * <ContratacionList contrataciones={userContrataciones} />
+ */
 const ContratacionList = ({ contrataciones }) => {
   const { profile } = useAuth();
-  const baseURL = "http://127.0.0.1:8000";
+  const baseURL = "http://127.0.0.1:8000";    // URL base del backend para imágenes
 
+   // Si no hay contrataciones aprobadas, muestra un mensaje informativo.
   if (contrataciones.length === 0) {
     return <p>No tienes trabajos aprobados por el momento.</p>;
   }
