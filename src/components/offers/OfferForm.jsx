@@ -1,11 +1,59 @@
+/**
+ * Componente: OfferForm
+ * 
+ * Descripción:
+ * ---------------
+ * Este componente representa un **formulario modal** para crear o editar ofertas de un proveedor.
+ * Permite ingresar información de la oferta, como:
+ * - Nombre
+ * - Tipo de oferta
+ * - Descripción
+ * - Fecha de inicio y cierre
+ * - Estado (activo/inactivo)
+ * 
+ * Se usa dentro de un modal de React-Bootstrap y soporta tanto creación como edición de ofertas.
+ * 
+ * Props:
+ * -------
+ * - `show` (boolean): Indica si el modal está visible.
+ * - `onHide` (function): Función que se ejecuta al cerrar el modal.
+ * - `onSubmit` (function): Función que se ejecuta al enviar el formulario. Recibe un objeto `offer`.
+ * - `initialData` (object | null): Datos iniciales de la oferta para edición. Puede incluir:
+ *      - `offer_id`
+ *      - `name`
+ *      - `description`
+ *      - `date_open`
+ *      - `date_close`
+ *      - `id_type_offer`
+ *      - `status`
+ * - `offerTypes` (array): Lista de tipos de oferta disponibles para el select. Cada tipo debe tener:
+ *      - `id_type_offer`
+ *      - `name`
+ * 
+ * Funcionalidades clave:
+ * -----------------------
+ * - Inicializa los campos con `initialData` si se proporciona (modo edición).
+ * - Resetea el formulario al abrir el modal en modo creación.
+ * - Maneja cambios en inputs de texto, textarea y selects.
+ * - Convierte fechas a formato `datetime-local` para compatibilidad con HTML5.
+ * - Ejecuta `onSubmit` con todos los datos al enviar el formulario.
+ * 
+ * Estilos y librerías:
+ * ----------------------
+ * - React-Bootstrap: `Modal`, `Button`
+ * - Clases Bootstrap para inputs, labels, filas y columnas.
+ */
+
+
 import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
 const OfferForm = ({ show, onHide, onSubmit, initialData, offerTypes = [] }) => {
   const [offer, setOffer] = useState({});
 
+  // --- Efecto: inicializar o resetear formulario al abrir el modal ---
   useEffect(() => {
-    // When the modal is shown, populate the form with initial data or reset it
+
     if (show) {
       setOffer({
         name: initialData?.name || '',
@@ -18,11 +66,13 @@ const OfferForm = ({ show, onHide, onSubmit, initialData, offerTypes = [] }) => 
     }
   }, [initialData, show]);
 
+  // --- Manejar cambios en cualquier campo del formulario ---
   const handleChange = (e) => {
     const { name, value } = e.target;
     setOffer({ ...offer, [name]: value });
   };
 
+  // --- Enviar formulario ---
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(offer);
