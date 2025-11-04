@@ -1,8 +1,51 @@
+/**
+ * Componente: NotificationPanel
+ * 
+ * Descripción:
+ * ---------------
+ * Este componente representa el **panel lateral de notificaciones** de la aplicación.
+ * Se encarga de mostrar la lista de notificaciones del usuario, con sus estados 
+ * (leídas/no leídas), tipos e íconos correspondientes.
+ * 
+ * También permite realizar acciones como:
+ * - Marcar notificaciones como leídas (individualmente o todas a la vez).
+ * - Cargar más notificaciones paginadas.
+ * - Cerrar el panel.
+ * 
+ * Props:
+ * -------
+ * - `isOpen` (boolean): Indica si el panel está visible o no.
+ * - `onClose` (function): Función que se ejecuta al hacer clic en el botón de cierre.
+ * 
+ * Contextos utilizados:
+ * ----------------------
+ * - `useNotificationContext()`:
+ *    - `notifications`: Lista de notificaciones cargadas.
+ *    - `unreadCount`: Número total de notificaciones no leídas.
+ *    - `loading`: Indica si las notificaciones se están cargando.
+ *    - `markAsRead(id)`: Marca una notificación como leída.
+ *    - `markAllAsRead()`: Marca todas las notificaciones como leídas.
+ *    - `loadNotifications(page)`: Carga una página de notificaciones.
+ * 
+ * Funcionalidades clave:
+ * -----------------------
+ * - Carga automática de notificaciones al abrir el panel.
+ * - Diferenciación visual de tipos de notificación mediante colores e íconos.
+ * - Control de paginación (botón “Cargar más”).
+ * - Formateo de tiempo relativo (“Hace 5 minutos”, “Hace 2 días”, etc.).
+ * 
+ * Archivos relacionados:
+ * -----------------------
+ * - `NotificationContext.jsx`: Define la lógica global de notificaciones.
+ * - `Notifications.css`: Contiene los estilos de este panel y sus elementos.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useNotificationContext } from '../../contexts/NotificationContext.jsx';
 import './Notifications.css';
 
 const NotificationPanel = ({ isOpen, onClose }) => {
+   // --- Contexto global de notificaciones ---
   const { 
     notifications, 
     unreadCount, 
@@ -12,18 +55,21 @@ const NotificationPanel = ({ isOpen, onClose }) => {
     loadNotifications 
   } = useNotificationContext();
 
+  // --- Estados locales ---
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  // Cargar más notificaciones cuando se abre el panel
+  // --- Efecto: cargar notificaciones al abrir el panel ---
   useEffect(() => {
     if (isOpen && notifications.length === 0) {
       loadNotifications();
     }
   }, [isOpen, notifications.length, loadNotifications]);
 
+   // Si el panel está cerrado, no renderizar nada
   if (!isOpen) return null;
 
+  // --- Determina el estilo según el tipo de notificación ---
   const getNotificationTypeStyle = (type) => {
     switch (type) {
       case 'postulation_created':
@@ -41,6 +87,7 @@ const NotificationPanel = ({ isOpen, onClose }) => {
     }
   };
 
+   // --- Determina el ícono correspondiente al tipo ---
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'postulation_created':
@@ -58,18 +105,21 @@ const NotificationPanel = ({ isOpen, onClose }) => {
     }
   };
 
+   // --- Marca una notificación como leída al hacer clic ---
   const handleNotificationClick = async (notification) => {
     if (!notification.is_read) {
       await markAsRead(notification.id);
     }
   };
 
+   // --- Carga más notificaciones (paginación) ---
   const handleLoadMore = () => {
     const nextPage = page + 1;
     setPage(nextPage);
     loadNotifications(nextPage);
   };
 
+  // --- Formatea el tiempo relativo ("Hace 2 horas", etc.) ---
   const formatTimeAgo = (timeAgo) => {
     if (timeAgo) return timeAgo;
     
