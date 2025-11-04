@@ -1,8 +1,32 @@
+// src/components/grades/GradeList.jsx
+// =====================================================
+// Componente: GradeList
+// -----------------------------------------------------
+// Muestra las calificaciones que un proveedor ha recibido por parte de sus clientes.
+// Cada calificación incluye información del cliente, su comentario, la valoración
+// mediante estrellas (StarRating), la fecha de la calificación y una posible respuesta.
+//
+// Dependencias:
+//  - React-Bootstrap (Card, Row, Col, Image)
+// =====================================================
+
 import React from 'react';
 import { Card, Row, Col, Image } from 'react-bootstrap';
 
+
+// =====================================================
+// Subcomponente: StarRating
+// -----------------------------------------------------
+// Representa visualmente una calificación con estrellas (1 a 5).
+// Las estrellas se pintan de color dorado según la puntuación recibida.
+//
+// @param {Object} props
+// @param {number} props.rating - Valor numérico de la calificación (1 a 5).
+// =====================================================
 const StarRating = ({ rating }) => {
   const stars = [];
+
+  // Renderiza las 5 estrellas, marcando las que estén dentro del valor de "rating"
   for (let i = 1; i <= 5; i++) {
     stars.push(
       <span key={i} style={{ color: i <= rating ? '#ffc107' : '#e4e5e9', fontSize: '1.2rem' }}>
@@ -13,6 +37,33 @@ const StarRating = ({ rating }) => {
   return <div>{stars}</div>;
 };
 
+
+// =====================================================
+// Componente principal: GradeList
+// -----------------------------------------------------
+// Renderiza una lista de calificaciones recibidas por un proveedor.
+// Si no hay calificaciones, muestra un mensaje informativo.
+//
+// @param {Object} props
+// @param {Array} props.grades - Lista de calificaciones del proveedor.
+//
+// Cada elemento del array `grades` tiene la forma:
+// {
+//   id: number,
+//   rating: number,
+//   coment: string,
+//   response?: string,
+//   date_create: string,
+//   customer: {
+//     name: string,
+//     lastname: string,
+//     profile_image?: string
+//   }
+// }
+//
+// @example
+// <GradeList grades={providerGrades} />
+// =====================================================
 const GradeList = ({ grades }) => {
   const baseURL = "http://127.0.0.1:8000";
   console.log(grades)
