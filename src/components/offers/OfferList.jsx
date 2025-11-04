@@ -1,3 +1,43 @@
+/**
+ * Componente: OfferList
+ * 
+ * Descripción:
+ * ---------------
+ * Este componente muestra una lista de **ofertas** de proveedores.
+ * Cada oferta incluye:
+ * - Información del proveedor (nombre, avatar, profesión)
+ * - Estado de la oferta (activa/inactiva)
+ * - Descripción de la oferta
+ * - Fechas de apertura y cierre
+ * - Botón para enviar un mensaje al proveedor
+ * 
+ * Props:
+ * -------
+ * - `offers` (array): Lista de ofertas a mostrar. Cada objeto de oferta debe incluir:
+ *      - `offer_id`
+ *      - `name`
+ *      - `description`
+ *      - `status`
+ *      - `date_open`
+ *      - `date_close`
+ *      - `id_provider`
+ * 
+ * Funcionalidades clave:
+ * -----------------------
+ * - Obtiene los perfiles de los proveedores asociados a las ofertas.
+ * - Maneja loading de perfiles con placeholders mientras se cargan.
+ * - Permite iniciar conversación con el proveedor mediante el contexto `useMessageContext`.
+ * - Muestra un mensaje central si no hay ofertas disponibles.
+ * - Renderiza las fechas en formato local y muestra el estado con badges.
+ * 
+ * Estilos y librerías:
+ * ----------------------
+ * - React Router: `Link` para navegar al perfil del proveedor
+ * - React-Bootstrap: Clases de Bootstrap para filas, columnas, badges y botones
+ * - Iconos de Bootstrap Icons
+ * - Clases personalizadas: `social-card`, `offer-card`, `badge-social`
+ */
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getProviderProfileById } from '../../services/profile.service';
@@ -8,6 +48,7 @@ const OfferList = ({ offers }) => {
   const [loadingProfiles, setLoadingProfiles] = useState(true);
   const { createConversation } = useMessageContext();
 
+  // --- Efecto: cargar perfiles de proveedores ---
   useEffect(() => {
     const fetchProviderProfiles = async () => {
       if (!offers || offers.length === 0) {
