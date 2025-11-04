@@ -1,15 +1,78 @@
-// TimeSlot.jsx
+// src/components/TimeSlot.jsx
+// =====================================================
+// Componente: TimeSlot
+// -----------------------------------------------------
+// Representa un bloque de horario individual dentro de la
+// disponibilidad semanal de un proveedor.
+//
+// Este componente permite:
+//  - Editar las horas de inicio y fin de una franja horaria.
+//  - Crear o actualizar un horario llamando al servicio backend.
+//  - Eliminar horarios existentes mediante un botón dedicado.
+//
+// Forma parte del módulo de gestión de disponibilidad del proveedor.
+// =====================================================
+
 import React from 'react';
 import { Row, Col, Form, Button, Spinner } from 'react-bootstrap';
 import { updateProviderAvailability, editProviderAvailability } from '../../services/availability.service.js';
 
+
+/**
+ * Componente que permite visualizar y editar una franja horaria (TimeSlot)
+ * de la disponibilidad semanal del proveedor.
+ *
+ * @component
+ * @param {Object} props - Propiedades del componente.
+ * @param {Object} props.slot - Objeto que representa la franja horaria (con start_time, end_time, id_availability, etc.).
+ * @param {number} props.index - Índice del slot dentro del arreglo de horarios del día.
+ * @param {number} props.day - Día de la semana al que pertenece el slot (0=Domingo, 1=Lunes, etc.).
+ * @param {Array} props.slots - Lista de franjas horarias correspondientes al día actual.
+ * @param {Function} props.setAvailability - Función para actualizar el estado global de disponibilidad.
+ * @param {Function} props.fetchAvailability - Función para recargar la disponibilidad desde el servidor.
+ * @param {boolean} props.isSubmitting - Indica si hay una operación de guardado o eliminación en curso.
+ * @param {Function} props.setIsSubmitting - Setter para actualizar el estado de envío.
+ * @param {Function} props.setError - Setter para mostrar errores en el componente padre.
+ * @param {Function} props.handleDeleteClick - Callback para eliminar un horario existente.
+ * @param {number|string} props.id_provider - ID del proveedor autenticado.
+ *
+ * @example
+ * <TimeSlot
+ *   slot={slot}
+ *   index={0}
+ *   day={1}
+ *   slots={slots}
+ *   setAvailability={setAvailability}
+ *   fetchAvailability={fetchAvailability}
+ *   isSubmitting={isSubmitting}
+ *   setIsSubmitting={setIsSubmitting}
+ *   setError={setError}
+ *   handleDeleteClick={handleDeleteClick}
+ *   id_provider={23}
+ * />
+ */
 const TimeSlot = ({ slot, index, day, slots, setAvailability, fetchAvailability, isSubmitting, setIsSubmitting, setError, handleDeleteClick, id_provider }) => {
+  
+    /**
+   * Actualiza el valor de un campo ("start_time" o "end_time") dentro del slot actual.
+   * 
+   * @param {"start_time"|"end_time"} field - Campo que se va a modificar.
+   * @param {string} value - Nuevo valor ingresado (formato "HH:MM").
+   */
   const handleTimeChange = (field, value) => {
     const updatedSlots = [...slots];
     updatedSlots[index] = { ...updatedSlots[index], [field]: value };
     setAvailability(prev => ({ ...prev, [day]: updatedSlots }));
   };
 
+    /**
+   * Guarda o actualiza la franja horaria actual.
+   * 
+   * - Si `slot.id_availability` existe → se actualiza el registro.
+   * - Si no existe → se crea un nuevo registro.
+   * 
+   * También maneja validaciones básicas (campos vacíos, proveedor indefinido).
+   */
   const handleSaveSlot = async () => {
     if (!slot.start_time || !slot.end_time) {
       setError('La hora de inicio y fin son obligatorias.');
@@ -22,6 +85,8 @@ const TimeSlot = ({ slot, index, day, slots, setAvailability, fetchAvailability,
     }
 
     setIsSubmitting(true);
+
+    // Prepara el payload con formato adecuado para el backend
     const payload = {
       id_provider,
       day_of_week: day,
