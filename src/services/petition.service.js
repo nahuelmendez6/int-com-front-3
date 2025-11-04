@@ -1,8 +1,32 @@
+// src/services/petitions.service.js
+// =====================================================
+// Servicio de Peticiones (Petitions Service)
+// -----------------------------------------------------
+// Este módulo centraliza todas las operaciones relacionadas con las
+// "peticiones" (solicitudes) dentro de la aplicación. Permite crear,
+// obtener, actualizar y listar peticiones, además de recuperar tipos
+// y categorías asociadas. Implementa manejo de errores, cacheo y reintentos.
+// =====================================================
+
 import { cache } from 'react';
 import api from './api.js';
 import cacheService from './cache.servie.js';
 import retryRequest from './retry.service.js';
 
+
+/**
+ * Crear una nueva petición.
+ * Envía los datos al backend mediante una petición POST a `/petitions/`.
+ *
+ * @async
+ * @function createPetition
+ * @param {Object} petitionData - Datos de la petición (tipo, descripción, archivos, etc.).
+ * @returns {Promise<Object>} Promesa que resuelve con los datos de la petición creada.
+ * @throws {Object} Error con detalles de la respuesta del servidor.
+ *
+ * @example
+ * const newPetition = await createPetition({ type: 1, description: 'Solicitud de servicio' });
+ */
 export const createPetition = async (petitionData) => {
 
     try {
@@ -14,7 +38,18 @@ export const createPetition = async (petitionData) => {
     }
 };
 
-
+/**
+ * Obtener todos los tipos de peticiones disponibles.
+ * Ideal para cargar en formularios de creación o filtros.
+ *
+ * @async
+ * @function getPetitionTypes
+ * @returns {Promise<Object[]>} Lista de tipos de peticiones.
+ *
+ * @example
+ * const types = await getPetitionTypes();
+ * console.log(types);
+ */
 export const getPetitionTypes = async () => {
     try {
         const response = await api.get('/petitions/type-petitions/');
@@ -25,7 +60,17 @@ export const getPetitionTypes = async () => {
     }
 };
 
-
+/**
+ * Obtener todas las peticiones asociadas a un cliente específico.
+ *
+ * @async
+ * @function getPetitionsByCustomer
+ * @param {number|string} customerId - ID del cliente.
+ * @returns {Promise<Object[]>} Lista de peticiones del cliente.
+ *
+ * @example
+ * const petitions = await getPetitionsByCustomer(12);
+ */
 export const getPetitionsByCustomer = async (customerId) => {
   try {
     const response = await api.get(`/petitions/customer/${customerId}`);
@@ -36,6 +81,17 @@ export const getPetitionsByCustomer = async (customerId) => {
   }
 };
 
+/**
+ * Obtener las categorías disponibles (generalmente asociadas a perfiles).
+ *
+ * @async
+ * @function getCategories
+ * @returns {Promise<Object[]>} Lista de categorías disponibles.
+ *
+ * @example
+ * const categories = await getCategories();
+ * console.log(categories);
+ */
 export const getCategories = async () => {
   try {
     const response = await api.get('/profiles/categories/');
@@ -46,7 +102,19 @@ export const getCategories = async () => {
   }
 };
 
-
+/**
+ * Obtener todas las peticiones, con soporte de cache y reintentos automáticos.
+ * 
+ * - Usa `cacheService` para evitar solicitudes repetidas en un corto período.
+ * - Usa `retryRequest` para reintentar hasta 3 veces con intervalo de 1s.
+ *
+ * @async
+ * @function getPetitions
+ * @returns {Promise<Object[]>} Lista de todas las peticiones.
+ *
+ * @example
+ * const petitions = await getPetitions();
+ */
 export const getPetitions = async () => {
     const cacheKey = cacheService.generateKey('petitions');
 
@@ -62,6 +130,17 @@ export const getPetitions = async () => {
     );
 };
 
+/**
+ * Obtener una petición específica por su ID.
+ *
+ * @async
+ * @function getPetition
+ * @param {number|string} id - ID de la petición a consultar.
+ * @returns {Promise<Object>} Datos de la petición.
+ *
+ * @example
+ * const petition = await getPetition(5);
+ */
 export const getPetition = async (id) => {
   try {
     const response = await api.get(`/petitions/${id}/`);
@@ -72,6 +151,19 @@ export const getPetition = async (id) => {
   }
 };
 
+/**
+ * Actualizar parcialmente una petición existente.
+ * Realiza una petición PATCH al endpoint `/petitions/{id}/`.
+ *
+ * @async
+ * @function updatePetition
+ * @param {number|string} id - ID de la petición a actualizar.
+ * @param {Object} petitionData - Campos a modificar (p. ej., estado o descripción).
+ * @returns {Promise<Object>} Petición actualizada.
+ *
+ * @example
+ * await updatePetition(10, { status: 'resuelta' });
+ */
 export const updatePetition = async (id, petitionData) => {
   try {
     const response = await api.patch(`/petitions/${id}/`, petitionData);
