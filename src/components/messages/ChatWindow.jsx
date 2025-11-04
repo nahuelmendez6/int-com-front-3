@@ -1,15 +1,58 @@
+// src/components/messages/ChatWindow.jsx
+// =====================================================
+// Componente: ChatWindow
+// -----------------------------------------------------
+// Este componente representa la ventana principal de chat de una conversación
+// entre dos usuarios (proveedor y cliente). Permite visualizar el historial
+// de mensajes y enviar nuevos en tiempo real.
+//
+// Características principales:
+//  - Muestra mensajes previos cargados desde el contexto de mensajes.
+//  - Permite enviar mensajes de texto.
+//  - Realiza scroll automático al mensaje más reciente.
+//  - Identifica y muestra el nombre del otro participante de la conversación.
+//  - Maneja estados de carga, envío y error.
+//
+// Dependencias:
+//  - React (useState, useEffect, useRef)
+//  - MessageContext (hook personalizado: useMessageContext)
+//  - Bootstrap Icons (para iconos de interfaz)
+//  - Hoja de estilos: Messages.css
+// =====================================================
+
 import React, { useState, useEffect, useRef } from 'react';
 import { useMessageContext } from '../../contexts/MessageContext';
 import './Messages.css';
 
+// =====================================================
+// Componente principal: ChatWindow
+// -----------------------------------------------------
+// @param {Object} props
+// @param {Object} props.conversation - Objeto con los datos de la conversación actual (participantes, ID, etc.).
+// @param {Function} props.onBack - Función para volver al listado de conversaciones.
+// @param {Function} props.onClose - Función para cerrar completamente el chat.
+//
+// Flujo general:
+//  1. Obtiene mensajes desde el contexto global (useMessageContext).
+//  2. Escucha cambios en el array de mensajes para auto-hacer scroll.
+//  3. Permite escribir un nuevo mensaje y enviarlo al backend.
+//  4. Renderiza los mensajes diferenciando los del usuario actual y los del otro participante.
+// =====================================================
 const ChatWindow = ({ conversation, onBack, onClose }) => {
-  const { messages, loading, sendMessage } = useMessageContext();
-  const [newMessage, setNewMessage] = useState('');
-  const [sending, setSending] = useState(false);
-  const messagesEndRef = useRef(null);
-  const messagesContainerRef = useRef(null);
+   // --- Estado del chat ---
+  const { messages, loading, sendMessage } = useMessageContext(); // Contexto de mensajes global
+  const [newMessage, setNewMessage] = useState(''); // Mensaje en el input
+  const [sending, setSending] = useState(false);  // Estado de envío
+  const messagesEndRef = useRef(null);    // Referencia para scroll automático
+  const messagesContainerRef = useRef(null);  // Contenedor principal de mensajes
 
-  // Scroll automático al final de los mensajes
+
+  // =====================================================
+  // Función: scrollToBottom
+  // -----------------------------------------------------
+  // Desplaza la vista hacia el último mensaje cada vez que cambia
+  // el array de mensajes (simulando comportamiento de apps de mensajería).
+  // =====================================================
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -18,6 +61,12 @@ const ChatWindow = ({ conversation, onBack, onClose }) => {
     scrollToBottom();
   }, [messages]);
 
+    // =====================================================
+  // Función: handleSendMessage
+  // -----------------------------------------------------
+  // Envía el mensaje actual al backend usando el método `sendMessage`
+  // del contexto. Maneja el estado de carga y limpieza del input.
+  // =====================================================
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!newMessage.trim() || sending) return;
@@ -33,6 +82,12 @@ const ChatWindow = ({ conversation, onBack, onClose }) => {
     }
   };
 
+    // =====================================================
+  // Función: formatMessageTime
+  // -----------------------------------------------------
+  // Convierte la fecha ISO de creación del mensaje en un formato legible
+  // de hora local (por ejemplo, "14:32").
+  // =====================================================
   const formatMessageTime = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('es-ES', { 
@@ -41,6 +96,13 @@ const ChatWindow = ({ conversation, onBack, onClose }) => {
     });
   };
 
+    // =====================================================
+  // Función: getParticipantName
+  // -----------------------------------------------------
+  // Obtiene el nombre del otro participante en la conversación
+  // (distinto al usuario actual). Usa los datos almacenados en localStorage
+  // para identificar al usuario actual.
+  // =====================================================
   const getParticipantName = () => {
     if (conversation.participants && conversation.participants.length > 0) {
       const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -54,8 +116,23 @@ const ChatWindow = ({ conversation, onBack, onClose }) => {
     return 'Usuario';
   };
 
+    // =====================================================
+  // Función: getParticipantAvatar
+  // -----------------------------------------------------
+  // (Futura mejora)
+  // Devuelve la URL del avatar del otro participante, si existiera.
+  // Por ahora retorna null y usa un ícono genérico de Bootstrap.
+  // =====================================================
   const getParticipantAvatar = () => null;
 
+    // =====================================================
+  // Renderizado principal
+  // -----------------------------------------------------
+  // Estructura general:
+  //  1. Encabezado del chat (nombre, botones de navegación)
+  //  2. Lista de mensajes (scrollable)
+  //  3. Input de nuevo mensaje con botón de envío
+  // =====================================================
   return (
     <div className="chat-window">
       <div className="chat-header">
