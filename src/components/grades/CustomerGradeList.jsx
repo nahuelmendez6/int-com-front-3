@@ -1,10 +1,45 @@
+// src/components/customer/CustomerGradeList.jsx
+// =====================================================
+// Componente: CustomerGradeList
+// -----------------------------------------------------
+// Muestra el listado de calificaciones recibidas por un cliente.
+// Cada calificación incluye la información del proveedor, la puntuación
+// (mediante el componente StarRating), comentarios y posibles respuestas.
+//
+// Dependencias:
+//  - React-Bootstrap (Card, ListGroup, Image)
+//  - StarRating: componente que representa estrellas de valoración
+// =====================================================
+
 import React from 'react';
 import { Card, ListGroup, Image } from 'react-bootstrap';
 import StarRating from '../common/StarRating';
 
+/**
+ * Renderiza la lista de calificaciones asociadas a un cliente.
+ * Si el cliente aún no recibió calificaciones, muestra un mensaje informativo.
+ *
+ * @component
+ * @param {Object} props - Propiedades del componente.
+ * @param {Array} props.grades - Lista de calificaciones recibidas por el cliente.
+ *
+ * Cada elemento del array `grades` tiene la forma:
+ * {
+ *   id_grade_customer: number,
+ *   provider: { name: string, lastname: string, profile_image: string },
+ *   rating: number,
+ *   comment?: string,
+ *   response?: string,
+ *   date_create: string
+ * }
+ *
+ * @example
+ * <CustomerGradeList grades={customerGrades} />
+ */
 const CustomerGradeList = ({ grades }) => {
   const baseURL = "http://127.0.0.1:8000";
 
+  // --- Caso: no hay calificaciones registradas ---
   if (!grades || grades.length === 0) {
     return (
       <Card className="mt-4">
@@ -18,6 +53,7 @@ const CustomerGradeList = ({ grades }) => {
     );
   }
 
+  // --- Renderizado principal: listado de calificaciones ---
   return (
     <Card className="mt-4">
       <Card.Header>
