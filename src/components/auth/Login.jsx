@@ -1,17 +1,52 @@
 // src/components/Login.jsx
+
+// src/components/Login.jsx
+// =====================================================
+// Componente: Login
+// -----------------------------------------------------
+// Este componente representa el formulario de inicio de sesión
+// para los usuarios del sistema (clientes y proveedores).
+//
+// Características:
+//  - Utiliza el hook `useAuth` para manejar la autenticación.
+//  - Redirige al usuario al feed principal tras el login exitoso.
+//  - Muestra mensajes de error en caso de credenciales inválidas.
+// =====================================================
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth.js";
 import "../../Form.css";
 
+/**
+ * Formulario de inicio de sesión para usuarios autenticables.
+ *
+ * @component
+ * @returns {JSX.Element} Componente de formulario de login.
+ *
+ * @example
+ * // Uso básico dentro de un enrutador de React
+ * <Route path="/login" element={<Login />} />
+ */
 const Login = () => {
+  // Hook personalizado de autenticación
   const { login } = useAuth();
+
+  // Hook de React Router para redireccionar tras iniciar sesión
   const navigate = useNavigate();
 
+  // Estados locales para controlar los inputs y mensajes de error
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
+    /**
+   * Maneja el envío del formulario.
+   * Intenta autenticar al usuario con las credenciales ingresadas.
+   *
+   * @async
+   * @function handleSubmit
+   * @param {Event} e - Evento del formulario.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
