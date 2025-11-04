@@ -1,9 +1,55 @@
+/**
+ * Componente: MessagePanel
+ * 
+ * Descripción:
+ * ---------------
+ * Este componente muestra el **panel principal de mensajería**, que lista las 
+ * conversaciones del usuario y permite abrir el chat correspondiente 
+ * (mostrado con el componente `ChatWindow`).
+ * 
+ * Funcionalidades principales:
+ * -----------------------------
+ * - Carga y muestra las conversaciones del usuario.
+ * - Permite buscar conversaciones mediante una barra de búsqueda.
+ * - Indica cuántos mensajes no leídos tiene cada conversación.
+ * - Permite abrir una conversación para ver y enviar mensajes.
+ * - Puede inicializarse directamente con una conversación específica.
+ * 
+ * Props:
+ * -------
+ * - `isOpen` (boolean): Controla si el panel está visible o no.
+ * - `onClose` (function): Función ejecutada al cerrar el panel.
+ * - `initialConversationId` (number | null): ID de una conversación que debe abrirse automáticamente.
+ * 
+ * Contextos utilizados:
+ * ----------------------
+ * - `useMessageContext()`: Proporciona funciones y datos globales de mensajería:
+ *    - `conversations`: Lista de conversaciones del usuario.
+ *    - `unreadCount`: Número total de mensajes no leídos.
+ *    - `loading`: Estado de carga general.
+ *    - `openConversation(conversation)`: Abre una conversación seleccionada.
+ *    - `loadConversations()`: Carga todas las conversaciones desde la API.
+ *    - `searchConversations(query)`: Busca conversaciones según el término ingresado.
+ * 
+ * Hooks principales:
+ * -------------------
+ * - `useState`: Controla los estados de búsqueda, conversación seleccionada, etc.
+ * - `useEffect`: Carga las conversaciones al abrir el panel y abre la inicial si se indica.
+ * 
+ * Archivos relacionados:
+ * -----------------------
+ * - `ChatWindow.jsx`: Muestra la conversación seleccionada.
+ * - `Messages.css`: Contiene los estilos visuales del panel y la lista de mensajes.
+ */
+
 import React, { useState, useEffect } from 'react';
 import { useMessageContext } from '../../contexts/MessageContext';
 import ChatWindow from './ChatWindow';
 import './Messages.css';
 
 const MessagePanel = ({ isOpen, onClose, initialConversationId = null }) => {
+
+   // --- Contexto global de mensajería ---
   const { 
     conversations, 
     unreadCount, 
@@ -13,23 +59,26 @@ const MessagePanel = ({ isOpen, onClose, initialConversationId = null }) => {
     searchConversations
   } = useMessageContext();
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState([]);
-  const [showSearch, setShowSearch] = useState(false);
-  const [selectedConversation, setSelectedConversation] = useState(null);
 
-  // Cargar conversaciones cuando se abre el panel
+  // --- Estados locales ---
+  const [searchQuery, setSearchQuery] = useState('');   // Texto de búsqueda
+  const [searchResults, setSearchResults] = useState([]); // Resultados filtrados
+  const [showSearch, setShowSearch] = useState(false);     // Controla visibilidad del buscador
+  const [selectedConversation, setSelectedConversation] = useState(null); // Conversación activa
+
+  // --- Efecto: cargar conversaciones al abrir el panel ---
   useEffect(() => {
     if (isOpen && conversations.length === 0) {
       loadConversations();
     }
   }, [isOpen, conversations.length, loadConversations]);
 
-  // Abrir conversación inicial por id si se solicita
+  // --- Efecto: abrir conversación inicial si se pasa un ID ---
   useEffect(() => {
     if (!isOpen || !initialConversationId) return;
     const conv = conversations.find(c => c.id === initialConversationId);
     if (conv) {
+      // Si ya existe en la lista, abrirla directamente
       setSelectedConversation(conv);
       openConversation(conv);
     } else {
@@ -57,15 +106,18 @@ const MessagePanel = ({ isOpen, onClose, initialConversationId = null }) => {
     }
   };
 
+  // --- Abrir una conversación desde la lista ---
   const handleConversationClick = (conversation) => {
     setSelectedConversation(conversation);
     openConversation(conversation);
   };
 
+  // --- Volver a la lista desde una conversación abierta ---
   const handleBackToList = () => {
     setSelectedConversation(null);
   };
 
+  // --- Formatear fecha de último mensaje (estilo "hace X minutos") ---
   const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -77,6 +129,7 @@ const MessagePanel = ({ isOpen, onClose, initialConversationId = null }) => {
     return `${Math.floor(diffInMinutes / 1440)}d`;
   };
 
+   // --- Obtener nombre visible de la otra persona en la conversación ---
   const getConversationDisplayName = (conversation) => {
     // participants: [{ id_user, email, name, lastname }]
     if (conversation.participants && conversation.participants.length > 0) {
