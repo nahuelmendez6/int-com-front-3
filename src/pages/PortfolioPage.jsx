@@ -21,10 +21,14 @@ const PortfolioPage = () => {
 
   const fetchPortfolios = async () => {
     try {
-      setLoading(true);
-      const response = await portfolioService.getPortfolios();
-      setPortfolios(response.data);
-      setError(null);
+      if (profile?.profile?.id_provider) {
+        setLoading(true);
+        const response = await portfolioService.getPortfoliosByProvider(profile.profile.id_provider);
+        setPortfolios(response.data);
+        setError(null);
+      } else {
+        setPortfolios([]);
+      }
     } catch (err) {
       setError('Error al cargar el portfolio.');
       console.error(err);
