@@ -44,11 +44,14 @@ export function useProviderServiceArea({ token, providerId, id_provider }) {
    * 
    * - Actualiza `serviceArea` con las ciudades registradas.
    * - Sincroniza el formulario (`formData`) con los IDs de las ciudades.
+   * @param {boolean} showLoading - Si es true, muestra el estado de carga. Por defecto false para actualizaciones.
    */
-  const fetchServiceArea = async () => {
+  const fetchServiceArea = async (showLoading = false) => {
     if (!providerId) return;
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
       const area = await getProviderArea(providerId);
       setServiceArea(area);
       setFormData(prev => ({
@@ -60,12 +63,14 @@ export function useProviderServiceArea({ token, providerId, id_provider }) {
       setError('Error al cargar el área de servicio.');
       console.error(err);
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
-    fetchServiceArea();
+    fetchServiceArea(true); // Solo mostrar loading en la carga inicial
   }, [providerId]);
 
   /**
@@ -73,15 +78,27 @@ export function useProviderServiceArea({ token, providerId, id_provider }) {
    * Elimina una ciudad del área de servicio del proveedor.
    * 
    * - Muestra un estado de eliminación (`deletingCity`).
-   * - Refresca los datos tras la eliminación.
+   * - Actualiza el estado local sin recargar toda la página.
    */
   const deleteCity = async (cityId) => {
     try {
       setDeletingCity(cityId);
       await removeCityFromProviderArea(token, providerId, cityId);
-      await fetchServiceArea();
+      // Actualizar el estado local sin mostrar loading
+      setServiceArea(prev => prev.filter(city => city.id_city !== cityId));
+      setFormData(prev => ({
+        ...prev,
+        serviceArea: {
+          ...prev.serviceArea,
+          cities: prev.serviceArea.cities.filter(c => c !== cityId.toString())
+        }
+      }));
+      // Refrescar datos en segundo plano sin mostrar loading
+      await fetchServiceArea(false);
     } catch (err) {
       console.error('Error eliminando ciudad:', err);
+      // Si falla, recargar los datos para mantener consistencia
+      await fetchServiceArea(false);
     } finally {
       setDeletingCity(null);
     }
@@ -166,7 +183,7 @@ export function useProviderServiceArea({ token, providerId, id_provider }) {
    * Envía las modificaciones del área de servicio al backend.
    * - Verifica que haya al menos una ciudad seleccionada.
    * - Actualiza las ciudades del proveedor mediante `updateProviderCities`.
-   * - Refresca los datos tras la actualización.
+   * - Actualiza el estado local sin recargar toda la página.
    */
   const submitChanges = async () => {
     if (formData.serviceArea.cities.length === 0) {
@@ -179,10 +196,13 @@ export function useProviderServiceArea({ token, providerId, id_provider }) {
         provider: id_provider,
         cities: formData.serviceArea.cities.map(Number),
       });
-      await fetchServiceArea();
+      // Refrescar datos en segundo plano sin mostrar loading
+      await fetchServiceArea(false);
     } catch (error) {
       console.error('Error actualizando áreas:', error);
       alert('Error al actualizar. Intente nuevamente.');
+      // Si falla, recargar los datos para mantener consistencia
+      await fetchServiceArea(false);
     }
   };
 

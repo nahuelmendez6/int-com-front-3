@@ -184,10 +184,40 @@ export const getProviderProfileById = async (providerId) => {
  * @property {Function} getTypeProviders
  * @property {Function} getProfessions
  */
+/**
+ * Obtener el dashboard personalizado según el rol del usuario.
+ * Realiza una solicitud GET a `/profiles/dashboard/`.
+ *
+ * @async
+ * @function getDashboard
+ * @returns {Promise<Object>} Datos del dashboard (summary, recent_postulations o recent_petitions según rol).
+ * @throws {Error} Lanza un error si la obtención falla.
+ *
+ * @example
+ * const dashboard = await getDashboard();
+ * if (dashboard.role === 'provider') {
+ *   console.log('Postulaciones:', dashboard.summary.postulations);
+ * }
+ */
+export const getDashboard = async () => {
+  try {
+    const response = await api.get('/profiles/dashboard/');
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.error('Error fetching dashboard:', error.response.data);
+    } else {
+      console.error('Error fetching dashboard:', error.message);
+    }
+    throw error;
+  }
+};
+
 export const profileService = {
   getProfile,
   updateProfile,
   getCategories,
   getTypeProviders,
   getProfessions,
+  getDashboard,
 };

@@ -63,6 +63,7 @@ const Sidebar = () => {
   const linksByRole = {
     customer: [
       { to: '/feed', label: 'Inicio', icon: 'bi-house-door'},
+      { to: '/dashboard', label: 'Dashboard', icon: 'bi-speedometer2'},
       { to: '/profile', label: 'Perfil', icon: 'bi-person'},
       { to: '/petitions', label: 'Peticiones', icon: 'bi-card-list'},
       { to: '/interests', label: 'Intereses', icon: 'bi-heart'},
@@ -71,6 +72,7 @@ const Sidebar = () => {
     ],
     provider: [
       { to: '/feed', label: 'Inicio', icon: 'bi-house-door'},
+      { to: '/dashboard', label: 'Dashboard', icon: 'bi-speedometer2'},
       { to: '/profile', label: 'Perfil', icon: 'bi-person'},
       { to: '/availability', label: 'Disponibilidad', icon: 'bi-calendar-check'},
       { to: '/offers', label: 'Ofertas', icon: 'bi-tag'},

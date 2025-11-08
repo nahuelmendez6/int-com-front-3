@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import contratacionesService from '../services/contrataciones.service.js';
 import ContratacionList from '../components/contrataciones/ContratacionList.jsx';
-import { Alert } from 'react-bootstrap';
+import PostulationStatistics from '../components/postulations/PostulationStatistics.jsx';
+import { Alert, Tabs, Tab } from 'react-bootstrap';
+import { useAuth } from '../hooks/useAuth.js';
 
 const ContratacionesPage = () => {
+  const { profile } = useAuth();
   const [contrataciones, setContrataciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('contrataciones');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,16 +45,20 @@ const ContratacionesPage = () => {
     );
   }
 
+  const isProvider = profile?.role === 'provider';
+
   return (
     <div className="contrataciones-page">
       <div className="card shadow rounded-3">
         <div className="card-body p-4">
           <h1 className="card-title mb-4">
             <i className="bi bi-check2-square me-2"></i>
-            Mis Contrataciones
+            {isProvider ? 'Trabajos Aprobados' : 'Mis Contrataciones'}
           </h1>
           <p className="text-muted mb-4">
-            Gestiona tus contrataciones activas y el historial de servicios contratados.
+            {isProvider 
+              ? 'Gestiona tus trabajos aprobados y visualiza estadísticas de tus postulaciones.'
+              : 'Gestiona tus contrataciones activas y el historial de servicios contratados.'}
           </p>
           
           {error && (
@@ -59,7 +67,35 @@ const ContratacionesPage = () => {
               {error}
             </Alert>
           )}
-          {!error && <ContratacionList contrataciones={contrataciones} />}
+
+          {isProvider ? (
+            <Tabs
+              activeKey={activeTab}
+              onSelect={(k) => setActiveTab(k)}
+              className="mb-4"
+            >
+              <Tab eventKey="contrataciones" title={
+                <span>
+                  <i className="bi bi-check2-square me-2"></i>
+                  Trabajos Aprobados
+                </span>
+              }>
+                {!error && <ContratacionList contrataciones={contrataciones} />}
+              </Tab>
+              <Tab eventKey="estadisticas" title={
+                <span>
+                  <i className="bi bi-bar-chart-fill me-2"></i>
+                  Estadísticas
+                </span>
+              }>
+                <div className="mt-4">
+                  <PostulationStatistics />
+                </div>
+              </Tab>
+            </Tabs>
+          ) : (
+            !error && <ContratacionList contrataciones={contrataciones} />
+          )}
         </div>
       </div>
     </div>

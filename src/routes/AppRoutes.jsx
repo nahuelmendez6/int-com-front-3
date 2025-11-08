@@ -22,6 +22,7 @@ const PortfolioPage = lazy(() => import("../pages/PortfolioPage.jsx"));
 const PortfolioDetailPage = lazy(() => import("../pages/PortfolioDetailPage.jsx"));
 const ContratacionesPage = lazy(() => import("../pages/ContratacionesPage.jsx"));
 const PostulationsPage = lazy(() => import("../pages/PostulationsPage.jsx"));
+const DashboardPage = lazy(() => import("../pages/DashboardPage.jsx"));
 
 // 🔒 Componente para proteger rutas privadas
 const PrivateRoute = ({ children }) => {
@@ -93,6 +94,7 @@ const AppRoutes = () => {
           <Route path="/portfolio/:id" element={<PortfolioDetailPage />} />
           <Route path="/contrataciones" element={<ContratacionesPage />} />
           <Route path="/mis-postulaciones" element={<PostulationsPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
         </Route>
 
         {/* 🧭 Ruta por defecto */}

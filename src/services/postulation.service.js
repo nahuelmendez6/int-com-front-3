@@ -151,3 +151,30 @@ export const acceptPostulation = async (postulationId) => {
     throw error;
   }
 };
+
+/**
+ * Obtener estadísticas de postulaciones del proveedor autenticado.
+ * Realiza una solicitud GET a `/postulations/statistics/`.
+ *
+ * @async
+ * @function getPostulationStatistics
+ * @returns {Promise<Object>} Estadísticas de postulaciones (summary, by_state, recent_postulations).
+ * @throws {Error} Lanza un error si la obtención falla.
+ *
+ * @example
+ * const stats = await getPostulationStatistics();
+ * console.log('Total:', stats.summary.total);
+ */
+export const getPostulationStatistics = async () => {
+  try {
+    const response = await api.get('/postulations/statistics/');
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.error('Error fetching postulation statistics:', error.response.data);
+    } else {
+      console.error('Error fetching postulation statistics:', error.message);
+    }
+    throw error;
+  }
+};
