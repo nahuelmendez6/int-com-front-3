@@ -42,8 +42,8 @@ const PostulationList = ({ postulations, onEdit, onDelete }) => {
                             {postulation.budgets && postulation.budgets.length > 0 && (
                                 <div className="budget-info">
                                     <h4>Presupuesto</h4>
-                                    <p><strong>Monto:</strong> ${parseFloat(postulation.budgets[0].amount).toLocaleString()}</p>
-                                    <p><strong>Tipo:</strong> {postulation.budgets[0].cost_type.replace('_', ' ')}</p>
+                                    <p><strong>Monto:</strong> ${parseFloat(postulation.budgets[0].unit_price || postulation.budgets[0].amount || 0).toLocaleString()}</p>
+                                    <p><strong>Tipo:</strong> {postulation.budgets[0].cost_type ? postulation.budgets[0].cost_type.replace(/_/g, ' ') : 'N/A'}</p>
                                 </div>
                             )}
                             {postulation.materials && postulation.materials.length > 0 && (

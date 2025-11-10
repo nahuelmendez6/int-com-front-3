@@ -68,6 +68,8 @@ const PostulationsPage = () => {
     }
   };
 
+  console.log(postulations);
+
   return (
     <div className="postulations-page">
       <div className="card shadow rounded-3">

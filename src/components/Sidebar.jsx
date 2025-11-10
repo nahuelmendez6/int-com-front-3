@@ -174,7 +174,7 @@ const Sidebar = () => {
         >
           <div className="p-3 d-flex flex-column" style={{ height: '100%'}}>
             <div>
-              <h4 className="text-white text-center mb-4">Integración Comunitaria</h4>
+              {/* <h4 className="text-white text-center mb-4">Integración Comunitaria</h4> */}
               <nav className="nav flex-column">
                 {renderLinks()}
               </nav>

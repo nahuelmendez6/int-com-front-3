@@ -48,7 +48,7 @@ const ContratacionList = ({ contrataciones }) => {
   if (contrataciones.length === 0) {
     return <p>No tienes trabajos aprobados por el momento.</p>;
   }
-
+  console.log('contrataciones:', contrataciones)
   return (
     <Row>
       {contrataciones.map(item => {
@@ -85,13 +85,86 @@ const ContratacionList = ({ contrataciones }) => {
                         <h6 className="mb-1">Propuesta aceptada:</h6>
                         <p className="mb-1 fst-italic">"{item.proposal}"</p>
                       </ListGroup.Item>
+                      {(item.budget && item.budget.length > 0) && (
+                        <ListGroup.Item>
+                          <h6 className="mb-2">Presupuesto:</h6>
+                          <div className="d-flex flex-column gap-2">
+                            {item.budget.map((budget, index) => (
+                              <div key={budget.id_budget || index} className="d-flex justify-content-between align-items-center">
+                                <div>
+                                  <strong>Tipo:</strong> {budget.cost_type ? budget.cost_type.replace(/_/g, ' ') : 'N/A'}
+                                </div>
+                                <Badge bg="info" className="p-2">
+                                  {new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(
+                                    parseFloat(budget.unit_price || budget.amount || 0)
+                                  )}
+                                </Badge>
+                              </div>
+                            ))}
+                          </div>
+                        </ListGroup.Item>
+                      )}
+                      {(item.materials && item.materials.length > 0) && (
+                        <ListGroup.Item>
+                          <h6 className="mb-2">Materiales:</h6>
+                          <div className="d-flex flex-column gap-3">
+                            {item.materials.map((materialItem) => {
+                              const material = materialItem.material || {};
+                              const unitPrice = parseFloat(materialItem.unit_price || 0);
+                              const quantity = parseFloat(materialItem.quantity || 0);
+                              const totalPrice = parseFloat(materialItem.total || 0);
+                              
+                              return (
+                                <div key={materialItem.id_postulation_material} className="border rounded p-3">
+                                  <div className="d-flex justify-content-between align-items-start mb-2">
+                                    <div className="flex-grow-1">
+                                      {material.name && (
+                                        <div className="mb-1">
+                                          <strong>Material:</strong> {material.name}
+                                        </div>
+                                      )}
+                                      {material.description && (
+                                        <div className="mb-1 text-muted small">
+                                          {material.description}
+                                        </div>
+                                      )}
+                                      <div className="mb-1">
+                                        <strong>Cantidad:</strong> {quantity} {material.unit ? `(${material.unit})` : ''}
+                                      </div>
+                                      {material.category && (
+                                        <div className="mb-1">
+                                          <strong>Categoría:</strong> {material.category}
+                                        </div>
+                                      )}
+                                      <div className="mb-1">
+                                        <strong>Precio unitario:</strong>{' '}
+                                        <Badge bg="primary" className="ms-1">
+                                          {new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(unitPrice)}
+                                        </Badge>
+                                      </div>
+                                      <div>
+                                        <strong>Total:</strong>{' '}
+                                        <Badge bg="success" className="ms-1">
+                                          {new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(totalPrice)}
+                                        </Badge>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {materialItem.notes && (
+                                    <div className="mt-2 pt-2 border-top">
+                                      <small className="text-muted">
+                                        <strong>Notas:</strong> {materialItem.notes}
+                                      </small>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </ListGroup.Item>
+                      )}
                       <ListGroup.Item className="d-flex justify-content-between align-items-start">
-                        <div>
-                          <h6 className="mb-1">Precio Final Acordado:</h6>
-                          <Badge bg="success" pill className="p-2 fs-6">
-                            {new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(item.final_price)}
-                          </Badge>
-                        </div>
+
                         <div className="text-end">
                            <h6 className="mb-1">Fecha de Aprobación:</h6>
                            <small className="text-muted">
