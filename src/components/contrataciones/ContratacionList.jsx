@@ -54,7 +54,7 @@ const ContratacionList = ({ contrataciones }) => {
       {contrataciones.map(item => {
         const otherUser = profile.role === 'customer' ? item.provider : item.customer;
         const profileImageUrl = otherUser.profile_image ? `${baseURL}${otherUser.profile_image}` : 'https://via.placeholder.com/150';
-
+        console.log('item', item)
         return (
           <Col md={12} key={item.id_postulation} className="mb-4">
             <Card className="shadow-sm">

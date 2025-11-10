@@ -17,6 +17,7 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import gradesService from '../../services/grades.service.js';
+import { useAuth } from '../../hooks/useAuth';
 
 
 /**
@@ -53,6 +54,7 @@ const Star = ({ marked, starId, onClick }) => (
  * <RatingForm providerId={12} id_postulation={45} />
  */
 const RatingForm = ({ providerId, id_postulation }) => {
+  const { user } = useAuth();
 
   // Estado local del formulario
   const [rating, setRating] = useState(0);  // número de estrellas seleccionadas
@@ -92,7 +94,7 @@ const RatingForm = ({ providerId, id_postulation }) => {
 
     // Datos enviados al backend
     const gradeData = {
-      provider: providerId,
+      provider: providerId, // id_user del proveedor a calificar
       grade: rating, // Asumiendo que grade y rating son lo mismo
       rating: rating,
       coment: comment,
