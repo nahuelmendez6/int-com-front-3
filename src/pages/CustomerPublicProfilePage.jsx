@@ -20,8 +20,15 @@ const CustomerPublicProfilePage = () => {
 
   const fetchGrades = useCallback(async () => {
     try {
-      const response = await gradesService.getGradesByCustomer(customerId);
-      const gradesData = response.results || response;
+      // Obtener id_user del perfil
+      const userId = profile?.id_user || profile?.id;
+      if (!userId) {
+        console.error('No se encontró id_user en el perfil');
+        return;
+      }
+      
+      const response = await gradesService.getGradesByCustomerUserId(userId);
+      const gradesData = response.results || response || [];
       setGrades(gradesData);
       if (gradesData.length > 0) {
         const totalRating = gradesData.reduce((acc, grade) => acc + grade.rating, 0);
@@ -33,7 +40,7 @@ const CustomerPublicProfilePage = () => {
       console.error('Error fetching customer grades:', err);
       setError('Error al cargar las calificaciones del cliente');
     }
-  }, [customerId]);
+  }, [profile]);
 
   useEffect(() => {
     const fetchProfileAndGrades = async () => {
@@ -44,8 +51,6 @@ const CustomerPublicProfilePage = () => {
         const profileData = await getUserProfile({ id_customer: customerId });
         setProfile(profileData);
         
-        await fetchGrades();
-
       } catch (err) {
         console.error('Error fetching customer profile:', err);
         setError('Error al cargar el perfil del cliente');
@@ -57,7 +62,14 @@ const CustomerPublicProfilePage = () => {
     if (customerId) {
       fetchProfileAndGrades();
     }
-  }, [customerId, fetchGrades]);
+  }, [customerId]);
+
+  // Cargar calificaciones cuando el perfil esté disponible
+  useEffect(() => {
+    if (profile) {
+      fetchGrades();
+    }
+  }, [profile, fetchGrades]);
 
   if (loading) {
     return <div className="text-center mt-5">Cargando perfil...</div>;

@@ -45,6 +45,21 @@ const gradesService = {
     }
   },
 // =====================================================
+// 🔍 Obtener todas las calificaciones por id_user
+// -----------------------------------------------------
+// @param {number|string} userId - ID del usuario (id_user).
+// @returns {Promise<Object[]>} Lista de calificaciones.
+// =====================================================
+  getGradesByUserId: async (userId) => {
+    try {
+      const response = await api.get(`/grades/?id_user=${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener las calificaciones por id_user", error.response?.data || error.message);
+      throw error;
+    }
+  },
+// =====================================================
 // Obtener calificación promedio de un proveedor
 // -----------------------------------------------------
 // @param {number|string} providerId - ID del proveedor.
@@ -56,6 +71,21 @@ const gradesService = {
       return response.data;
     } catch (error) {
       console.error("Error al obtener la calificación promedio", error.response?.data || error.message);
+      throw error;
+    }
+  },
+// =====================================================
+// Obtener calificación promedio por id_user
+// -----------------------------------------------------
+// @param {number|string} userId - ID del usuario (id_user).
+// @returns {Promise<Object>} Objeto con la calificación promedio.
+// =====================================================
+  getAverageRatingByUserId: async (userId) => {
+    try {
+      const response = await api.get(`/grades/average-rating/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener la calificación promedio por id_user", error.response?.data || error.message);
       throw error;
     }
   },
@@ -86,6 +116,21 @@ const gradesService = {
       return response.data;
     } catch (error) {
       console.error("Error al obtener las calificaciones del cliente", error.response?.data || error.message);
+      throw error;
+    }
+  },
+// =====================================================
+// Obtener calificaciones de un cliente por id_user
+// -----------------------------------------------------
+// @param {number|string} userId - ID del usuario (id_user).
+// @returns {Promise<Object[]>} Lista de calificaciones del cliente.
+// =====================================================
+  getGradesByCustomerUserId: async (userId) => {
+    try {
+      const response = await api.get(`/grades/grades-customer/?id_user=${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener las calificaciones del cliente por id_user", error.response?.data || error.message);
       throw error;
     }
   },

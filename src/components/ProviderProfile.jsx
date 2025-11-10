@@ -17,8 +17,9 @@ const ProviderProfile = ({ userData }) => {
   const [formData, setFormData] = useState({});
   const [imageFile, setImageFile] = useState(null);
   console.log(userData)
-  const providerId = userData?.profile?.id_provider; // Extract providerId from userData
-  const { averageRating, loading: loadingRating, error: errorRating } = useAverageRating(providerId);
+  // Obtener id_user del usuario para las calificaciones
+  const userId = userData?.user?.id_user || userData?.user?.id;
+  const { averageRating, loading: loadingRating, error: errorRating } = useAverageRating(userId);
 
   // Opciones de perfil
   const [categories, setCategories] = useState([]);

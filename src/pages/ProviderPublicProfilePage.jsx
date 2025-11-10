@@ -22,23 +22,31 @@ const ProviderPublicProfilePage = () => {
   const [error, setError] = useState(null);
   const { createConversation } = useMessageContext();
 
-  const { averageRating, loading: loadingRating, error: errorRating } = useAverageRating(providerId);
-
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
         setLoading(true);
-        const [profileData, portfolioData, gradesData, materialsData] = await Promise.all([
+        const [profileData, portfolioData, materialsData] = await Promise.all([
           getProviderProfileById(providerId),
           portfolioService.getPortfoliosByProvider(providerId),
-          gradesService.getGradesByProvider(providerId),
           materialService.getMaterialsByProvider(providerId)
         ]);
         
         setProvider(profileData);
         setPortfolio(portfolioData.data);
-        setGrades(gradesData);
         setMaterials(materialsData.data);
+
+        // Obtener calificaciones usando id_user del perfil
+        const userId = profileData?.user?.id_user || profileData?.user?.id;
+        if (userId) {
+          try {
+            const gradesData = await gradesService.getGradesByUserId(userId);
+            setGrades(gradesData.results || gradesData || []);
+          } catch (err) {
+            console.error('Error fetching grades:', err);
+            setGrades([]);
+          }
+        }
 
       } catch (err) {
         setError('No se pudo cargar el perfil completo del proveedor.');
@@ -50,6 +58,10 @@ const ProviderPublicProfilePage = () => {
 
     fetchProfileData();
   }, [providerId]);
+
+  // Obtener id_user del perfil para el promedio
+  const userId = provider?.user?.id_user || provider?.user?.id;
+  const { averageRating, loading: loadingRating, error: errorRating } = useAverageRating(userId);
 
   if (loading || loadingRating) return <div className="text-center mt-5">Cargando perfil...</div>;
   if (error || errorRating) return <div className="alert alert-danger mt-5">{error || errorRating}</div>;
