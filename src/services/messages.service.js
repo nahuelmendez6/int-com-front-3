@@ -20,7 +20,7 @@ const messagesService = {
    * @returns {Promise<Object[]>} Lista de conversaciones activas.
    */
   async getConversations() {
-    const response = await api.get(`${BASE}/conversations/`);
+    const response = await api.get(`${BASE}/conversations/`, { cache: false });
     return response.data;
   },
 
@@ -30,7 +30,7 @@ const messagesService = {
    * @returns {Promise<Object[]>} Lista de mensajes en la conversación.
    */
   async getMessages(conversationId) {
-    const response = await api.get(`${BASE}/conversations/${conversationId}/`);
+    const response = await api.get(`${BASE}/conversations/${conversationId}/`, { cache: false });
     return response.data;
   },
 
