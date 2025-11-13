@@ -46,7 +46,7 @@ export const createOffer = (offerData) => {
 
 /**
  * Actualizar una oferta existente.
- * Realiza una petición PUT al endpoint `/offers/{offerId}/` con los datos actualizados.
+ * Realiza una petición PATCH al endpoint `/offers/{offerId}/` con los datos actualizados.
  * 
  * @async
  * @function updateOffer
@@ -58,7 +58,7 @@ export const createOffer = (offerData) => {
  * await updateOffer(5, { price: 120, description: 'Nuevo precio de oferta' });
  */
 export const updateOffer = (offerId, offerData) => {
-  return api.put(`/offers/${offerId}/`, offerData);
+  return api.patch(`/offers/${offerId}/`, offerData);
 };
 
 /**
