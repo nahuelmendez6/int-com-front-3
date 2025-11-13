@@ -138,6 +138,11 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
     localStorage.removeItem("profile");
+    try {
+      api.cache?.clear();
+    } catch (err) {
+      console.warn("No se pudo limpiar la caché de API al cerrar sesión:", err);
+    }
     setUser(null);
     setProfile(null);
   }, []);
