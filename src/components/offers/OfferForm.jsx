@@ -53,13 +53,12 @@ const OfferForm = ({ show, onHide, onSubmit, initialData, offerTypes = [] }) => 
 
   // --- Efecto: inicializar o resetear formulario al abrir el modal ---
   useEffect(() => {
-
     if (show) {
       setOffer({
         name: initialData?.name || '',
         description: initialData?.description || '',
-        date_open: initialData?.date_open ? new Date(initialData.date_open).toISOString().slice(0, 16) : '',
-        date_close: initialData?.date_close ? new Date(initialData.date_close).toISOString().slice(0, 16) : '',
+        date_open: initialData?.date_open ? new Date(initialData.date_open).toISOString().slice(0, 10) : '',
+        date_close: initialData?.date_close ? new Date(initialData.date_close).toISOString().slice(0, 10) : '',
         id_type_offer: initialData?.id_type_offer || 1,
         status: initialData?.status || 'active',
       });
@@ -75,7 +74,12 @@ const OfferForm = ({ show, onHide, onSubmit, initialData, offerTypes = [] }) => 
   // --- Enviar formulario ---
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(offer);
+    const offerData = {
+      ...offer,
+      date_open: offer.date_open ? `${offer.date_open}T00:00:00` : null,
+      date_close: offer.date_close ? `${offer.date_close}T23:59:59` : null,
+    };
+    onSubmit(offerData);
   };
 
   return (
@@ -105,11 +109,11 @@ const OfferForm = ({ show, onHide, onSubmit, initialData, offerTypes = [] }) => 
           <div className="row">
             <div className="col-md-6 mb-3">
               <label htmlFor="date_open" className="form-label">Fecha de Inicio</label>
-              <input type="datetime-local" className="form-control" id="date_open" name="date_open" value={offer.date_open} onChange={handleChange} required />
+              <input type="date" className="form-control" id="date_open" name="date_open" value={offer.date_open} onChange={handleChange} required />
             </div>
             <div className="col-md-6 mb-3">
               <label htmlFor="date_close" className="form-label">Fecha de Cierre</label>
-              <input type="datetime-local" className="form-control" id="date_close" name="date_close" value={offer.date_close} onChange={handleChange} required />
+              <input type="date" className="form-control" id="date_close" name="date_close" value={offer.date_close} onChange={handleChange} required />
             </div>
           </div>
         </Modal.Body>

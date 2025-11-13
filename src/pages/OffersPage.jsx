@@ -59,13 +59,11 @@ const OffersPage = () => {
   };
 
   const handleDelete = async (offerId) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta oferta?')) {
-      try {
-        await deleteOffer(offerId);
-        fetchOffers(); // Recargar lista
-      } catch (err) {
-        setError('Error al eliminar la oferta.');
-      }
+    try {
+      await deleteOffer(offerId);
+      fetchOffers(); // Recargar lista
+    } catch (err) {
+      setError('Error al eliminar la oferta.');
     }
   };
 
