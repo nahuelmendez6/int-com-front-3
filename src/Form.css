@@ -1,11 +1,11 @@
 
 .form-container {
-  width: 320px; /* smaller width */
+  width: min(100%, 500px);
   background-color: #fff;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   border-radius: 10px;
   box-sizing: border-box;
-  padding: 20px 25px; /* smaller padding */
+  padding: 16px 20px;
   margin: auto; /* Center the form */
 }
 
@@ -22,8 +22,8 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px; /* smaller gap */
-  margin-bottom: 15px;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .input {
@@ -31,7 +31,12 @@
   border: 1px solid #c0c0c0;
   outline: 0 !important;
   box-sizing: border-box;
-  padding: 12px 15px;
+  padding: 10px 14px;
+}
+
+.wide-input {
+  width: 100%;
+  min-width: 300px;
 }
 
 .page-link {
