@@ -14,7 +14,7 @@ const PostulationList = ({ postulations, loading, error, onUpdate, petitionId })
             default: return { text: 'Desconocido', variant: 'secondary' };
         }
     };
-
+    console.log(postulations);
     if (loading) {
         return <p>Cargando postulaciones...</p>;
     }
@@ -39,7 +39,7 @@ const PostulationList = ({ postulations, loading, error, onUpdate, petitionId })
                             <Link to={`/provider/${postulation.id_provider}`} className="provider-profile-link">
                                 <div className="d-flex align-items-center">
                                     <Image
-                                        src={`http://127.0.0.1:8000/${postulation.provider_user?.user.profile_image}`}
+                                        src={`http://127.0.0.1:8000${postulation.provider_user.user.profile_image}`}
                                         roundedCircle
                                         style={{ width: '40px', height: '40px', objectFit: 'cover' }}
                                         />
