@@ -17,7 +17,7 @@ const api = axios.create({
 // =====================================================
 // ⚙️ Utilidades internas para el caché
 // =====================================================
-const DEFAULT_CACHE_TTL = 2 * 60 * 1000; // 2 minutos
+const DEFAULT_CACHE_TTL = 30 * 60 * 1000; // 30 minutos
 const cacheStore = new Map();
 
 const stableSerialize = (value) => {
