@@ -4,7 +4,28 @@ import { usePostulationForm } from '../../hooks/usePostulationForm.js';
 import { BudgetSection } from './BudgetSection.jsx';
 import { MaterialSection } from './MaterialSection.jsx';
 
+
+/**
+ * @function PostulationForm
+ * @description Componente de formulario que permite a un proveedor crear o editar
+ * una postulación (oferta de servicio) para una petición.
+ * Utiliza un hook personalizado (`usePostulationForm`) para manejar la lógica de estado
+ * y la carga de datos necesarios (como materiales disponibles).
+ * * @param {boolean} show - Controla si el Modal debe mostrarse.
+ * @param {function} handleClose - Función que se llama al cerrar el Modal.
+ * @param {function} onSubmit - Callback que maneja el envío final de los datos al componente padre.
+ * @param {string | null} error - Mensaje de error a mostrar.
+ * @param {boolean} submitting - Indica si el formulario está en proceso de envío (muestra 'Guardando...').
+ * @param {object | null} initialData - Datos iniciales de una postulación existente para el modo Edición.
+ * @param {number} providerId - ID del proveedor, necesario para el hook de formulario.
+ * @returns {JSX.Element} Un Modal que contiene el formulario de postulación.
+ */
 const PostulationForm = ({ show, handleClose, onSubmit, error, submitting, initialData, providerId }) => {
+  
+  // 1. Hook Personalizado para la Lógica del Formulario
+  // Este hook se encarga de:
+  // - Inicializar los estados (propuesta, presupuestos, materiales) con `initialData` si existe.
+  // - Cargar dinámicamente los materiales disponibles para el proveedor/petición.
   const {
     proposal,
     setProposal,
@@ -15,7 +36,13 @@ const PostulationForm = ({ show, handleClose, onSubmit, error, submitting, initi
     availableMaterials,
     loadingMaterials,
   } = usePostulationForm(initialData, providerId, show);
-
+  
+  /**
+   * @function handleSubmit
+   * @description Maneja el evento de envío del formulario.
+   * Previene la recarga por defecto y pasa los datos consolidados al callback `onSubmit` del componente padre.
+   * @param {Event} e - Evento de formulario.
+   */
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit({
@@ -26,6 +53,8 @@ const PostulationForm = ({ show, handleClose, onSubmit, error, submitting, initi
   };
 
   return (
+    // El Modal se configura para ser de tamaño grande ('lg') y tiene 'backdrop="static"' 
+    // para evitar que se cierre al hacer clic fuera de él, forzando el uso del botón 'Cancelar'.
     <Modal show={show} onHide={handleClose} size="lg" backdrop="static">
       <Modal.Header closeButton>
         <Modal.Title>{initialData ? 'Editar Postulación' : 'Crear Postulación'}</Modal.Title>

@@ -2,8 +2,26 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 import './ProviderPostulationList.css';
 
+/**
+ * @function PostulationList
+ * @description Componente funcional que renderiza una lista de postulaciones (ofertas de servicio)
+ * realizadas por un proveedor, mostrando el estado, los detalles de la propuesta,
+ * el presupuesto y los materiales.
+ * Permite la edición y eliminación de postulaciones solo si están en estado 'Pendiente'.
+ * * @param {object[]} postulations - Array de objetos de postulación a mostrar.
+ * @param {function} onEdit - Callback que se llama al hacer clic en 'Editar'. Recibe el objeto de postulación.
+ * @param {function} onDelete - Callback que se llama al hacer clic en 'Eliminar'. Recibe el ID de la postulación.
+ * @returns {JSX.Element} La cuadrícula de tarjetas de postulación o un mensaje informativo.
+ */
 const PostulationList = ({ postulations, onEdit, onDelete }) => {
 
+    /**
+     * @function getStatusInfo
+     * @description Mapea el ID de estado numérico a un texto legible y una clase CSS
+     * para estilizar el estado en la interfaz.
+     * @param {number} id_state - El ID del estado de la postulación.
+     * @returns {object} Un objeto con 'text' (nombre del estado) y 'className' (clase CSS).
+     */
     const getStatusInfo = (id_state) => {
         switch (id_state) {
             case 1:
@@ -18,11 +36,11 @@ const PostulationList = ({ postulations, onEdit, onDelete }) => {
                 return { text: 'Desconocido', className: 'unknown' };
         }
     };
-
+    // Manejo de caso vacío: si no hay postulaciones, muestra un mensaje.
     if (!postulations || postulations.length === 0) {
         return <div className="alert alert-info">No has realizado ninguna postulación aún.</div>;
     }
-
+    // Renderizado de la cuadrícula de postulaciones.
     return (
         <div className="postulations-grid">
             {postulations.map((postulation) => {

@@ -2,20 +2,47 @@ import React, { useState, useEffect } from 'react';
 import { getPostulationStatistics } from '../../services/postulation.service.js';
 import './PostulationStatistics.css';
 
+
+/**
+ * @function PostulationStatistics
+ * @description Componente que muestra diversas métricas y estadísticas relacionadas
+ * con las postulaciones (ofertas de servicio) de un proveedor.
+ * Realiza una llamada API para obtener los datos al montarse y maneja los estados
+ * de carga, error y visualización de datos.
+ * @returns {JSX.Element} La interfaz de usuario que muestra las estadísticas agrupadas.
+ */
 const PostulationStatistics = () => {
+
+  // 1. Estados Locales
+  
+  // Almacena el objeto de estadísticas retornado por la API.
   const [stats, setStats] = useState(null);
+
+  // Indica si los datos están siendo cargados (muestra el spinner).
   const [loading, setLoading] = useState(true);
+
+  // Almacena el mensaje de error en caso de fallo de la API.
   const [error, setError] = useState(null);
 
+  // 2. Efecto de Carga de Datos (al montar el componente)
   useEffect(() => {
+
+    /**
+     * @async
+     * @function fetchStatistics
+     * @description Llama al servicio API para obtener las estadísticas de postulaciones.
+     * Gestiona el ciclo de vida de carga (inicio, éxito o fallo).
+     */
     const fetchStatistics = async () => {
       try {
         setLoading(true);
         setError(null);
+        // Llamada al servicio API
         const data = await getPostulationStatistics();
         setStats(data);
       } catch (err) {
         console.error('Error fetching statistics:', err);
+        // Captura el mensaje de error desde la respuesta o un mensaje genérico.
         setError(err.response?.data?.detail || err.message || 'Error al cargar estadísticas');
       } finally {
         setLoading(false);
@@ -24,7 +51,7 @@ const PostulationStatistics = () => {
 
     fetchStatistics();
   }, []);
-
+  // 3. Renderizado Condicional: Carga
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
@@ -37,7 +64,7 @@ const PostulationStatistics = () => {
       </div>
     );
   }
-
+  // 4. Renderizado Condicional: Error
   if (error) {
     return (
       <div className="alert alert-danger" role="alert">
@@ -46,7 +73,7 @@ const PostulationStatistics = () => {
       </div>
     );
   }
-
+  // Si no hay errores y 'stats' es nulo (aunque esto debería ser capturado en el loading/error), no renderiza nada.
   if (!stats) {
     return null;
   }
@@ -178,7 +205,13 @@ const PostulationStatistics = () => {
   );
 };
 
-// Función auxiliar para obtener la clase del badge según el estado
+/**
+ * @function getStateBadgeClass
+ * @description Función auxiliar para asignar una clase de badge de Bootstrap 
+ * basada en el nombre del estado (ej: 'Aprobada' -> 'bg-success').
+ * @param {string} stateName - El nombre del estado de la postulación.
+ * @returns {string} La clase CSS del badge.
+ */
 const getStateBadgeClass = (stateName) => {
   const state = stateName?.toLowerCase();
   if (state?.includes('aprobada')) return 'bg-success';

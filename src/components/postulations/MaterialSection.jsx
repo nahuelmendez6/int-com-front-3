@@ -1,22 +1,44 @@
 import React from 'react';
 import { Card, Row, Col, Button, Form } from 'react-bootstrap';
 
+
+/**
+ * @function MaterialSection
+ * @description Componente de sección de formulario que permite al usuario gestionar 
+ * la lista de materiales cotizados dentro de una postulación. Incluye lógica para 
+ * calcular el total basado en la cantidad y el precio unitario.
+ * * @param {object[]} materials - El estado actual del array de materiales.
+ * @param {function} setMaterials - La función para actualizar el estado del array de materiales.
+ * @param {object[]} availableMaterials - Lista de materiales disponibles para seleccionar (cargados desde la API).
+ * @param {boolean} loadingMaterials - Indica si la lista de materiales disponibles está cargando.
+ * @returns {JSX.Element} Una tarjeta de Bootstrap con la interfaz para gestionar materiales.
+ */
 export const MaterialSection = ({
   materials,
   setMaterials,
   availableMaterials,
   loadingMaterials,
 }) => {
+
+  /**
+   * @function handleMaterialChange
+   * @description Maneja los cambios en cualquier campo de un material específico.
+   * Recalcula automáticamente el campo 'total' si se cambian 'quantity' o 'unit_price',
+   * o si se selecciona un nuevo 'id_material' (cargando su precio unitario por defecto).
+   * @param {number} index - Índice del material dentro del array `materials`.
+   * @param {string} field - El nombre del campo que está siendo modificado ('quantity', 'unit_price', etc.).
+   * @param {string} value - El nuevo valor del campo.
+   */
   const handleMaterialChange = (index, field, value) => {
     const updated = [...materials];
     updated[index][field] = value;
-
+    // Lógica para recalcular el Total
     if (field === 'quantity' || field === 'unit_price') {
       const q = parseFloat(updated[index].quantity) || 0;
       const p = parseFloat(updated[index].unit_price) || 0;
       updated[index].total = (q * p).toFixed(2);
     }
-
+    // Lógica para autocompletar el precio unitario al seleccionar un material
     if (field === 'id_material') {
       const selected = availableMaterials.find(
         (m) => m.id_material === parseInt(value)
@@ -31,13 +53,20 @@ export const MaterialSection = ({
 
     setMaterials(updated);
   };
-
+  /**
+   * @function addMaterial
+   * @description Añade un nuevo elemento de material vacío al array de `materials`.
+   */
   const addMaterial = () =>
     setMaterials([
       ...materials,
       { id_material: '', quantity: '', unit_price: '', total: '0.00', notes: '' },
     ]);
-
+  /**
+   * @function removeMaterial
+   * @description Elimina un material del array por su índice.
+   * @param {number} index - Índice del material a eliminar.
+   */
   const removeMaterial = (index) =>
     setMaterials(materials.filter((_, i) => i !== index));
 

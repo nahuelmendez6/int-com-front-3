@@ -1,6 +1,16 @@
 import React from 'react';
 import { Card, Row, Col, Button, Form } from 'react-bootstrap';
 
+
+/**
+ * @function renderBudgetFields
+ * @description Función auxiliar que renderiza los campos de formulario específicos 
+ * requeridos por cada tipo de costo de presupuesto (Por Proyecto, Por Hora, Por Ítem).
+ * @param {object} item - El objeto de presupuesto actual.
+ * @param {number} index - El índice del objeto en el array.
+ * @param {function} handleBudgetChange - La función handler para actualizar el estado.
+ * @returns {JSX.Element | null} JSX con los campos de formulario específicos.
+ */
 const renderBudgetFields = (item, index, handleBudgetChange) => {
   switch (item.cost_type) {
     case 'por_proyecto':
@@ -99,16 +109,44 @@ const renderBudgetFields = (item, index, handleBudgetChange) => {
   }
 };
 
+
+/**
+ * @function BudgetSection
+ * @description Componente de sección de formulario que permite al usuario especificar 
+ * uno o más ítems de presupuesto, permitiendo diferentes modalidades de costo (por hora, 
+ * por proyecto, o por ítem).
+ * * @param {object[]} budgetItems - El estado actual del array de ítems de presupuesto.
+ * @param {function} setBudgetItems - La función para actualizar el estado del array de presupuestos.
+ * @returns {JSX.Element} Una tarjeta de Bootstrap con la interfaz para gestionar el presupuesto.
+ */
 export const BudgetSection = ({ budgetItems, setBudgetItems }) => {
+
+  /**
+   * @function handleBudgetChange
+   * @description Maneja el cambio de cualquier campo dentro de un ítem de presupuesto específico.
+   * @param {number} index - Índice del ítem dentro del array `budgetItems`.
+   * @param {string} field - El nombre del campo a modificar ('cost_type', 'amount', etc.).
+   * @param {string} value - El nuevo valor del campo.
+   */
   const handleBudgetChange = (index, field, value) => {
     const updated = [...budgetItems];
     updated[index][field] = value;
     setBudgetItems(updated);
   };
 
+  /**
+   * @function addBudgetItem
+   * @description Añade un nuevo ítem de presupuesto al array, con el tipo de costo 
+   * predeterminado 'por_proyecto'.
+   */
   const addBudgetItem = () =>
     setBudgetItems([...budgetItems, { cost_type: 'por_proyecto', amount: '', notes: '' }]);
 
+  /**
+   * @function removeBudgetItem
+   * @description Elimina un ítem de presupuesto del array por su índice.
+   * @param {number} index - Índice del ítem a eliminar.
+   */
   const removeBudgetItem = (index) =>
     setBudgetItems(budgetItems.filter((_, i) => i !== index));
 

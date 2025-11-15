@@ -3,8 +3,29 @@ import { Button, Image, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import './PostulationList.css';
 
+
+/**
+ * @function PostulationList
+ * @description Componente que renderiza la lista de postulaciones (ofertas de servicio)
+ * presentadas por los proveedores a una petición específica del cliente.
+ * Muestra el perfil del proveedor, la propuesta, presupuesto, materiales y permite al cliente
+ * aprobar o rechazar postulaciones pendientes.
+ * * @param {object[]} postulations - Array de objetos de postulación.
+ * @param {boolean} loading - Indica si los datos están siendo cargados.
+ * @param {string | null} error - Mensaje de error si la carga falla.
+ * @param {function} onUpdate - Callback para actualizar el estado de una postulación (Aprobar/Rechazar).
+ * @param {number} petitionId - El ID de la petición a la que pertenecen estas postulaciones.
+ * @returns {JSX.Element} La lista de postulaciones o un mensaje de estado.
+ */
 const PostulationList = ({ postulations, loading, error, onUpdate, petitionId }) => {
 
+    /**
+     * @function getStatusInfo
+     * @description Mapea el ID de estado numérico a un texto legible y una variante de color
+     * para el componente Badge de Bootstrap.
+     * @param {number} id_state - El ID del estado de la postulación.
+     * @returns {object} Un objeto con 'text' (nombre del estado) y 'variant' (color del Badge).
+     */
     const getStatusInfo = (id_state) => {
         switch (id_state) {
             case 1: return { text: 'Pendiente', variant: 'warning' };
@@ -14,19 +35,20 @@ const PostulationList = ({ postulations, loading, error, onUpdate, petitionId })
             default: return { text: 'Desconocido', variant: 'secondary' };
         }
     };
-    console.log(postulations);
+
+    // 1. Renderizado Condicional: Carga
     if (loading) {
         return <p>Cargando postulaciones...</p>;
     }
-
+    // 2. Renderizado Condicional: Error
     if (error) {
         return <div className="alert alert-danger">{error}</div>;
     }
-
+    // 3. Renderizado Condicional: Lista vacía
     if (!postulations || postulations.length === 0) {
         return <div className="alert alert-info">Esta petición aún no tiene postulaciones.</div>;
     }
-
+    // 4. Renderizado de la Lista (Perspectiva del Cliente)
     return (
         <ul className="list-group postulation-customer-list">
             {postulations.map((postulation) => {
