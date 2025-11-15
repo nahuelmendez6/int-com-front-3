@@ -10,6 +10,20 @@ import { useAuth } from "../../hooks/useAuth.js"; // Add this import
 import { useMessageContext } from "../../contexts/MessageContext";
 import "./PetitionList.css";
 
+
+/**
+ * @function PetitionList
+ * @description Componente principal que muestra una lista de peticiones (solicitudes de servicio).
+ * El comportamiento de la lista es dinámico y depende del rol del usuario (`profile`):
+ * - Cliente: Muestra botones de Edición/Eliminación y la lista de Postulaciones recibidas.
+ * - Proveedor: Muestra botones de Postularse/Mensaje y el estado de postulación actual.
+ * * Utiliza el hook `usePostulations` para gestionar la carga y actualización de postulaciones.
+ * * * @param {object[]} petitions - Array de objetos de petición a mostrar.
+ * @param {function} onEdit - Callback para editar una petición (modo Cliente).
+ * @param {function} onDelete - Callback para eliminar una petición (modo Cliente).
+ * @param {object} profile - Objeto de perfil del usuario logueado (incluye el `role`).
+ * @returns {JSX.Element} La lista de tarjetas de petición.
+ */
 const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
   const [showModal, setShowModal] = useState(false);
   const [attachments, setAttachments] = useState([]);

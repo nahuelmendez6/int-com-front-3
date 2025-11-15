@@ -3,26 +3,45 @@ import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 import { getPetitionTypes, createPetition, updatePetition } from '../../services/petitions.service.js';
 import { getProfessions, getCategories, getTypeProviders } from '../../services/profile.service.js';
 
-
+/**
+ * @function CreatePetitionForm
+ * @description Componente de formulario modal utilizado para crear o editar una petición (solicitud de servicio)
+ * por parte de un cliente. Se encarga de cargar datos de selección (tipos de petición, categorías, etc.)
+ * y manejar la lógica de envío de formularios multipart/form-data, incluyendo archivos adjuntos.
+ * * @param {boolean} show - Controla la visibilidad del Modal.
+ * @param {function} onHide - Callback que se ejecuta al cerrar el Modal.
+ * @param {object | null} petitionToEdit - Objeto de petición si estamos en modo edición; `null` si es creación.
+ * @param {object} customerProfile - Información del perfil del cliente, incluyendo `id_customer`.
+ * @param {function} onPetitionCreatedOrUpdated - Callback para notificar al componente padre que debe refrescar la lista.
+ * @returns {JSX.Element} El Modal con el formulario de creación/edición de petición.
+ */
 const CreatePetitionForm = ({ show, onHide, petitionToEdit, customerProfile, onPetitionCreatedOrUpdated }) => {
+  
+  // 1. Estados para Datos de Selección (Lookups)
   const [petitionTypes, setPetitionTypes] = useState([]);
   const [categories, setCategories] = useState([]);
   const [professions, setProfessions] = useState([]);
   const [providerTypes, setProviderTypes] = useState([]);
+  
+  // Estado para manejar los archivos adjuntos (se envían como FormData).
   const [attachments, setAttachments] = useState([]);
+
+
+  // 2. Estado del Formulario
   const [formData, setFormData] = useState({
     description: '',
     date_since: '',
     date_until: '',
     id_type_petition: '',
-    categories: [],
+    categories: [], // Almacena IDs de categorías seleccionadas, posiblemente como objetos { id_category: X }
     id_profession: '',
     id_type_provider: '',
   });
 
+  // 3. useEffect: Inicialización del Formulario (Modo Edición o Creación)
   useEffect(() => {
     if (petitionToEdit) {
-      // Handle categories properly - could be array of objects or array of numbers
+      // Lógica de mapeo de categorías para edición: asegura que el formato sea consistente ({ id_category: X })
       let categoriesData = [];
       if (petitionToEdit.categories && Array.isArray(petitionToEdit.categories)) {
         categoriesData = petitionToEdit.categories.map(c => {
@@ -35,7 +54,7 @@ const CreatePetitionForm = ({ show, onHide, petitionToEdit, customerProfile, onP
           return null;
         }).filter(Boolean);
       }
-      
+      // Estado inicial para el modo Creación
       setFormData({
         description: petitionToEdit.description || '',
         date_since: petitionToEdit.date_since || '',
@@ -57,8 +76,9 @@ const CreatePetitionForm = ({ show, onHide, petitionToEdit, customerProfile, onP
       });
       setAttachments([]);
     }
-  }, [petitionToEdit]);
+  }, [petitionToEdit]); // Se ejecuta al cambiar la petición a editar (o al abrir el modal).
 
+  // 4. useEffect: Carga de Datos Iniciales (Tipos de Petición, Categorías, etc.)
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -92,13 +112,26 @@ const CreatePetitionForm = ({ show, onHide, petitionToEdit, customerProfile, onP
     fetchInitialData();
   }, []);
 
+  // Se ejecuta solo al montar el componente.
+
+  /**
+   * @function handleChange
+   * @description Handler genérico para campos de texto y select simples.
+   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Direct handler that uses the category ID directly from the closure
-  // This avoids any issues with event value propagation
+  /**
+   * @function handleCategoryChangeDirect
+   * @description Handler principal para checkboxes de categorías.
+   * Utiliza el ID de la categoría directamente (desde el closure) y no depende del `e.target.value`
+   * para evitar errores de propagación de eventos en React/Browsers.
+   * @param {number} categoryId - El ID numérico de la categoría.
+   * @param {boolean} checked - Si el checkbox está marcado o desmarcado.
+   * @param {object} categoryObj - El objeto completo de la categoría.
+   */
   const handleCategoryChangeDirect = (categoryId, checked, categoryObj) => {
     // Debug: Log category selection with full details
     console.log('=== Category checkbox changed (DIRECT) ===');
@@ -140,7 +173,7 @@ const CreatePetitionForm = ({ show, onHide, petitionToEdit, customerProfile, onP
         return id !== categoryId;
       });
       const afterCount = selectedCategories.length;
-      console.log('❌ Category REMOVED. ID:', categoryId, 'Name:', categoryObj?.name);
+      console.log('Category REMOVED. ID:', categoryId, 'Name:', categoryObj?.name);
       console.log(`Categories count: ${beforeCount} -> ${afterCount}`);
       console.log('Updated selected categories:', selectedCategories.map(c => {
         const id = typeof c === 'object' && c.id_category ? c.id_category : c;
@@ -150,7 +183,7 @@ const CreatePetitionForm = ({ show, onHide, petitionToEdit, customerProfile, onP
     setFormData({ ...formData, categories: selectedCategories });
   };
 
-  // Legacy handler for backward compatibility (keeping in case needed)
+
   const handleCategoryChange = (e) => {
     const { value, checked, id } = e.target;
     const categoryId = parseInt(value, 10);
@@ -165,10 +198,20 @@ const CreatePetitionForm = ({ show, onHide, petitionToEdit, customerProfile, onP
     handleCategoryChangeDirect(categoryId, checked, categoryObj);
   };
 
+  /**
+   * @function handleFileChange
+   * @description Almacena los archivos seleccionados por el usuario.
+   */
   const handleFileChange = (e) => {
     setAttachments([...e.target.files]);
   };
-
+  /**
+   * @async
+   * @function handleSubmit
+   * @description Prepara y envía los datos del formulario a la API (creación o actualización).
+   * Utiliza `FormData` para manejar la mezcla de datos JSON y archivos.
+   * @param {Event} e - Evento de envío del formulario.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     

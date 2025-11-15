@@ -2,7 +2,20 @@ import React, { useState } from 'react';
 import { Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import materialService from '../../services/material.service';
 
+
+/**
+ * @function MaterialForm
+ * @description Componente de formulario para crear o editar un material/producto
+ * del catálogo de un proveedor. Maneja los datos del formulario, la validación,
+ * y la lógica de envío, incluyendo la subida de archivos adjuntos en el modo creación.
+ * * @param {function} onSuccess - Callback que se ejecuta tras una creación/actualización exitosa.
+ * @param {object | null} material - Objeto de material existente si se está en modo edición.
+ * @param {number} providerId - ID del proveedor al que pertenece el material.
+ * @returns {JSX.Element} El formulario de creación/edición de material.
+ */
 const MaterialForm = ({ onSuccess, material = null, providerId }) => {
+
+  // 1. Estado del Formulario
   const [formData, setFormData] = useState({
     name: material?.name || '',
     description: material?.description || '',
@@ -10,10 +23,21 @@ const MaterialForm = ({ onSuccess, material = null, providerId }) => {
     unit: material?.unit || 'unidad',
     id_provider: providerId
   });
+
+  // Estado para manejar archivos adjuntos (solo en creación)
   const [files, setFiles] = useState([]);
+
+  // Manejo de errores de validación o API
   const [error, setError] = useState('');
+
+  // Indica si la petición está en curso (deshabilita el botón)
   const [submitting, setSubmitting] = useState(false);
 
+
+  /**
+   * @function handleChange
+   * @description Handler genérico para actualizar el estado del formulario.
+   */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -22,6 +46,12 @@ const MaterialForm = ({ onSuccess, material = null, providerId }) => {
     }));
   };
 
+  /**
+   * @async
+   * @function handleSubmit
+   * @description Procesa el envío del formulario, manejando la creación y actualización.
+   * @param {Event} e - Evento de formulario.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -29,14 +59,16 @@ const MaterialForm = ({ onSuccess, material = null, providerId }) => {
 
     try {
       if (material) {
-        // Update existing material
+        // --- MODO EDICIÓN ---
         await materialService.updateMaterial(material.id_material, formData);
       } else {
-        // Create new material
+        // --- MODO CREACIÓN ---
+        
+        // 1. Crear el material
         const newMaterialResponse = await materialService.createMaterial(formData);
         const newMaterialId = newMaterialResponse.data.id_material;
 
-        // Upload attachments if any files were selected
+        // 2. Subir adjuntos (si existen)
         if (files.length > 0) {
           const uploadPromises = Array.from(files).map(file => 
             materialService.createMaterialAttachment(newMaterialId, file)
@@ -47,14 +79,16 @@ const MaterialForm = ({ onSuccess, material = null, providerId }) => {
       
       if (onSuccess) onSuccess();
     } catch (err) {
+      // 3. Manejo de Errores
       if (err.response && err.response.data) {
-        // The backend sent back validation errors
+        // Errores de validación del backend
         console.error("Validation Error:", err.response.data);
         const errorMessages = Object.entries(err.response.data).map(([field, messages]) => 
           `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`
         ).join('; ');
         setError(`Error de validación: ${errorMessages}`);
       } else {
+        // Error genérico
         setError('Error al guardar el material. Por favor, inténtalo de nuevo.');
         console.error(err);
       }

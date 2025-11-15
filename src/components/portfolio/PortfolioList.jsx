@@ -3,22 +3,50 @@ import { Link } from 'react-router-dom';
 import { Button, Card, Col, Row, Carousel, Modal } from 'react-bootstrap';
 import portfolioService from '../../services/portfolio.service';
 
+
+/**
+ * @function PortfolioList
+ * @description Componente que renderiza la lista de proyectos del portfolio de un proveedor
+ * en formato de tarjetas. Soporta dos modos: vista pública (solo visualización) y
+ * vista de edición (con opciones para archivar).
+ * * @param {object[]} portfolios - Array de objetos de portfolio.
+ * @param {function} refreshPortfolios - Callback para recargar la lista después de una acción (ej: archivar).
+ * @param {boolean} isPublicView - Si es `true`, oculta los botones de acción y los enlaces de edición.
+ * @returns {JSX.Element} La cuadrícula de tarjetas de portfolio o un mensaje/null si está vacío.
+ */
 const PortfolioList = ({ portfolios, refreshPortfolios, isPublicView = false }) => {
+
+  // URL base para cargar archivos adjuntos de la API.
   const API_BASE_URL = 'http://127.0.0.1:8000';
 
+  // 1. Estados Locales para el Modal de Confirmación
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [portfolioToArchive, setPortfolioToArchive] = useState(null);
 
+  /**
+   * @function openDeleteModal
+   * @description Abre el modal de confirmación y establece el ID del proyecto a archivar.
+   * @param {number} id - ID del proyecto de portfolio.
+   */
   const openDeleteModal = (id) => {
     setPortfolioToArchive(id);
     setShowDeleteModal(true);
   };
 
+  /**
+   * @function closeDeleteModal
+   * @description Cierra el modal de confirmación y limpia el ID del proyecto.
+   */
   const closeDeleteModal = () => {
     setPortfolioToArchive(null);
     setShowDeleteModal(false);
   };
 
+  /**
+   * @async
+   * @function handleSoftDelete
+   * @description Realiza la eliminación lógica (soft delete/archivado) del proyecto seleccionado.
+   */
   const handleSoftDelete = async () => {
     if (!portfolioToArchive) return;
 
@@ -33,13 +61,16 @@ const PortfolioList = ({ portfolios, refreshPortfolios, isPublicView = false }) 
     }
   };
 
+  // Filtra los proyectos que no han sido eliminados lógicamente (is_deleted: false)
   const activePortfolios = portfolios.filter(p => !p.is_deleted);
 
+  // 2. Renderizado Condicional: Lista Vacía
   if (!activePortfolios || activePortfolios.length === 0) {
     // No muestra nada en el perfil público si no hay portfolio
     return isPublicView ? null : <p>Aún no has añadido ningún proyecto a tu portfolio.</p>;
   }
 
+  // 3. Renderizado Principal de la Lista
   return (
     <>
       <Row xs={1} md={1} className="g-4">

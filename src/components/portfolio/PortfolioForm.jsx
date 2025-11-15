@@ -3,15 +3,43 @@ import portfolioService from '../../services/portfolio.service';
 import { Button, Form } from 'react-bootstrap';
 import { useAuth } from '../../hooks/useAuth'
 
+
+/**
+ * @function PortfolioForm
+ * @description Componente de formulario para crear o editar un proyecto de portfolio
+ * de un proveedor. Maneja la lógica de envío de datos y la carga inicial de archivos
+ * durante la creación.
+ * * @param {function} onSuccess - Callback que se ejecuta tras una creación/actualización exitosa.
+ * @param {object | null} portfolio - Objeto de portfolio existente si se está en modo edición.
+ * @returns {JSX.Element} El formulario HTML/React con los campos del portfolio.
+ */
 const PortfolioForm = ({ onSuccess, portfolio = null }) => {
+
+  // 1. Estados Locales
+  // Inicializa los campos con datos existentes si `portfolio` está presente (Edición)
   const [name, setName] = useState(portfolio?.name || '');
   const [description, setDescription] = useState(portfolio?.description || '');
+
+  // Para manejar la selección de archivos (solo se usa en el modo Creación)
   const [files, setFiles] = useState([]);
+
+  // Manejo de errores de validación o API
   const [error, setError] = useState('');
+
+  // Indica si la petición está en curso (deshabilita el botón)
   const [submitting, setSubmitting] = useState(false);
 
+  // 2. Hook de Autenticación para obtener el ID del Proveedor
   const { profile } = useAuth();
   console.log('este es el id',profile.profile.id_provider)
+
+  /**
+   * @async
+   * @function handleSubmit
+   * @description Maneja el envío del formulario, distinguiendo entre creación y edición.
+   * En creación, primero crea el proyecto y luego sube los archivos adjuntos.
+   * @param {Event} e - Evento de formulario.
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -25,12 +53,16 @@ const PortfolioForm = ({ onSuccess, portfolio = null }) => {
 
     try {
       if (portfolio) {
-        // Update logic: attachments are handled separately in the detail page
+        // --- MODO EDICIÓN ---
+        // La actualización de archivos adjuntos se hace por separado, generalmente
+        // en una vista de detalle diferente, ya que este formulario solo maneja los metadatos.
         await portfolioService.updatePortfolio(portfolio.id_portfolio, portfolioData);
         onSuccess();
 
       } else {
-        // Create logic: first create portfolio, then upload attachments
+        // --- MODO CREACIÓN ---
+        
+        // 1. Crear el proyecto de portfolio
         const newPortfolioResponse = await portfolioService.createPortfolio(portfolioData);
         const newPortfolioId = newPortfolioResponse.data.id_portfolio;
 

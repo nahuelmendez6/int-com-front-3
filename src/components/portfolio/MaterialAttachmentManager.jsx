@@ -2,16 +2,35 @@ import React, { useState, useEffect } from 'react';
 import { Button, Row, Col, Card, Modal, Alert, Spinner } from 'react-bootstrap';
 import materialService from '../../services/material.service';
 
-const MaterialAttachmentManager = ({ materialId, materialName }) => {
-  const [attachments, setAttachments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState('');
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [attachmentToDelete, setAttachmentToDelete] = useState(null);
 
+/**
+ * @function MaterialAttachmentManager
+ * @description Componente encargado de gestionar los archivos adjuntos (imágenes, documentos) 
+ * asociados a un material/producto. Permite cargar, listar, previsualizar y eliminar adjuntos.
+ * * @param {number} materialId - El ID del material al que pertenecen los adjuntos.
+ * @param {string} materialName - El nombre del material (usado solo para la UX, títulos).
+ * @returns {JSX.Element} La interfaz de gestión de adjuntos con la lista y controles de subida/eliminación.
+ */
+const MaterialAttachmentManager = ({ materialId, materialName }) => {
+  // 1. Estados de Datos y UI
+  const [attachments, setAttachments] = useState([]); // Lista de adjuntos cargados
+  const [loading, setLoading] = useState(true);     // Estado de carga inicial (fetching)
+  const [uploading, setUploading] = useState(false); // Estado de subida de archivos
+  const [error, setError] = useState('');           // Mensaje de error
+
+  // 2. Estados del Modal de Eliminación
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [attachmentToDelete, setAttachmentToDelete] = useState(null); // Adjunto seleccionado para eliminar
+
+  // URL base para construir las rutas completas de los archivos
   const API_BASE_URL = 'http://127.0.0.1:8000';
 
+  // 3. Funciones de Carga de Datos
+  /**
+   * @async
+   * @function fetchAttachments
+   * @description Llama a la API para obtener la lista actual de adjuntos del material.
+   */
   const fetchAttachments = async () => {
     try {
       setLoading(true);
@@ -26,12 +45,22 @@ const MaterialAttachmentManager = ({ materialId, materialName }) => {
     }
   };
 
+  // 4. Efecto de Carga
   useEffect(() => {
     if (materialId) {
       fetchAttachments();
     }
-  }, [materialId]);
+  }, [materialId]); // Se ejecuta cada vez que cambia el ID del material
 
+
+  // 5. Lógica de Subida de Archivos
+  /**
+   * @async
+   * @function handleFileUpload
+   * @description Procesa los archivos seleccionados por el usuario y los sube a la API.
+   * Luego, refresca la lista de adjuntos.
+   * @param {Event} e - Evento de cambio del input de archivo.
+   */
   const handleFileUpload = async (e) => {
     const files = Array.from(e.target.files);
     if (files.length === 0) return;
@@ -54,6 +83,7 @@ const MaterialAttachmentManager = ({ materialId, materialName }) => {
     }
   };
 
+  // 6. Lógica de Eliminación
   const openDeleteModal = (attachment) => {
     setAttachmentToDelete(attachment);
     setShowDeleteModal(true);
@@ -64,6 +94,11 @@ const MaterialAttachmentManager = ({ materialId, materialName }) => {
     setShowDeleteModal(false);
   };
 
+  /**
+   * @async
+   * @function handleDelete
+   * @description Elimina el adjunto seleccionado y refresca la lista.
+   */
   const handleDelete = async () => {
     if (!attachmentToDelete) return;
 
@@ -78,6 +113,12 @@ const MaterialAttachmentManager = ({ materialId, materialName }) => {
     }
   };
 
+  /**
+   * @function getFileIcon
+   * @description Retorna el icono de Bootstrap (bi-class) basado en la extensión del archivo.
+   * @param {string} filename - Nombre completo del archivo.
+   * @returns {string} Clase CSS del icono.
+   */
   const getFileIcon = (filename) => {
     const extension = filename.split('.').pop().toLowerCase();
     const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
@@ -98,6 +139,12 @@ const MaterialAttachmentManager = ({ materialId, materialName }) => {
     }
   };
 
+  /**
+   * @function formatFileSize
+   * @description Convierte el tamaño de archivo en bytes a un formato legible (KB, MB, etc.).
+   * @param {number} bytes - Tamaño del archivo en bytes.
+   * @returns {string} Tamaño formateado.
+   */
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -106,6 +153,12 @@ const MaterialAttachmentManager = ({ materialId, materialName }) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  /**
+   * @function formatDate
+   * @description Formatea la cadena de fecha a un formato local legible.
+   * @param {string} dateString - La fecha en formato string.
+   * @returns {string} Fecha y hora formateada.
+   */
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('es-AR', {
       year: 'numeric',

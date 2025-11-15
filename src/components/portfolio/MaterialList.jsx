@@ -4,12 +4,29 @@ import materialService from '../../services/material.service';
 import MaterialForm from './MaterialForm';
 import MaterialAttachmentManager from './MaterialAttachmentManager';
 
+
+/**
+ * @function MaterialList
+ * @description Componente que muestra una lista de materiales (productos) de un proveedor en formato de tabla.
+ * Soporta dos modos: vista pública (solo tabla) y vista de gestión (con edición, eliminación y adjuntos).
+ * Incluye la lógica para mostrar modales de confirmación y formularios de edición/adjuntos.
+ * * @param {object[]} materials - Array de objetos de material.
+ * @param {boolean} isPublicView - Si es `true`, oculta las columnas de acciones.
+ * @param {function} onEdit - [No usado internamente, pero pasado] Callback para editar.
+ * @param {function} onDelete - [No usado internamente, pero pasado] Callback para eliminar.
+ * @param {number} providerId - ID del proveedor actual.
+ * @param {function} refreshMaterials - Callback para recargar la lista de materiales después de una acción.
+ * @returns {JSX.Element} Una tabla con la lista de materiales y los modales asociados.
+ */
 const MaterialList = ({ materials, isPublicView = false, onEdit, onDelete, providerId, refreshMaterials }) => {
+  
+  // 1. Estados para la gestión de Modales
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAttachmentsModal, setShowAttachmentsModal] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState(null);
 
+  // 2. Handlers de Apertura de Modales
   const openDeleteModal = (material) => {
     setSelectedMaterial(material);
     setShowDeleteModal(true);
@@ -25,6 +42,11 @@ const MaterialList = ({ materials, isPublicView = false, onEdit, onDelete, provi
     setShowAttachmentsModal(true);
   };
 
+
+  /**
+   * @function closeModals
+   * @description Cierra todos los modales y limpia el material seleccionado.
+   */
   const closeModals = () => {
     setShowDeleteModal(false);
     setShowEditModal(false);
@@ -32,6 +54,12 @@ const MaterialList = ({ materials, isPublicView = false, onEdit, onDelete, provi
     setSelectedMaterial(null);
   };
 
+  // 3. Lógica de Eliminación
+  /**
+   * @async
+   * @function handleDelete
+   * @description Llama al servicio para eliminar el material seleccionado.
+   */
   const handleDelete = async () => {
     if (!selectedMaterial) return;
 
@@ -51,6 +79,12 @@ const MaterialList = ({ materials, isPublicView = false, onEdit, onDelete, provi
     closeModals();
   };
 
+  /**
+   * @function formatPrice
+   * @description Formatea el precio a moneda local (Peso Argentino).
+   * @param {number} price - El precio a formatear.
+   * @returns {string} El precio formateado con símbolo de moneda.
+   */
   const formatPrice = (price) => {
     return new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -61,6 +95,7 @@ const MaterialList = ({ materials, isPublicView = false, onEdit, onDelete, provi
   // Filter out deleted materials
   const activeMaterials = materials.filter(m => !m.is_deleted);
 
+  // 4. Renderizado Condicional: Lista Vacía
   if (!materials || activeMaterials.length === 0) {
     return (
       <div className="text-center py-4">
@@ -71,6 +106,7 @@ const MaterialList = ({ materials, isPublicView = false, onEdit, onDelete, provi
     );
   }
 
+  // 5. Renderizado de la Tabla
   return (
     <>
       <div className="table-responsive">
