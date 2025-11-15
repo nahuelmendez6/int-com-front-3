@@ -10,6 +10,8 @@ import ImageUpload from './ImageUpload.jsx';
 import './ProviderProfile.css';
 import useAverageRating from '../hooks/useAverageRating';
 import StarRating from './common/StarRating';
+import gradesService from '../services/grades.service.js';
+import GradeList from './grades/GradeList.jsx';
 
 const ProviderProfile = ({ userData }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -20,6 +22,7 @@ const ProviderProfile = ({ userData }) => {
   // Obtener id_user del usuario para las calificaciones
   const userId = userData?.user?.id_user || userData?.user?.id;
   const { averageRating, loading: loadingRating, error: errorRating } = useAverageRating(userId);
+  const [grades, setGrades] = useState([]);
 
   // Opciones de perfil
   const [categories, setCategories] = useState([]);
@@ -51,6 +54,21 @@ const ProviderProfile = ({ userData }) => {
     };
     fetchInitialData();
   }, []);
+
+  useEffect(() => {
+    const fetchGrades = async () => {
+      if (userId) {
+        try {
+          const gradesData = await gradesService.getGradesByUserId(userId);
+          setGrades(gradesData.results || gradesData || []);
+        } catch (err) {
+          console.error('Error fetching grades:', err);
+          setGrades([]);
+        }
+      }
+    };
+    fetchGrades();
+  }, [userId]);
 
   const startEditing = () => {
     setFormData({
@@ -211,6 +229,12 @@ const ProviderProfile = ({ userData }) => {
                 </div>
               </div>
             </div>
+
+            <hr />
+            <h5 className="border-start border-3 border-primary ps-3 mt-4 mb-3 fw-semibold">
+              Calificaciones
+            </h5>
+            <GradeList grades={grades} />
 
             <div className="d-grid d-md-flex justify-content-md-end mt-4 gap-2">
               <button onClick={startEditing} className="btn btn-social btn-primary-social">

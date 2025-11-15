@@ -3,6 +3,9 @@ import { profileService } from '../services/profile.service.js';
 import { getProvinces, getDepartmentsByProvince, getCitiesByDepartment } from '../services/location.service.js';
 import AddressForm from './AddressForm.jsx';
 import ImageUpload from './ImageUpload.jsx';
+import gradesService from '../services/grades.service.js';
+import StarRating from './common/StarRating.jsx';
+import CustomerGradeList from './grades/CustomerGradeList.jsx';
 
 const CustomerProfile = ({ userData }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -10,6 +13,8 @@ const CustomerProfile = ({ userData }) => {
   // Datos de usuario y perfil
   const [profileData, setProfileData] = useState(userData.profile || {});
   const [user, setUser] = useState(userData.user || {});
+  const [grades, setGrades] = useState([]);
+  const [averageRating, setAverageRating] = useState(0);
 
   // Formulario editable
   const [formData, setFormData] = useState({
@@ -38,6 +43,30 @@ const CustomerProfile = ({ userData }) => {
     };
     fetchProvinces();
   }, []);
+
+  useEffect(() => {
+    const fetchGrades = async () => {
+      const userId = userData?.user?.id_user || userData?.user?.id;
+      if (userId) {
+        try {
+          const response = await gradesService.getGradesByCustomerUserId(userId);
+          const gradesData = response.results || response || [];
+          setGrades(gradesData);
+          if (gradesData.length > 0) {
+            const totalRating = gradesData.reduce((acc, grade) => acc + grade.rating, 0);
+            setAverageRating(totalRating / gradesData.length);
+          } else {
+            setAverageRating(0);
+          }
+        } catch (err) {
+          console.error('Error fetching customer grades:', err);
+        }
+      }
+    };
+    if (userData?.user) {
+        fetchGrades();
+    }
+  }, [userData]);
 
   // Cambios en los inputs de texto
   const handleInputChange = (e) => {
@@ -114,6 +143,12 @@ const CustomerProfile = ({ userData }) => {
               <i className="bi bi-person-circle me-2"></i>
               {user.first_name} {user.last_name}
             </h4>
+            {averageRating > 0 && (
+                <div className="d-flex justify-content-center align-items-center mb-2">
+                    <StarRating rating={averageRating} readOnly />
+                    <span className="ms-2 text-muted">({grades.length} calificaciones)</span>
+                </div>
+            )}
             <p className="text-muted">
               <i className="bi bi-envelope me-1"></i>
               {user.email}
@@ -131,6 +166,11 @@ const CustomerProfile = ({ userData }) => {
             <p className="text-muted">{fullAddress}</p>
           </div>
         </div>
+        <hr />
+        <h5 className="border-start border-3 border-primary ps-3 mt-4 mb-3 fw-semibold">
+            Calificaciones Recibidas
+        </h5>
+        <CustomerGradeList grades={grades} />
         <div className="d-grid d-md-flex justify-content-md-end mt-4">
           <button onClick={() => setIsEditing(true)} className="btn btn-social btn-primary-social">
             <i className="bi bi-pencil-square me-2"></i>Editar Perfil
