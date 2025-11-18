@@ -244,11 +244,11 @@ const OfferList = ({ offers, onEdit, onDelete }) => {
                   <div className="d-flex justify-content-between align-items-center">
                     <div className="text-muted small">
                       <i className="bi bi-calendar-event me-1"></i>
-                      <span>Desde: {new Date(offer.date_open).toLocaleDateString()}</span>
+                      <span>Desde: {new Date(offer.date_open).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                     </div>
                     <div className="text-muted small">
                       <i className="bi bi-calendar-x me-1"></i>
-                      <span>Hasta: {new Date(offer.date_close).toLocaleDateString()}</span>
+                      <span>Hasta: {new Date(offer.date_close).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                     </div>
                   </div>
                 </div>

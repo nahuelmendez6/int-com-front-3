@@ -168,9 +168,9 @@ const PetitionList = ({ petitions, onEdit, onDelete, profile }) => {
               <div className="border-top d-flex flex-wrap justify-content-between align-items-center px-4 py-3" style={{ background: 'rgba(248, 249, 250, 0.8)' }}>
                 <small className="text-muted d-flex align-items-center">
                   <i className="bi bi-calendar-range me-2"></i>
-                  <span>Desde: {new Date(petition.date_since).toLocaleDateString()}</span>
+                  <span>Desde: {new Date(petition.date_since).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                   <span className="mx-2">•</span>
-                  <span>Hasta: {new Date(petition.date_until).toLocaleDateString()}</span>
+                  <span>Hasta: {new Date(petition.date_until).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                 </small>
 
                 <div className="d-flex align-items-center gap-2 flex-wrap">
