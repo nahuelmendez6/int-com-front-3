@@ -73,12 +73,12 @@ const AppRoutes = () => {
   return (
     <Loader>
       <Routes>
-        {/* 🔓 Rutas públicas */}
+        {/* Rutas públicas */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register-provider" element={<ProviderRegistrationForm />} />
         <Route path="/register-customer" element={<CustomerRegistrationForm />} />
 
-        {/* 🔐 Rutas privadas - Envueltas por MainLayout */}
+        {/* Rutas privadas - Envueltas por MainLayout */}
         <Route element={<PrivateRoute><LayoutWrapper /></PrivateRoute>}>
           <Route path="/feed" element={<Feed />} />
           <Route path="/profile" element={<Profile />} />
@@ -97,7 +97,7 @@ const AppRoutes = () => {
           <Route path="/dashboard" element={<DashboardPage />} />
         </Route>
 
-        {/* 🧭 Ruta por defecto */}
+        {/* Ruta por defecto */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Loader>

@@ -66,13 +66,13 @@ const ContratacionList = ({ contrataciones }) => {
               <Card.Body>
                 <Row>
                   <Col md={3} className="text-center border-end">
-                    {isCustomer ? (
-                      <Link to={`/customer/${otherUser.id}`}>
-                        <Image 
-                          src={profileImageUrl} 
-                          roundedCircle 
-                          fluid 
-                          style={{ width: '120px', height: '120px', objectFit: 'cover', cursor: 'pointer' }} 
+                    {profile.role === 'customer' ? (
+                      <Link to={`/provider/${otherUser.id}`}>
+                        <Image
+                          src={profileImageUrl}
+                          roundedCircle
+                          fluid
+                          style={{ width: '120px', height: '120px', objectFit: 'cover', cursor: 'pointer' }}
                           alt={`Foto de perfil de ${otherUser.name}`}
                         />
                       </Link>
@@ -81,12 +81,12 @@ const ContratacionList = ({ contrataciones }) => {
                         src={profileImageUrl} 
                         roundedCircle 
                         fluid 
-                        style={{ width: '120px', height: '120px', objectFit: 'cover' }} 
+                        style={{ width: '120px', height: '120px', objectFit: 'cover' }}
                         alt={`Foto de perfil de ${otherUser.name}`}
                       />
                     )}
                     <h6 className="mt-3 mb-1">
-                      {isCustomer ? <Link to={`/customer/${otherUser.id}`} className="text-dark text-decoration-none">{`${otherUser.name} ${otherUser.lastname}`}</Link> : `${otherUser.name} ${otherUser.lastname}`}
+                      {profile.role === 'customer' ? <Link to={`/provider/${otherUser.id}`} className="text-dark text-decoration-none">{`${otherUser.name} ${otherUser.lastname}`}</Link> : `${otherUser.name} ${otherUser.lastname}`}
                     </h6>
                     {otherUser.profession && <p className="text-muted small">{otherUser.profession}</p>}
                      <p className="mt-2">
