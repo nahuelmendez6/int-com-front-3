@@ -84,7 +84,6 @@ export const getPetitionTypes = async () => {
   }
 };
 
-
 /**
  * Actualizar parcialmente una petición existente.
  * Soporta actualización de campos y archivos mediante multipart/form-data.
@@ -114,6 +113,21 @@ export const updatePetition = async (id, petitionData) => {
   }
 };
 
+
+export const deletePetition = async (id) => {
+  try {
+    const response = await api.patch(
+      `/petitions/${id}/`, { is_deleted: true }, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error updating petition:', error);
+    throw error;
+}}
+
 /**
  * Eliminar una petición (soft delete).
  * Marca la petición como eliminada mediante el campo `is_deleted: true`.
@@ -126,21 +140,7 @@ export const updatePetition = async (id, petitionData) => {
  * @example
  * await deletePetition(8);
  */
-export const deletePetition = async (id) => {
-  try {
-    const formData = new FormData();
-    formData.append('is_deleted', 'true');
-    const response = await api.patch(`/petitions/${id}/`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error deleting petition:', error);
-    throw error;
-  }
-};
+
 
 /**
  * Obtener el feed de peticiones visible para el proveedor autenticado.
