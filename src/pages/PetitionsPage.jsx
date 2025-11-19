@@ -47,6 +47,13 @@ const PetitionsPage = () => {
     }
   };
 
+  const handlePetitionCreatedOrUpdated = () => {
+    // Llama a refetch para recargar la lista de peticiones desde el servidor.
+    refetch();
+    setShowFormModal(false);
+    setEditingPetition(null);
+  };
+
   return (
     <div className="petitions-page">
       <div className="card shadow rounded-3">
@@ -102,7 +109,7 @@ const PetitionsPage = () => {
         onHide={() => setShowFormModal(false)}
         petitionToEdit={editingPetition}
         customerProfile={profile}
-        onPetitionCreatedOrUpdated={() => refetch()}
+        onPetitionCreatedOrUpdated={handlePetitionCreatedOrUpdated}
       />
 
       <ConfirmationModal

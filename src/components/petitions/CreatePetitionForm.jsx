@@ -351,13 +351,16 @@ const CreatePetitionForm = ({ show, onHide, petitionToEdit, customerProfile, onP
     }
 
     try {
+      let savedPetition;
       if (petitionToEdit) {
-        await updatePetition(petitionToEdit.id_petition, petitionFormData);
+        savedPetition = await updatePetition(petitionToEdit.id_petition, petitionFormData);
       } else {
-        await createPetition(petitionFormData);
+        savedPetition = await createPetition(petitionFormData);
       }
       onHide();
-      onPetitionCreatedOrUpdated(); // Notify parent to refresh petitions
+      // Pasamos la petición guardada (con el ID y datos actualizados) al componente padre.
+      // Esto evita la recarga completa y soluciona el error.
+      onPetitionCreatedOrUpdated(savedPetition); 
     } catch (error) {
       console.error('Error saving petition:', error);
       if (error.response?.data) {
