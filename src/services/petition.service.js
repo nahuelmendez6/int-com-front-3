@@ -173,3 +173,20 @@ export const updatePetition = async (id, petitionData) => {
     throw error;
   }
 };
+
+/**
+ * Eliminar una petición (soft delete).
+ * Marca la petición como eliminada mediante el campo `is_deleted: true`.
+ *
+ * @async
+ * @function deletePetition
+ * @param {number|string} id - ID de la petición a eliminar.
+ * @returns {Promise<Object>} Respuesta del servidor con la petición actualizada.
+ *
+ * @example
+ * await deletePetition(8);
+ */
+export const deletePetition = async (id) => {
+  const response = await api.patch(`/petitions/${id}/`, { is_deleted: true });
+  return response.data;
+};

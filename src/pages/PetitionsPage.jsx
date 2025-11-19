@@ -5,7 +5,7 @@ import CreatePetitionForm from '../components/petitions/CreatePetitionForm';
 import ConfirmationModal from '../components/common/ConfirmationModal';
 import { useAuth } from '../hooks/useAuth.js';
 import { usePetitions } from '../hooks/usePetitions.js';
-import { deletePetition } from '../services/petitions.service.js';
+import { deletePetition } from '../services/petition.service.js';
 
 const PetitionsPage = () => {
   const { profile } = useAuth();

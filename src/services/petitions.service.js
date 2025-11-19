@@ -128,7 +128,13 @@ export const updatePetition = async (id, petitionData) => {
  */
 export const deletePetition = async (id) => {
   try {
-    const response = await api.patch(`/petitions/${id}/`, { is_deleted: true });
+    const formData = new FormData();
+    formData.append('is_deleted', 'true');
+    const response = await api.patch(`/petitions/${id}/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   } catch (error) {
     console.error('Error deleting petition:', error);

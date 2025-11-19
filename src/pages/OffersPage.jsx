@@ -36,15 +36,22 @@ const OffersPage = () => {
   const handleSubmit = async (offerData) => {
     try {
       if (editingOffer) {
-        await updateOffer(editingOffer.offer_id, offerData);
+        const response = await updateOffer(editingOffer.offer_id, offerData);
+        setOffers(offers.map(o => 
+          o.offer_id === editingOffer.offer_id ? response.data : o
+        ));
       } else {
-        await createOffer(offerData);
+        const response = await createOffer(offerData);
+        // Asumimos que la API devuelve la nueva oferta con su ID y datos completos.
+        // La añadimos al principio de la lista para que sea visible inmediatamente.
+        setOffers([response.data, ...offers]);
       }
       setShowModal(false);
       setEditingOffer(null);
-      fetchOffers(); // Recargar lista
+      // Se elimina fetchOffers() para evitar la recarga completa.
+      // La UI se actualiza manipulando el estado localmente.
     } catch (err) {
-      setError('Error al guardar la oferta.');
+      setError(editingOffer ? 'Error al actualizar la oferta.' : 'Error al crear la oferta.');
     }
   };
 
@@ -61,7 +68,8 @@ const OffersPage = () => {
   const handleDelete = async (offerId) => {
     try {
       await deleteOffer(offerId);
-      fetchOffers(); // Recargar lista
+      // Filtramos la oferta eliminada del estado local en lugar de recargar.
+      setOffers(offers.filter(o => o.offer_id !== offerId));
     } catch (err) {
       setError('Error al eliminar la oferta.');
     }

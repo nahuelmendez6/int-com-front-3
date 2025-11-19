@@ -90,7 +90,7 @@ const cacheService = new CacheService();
 
 // limpiar cache expirado cada 10 minutos
 
-setmInterval(() => {
+setInterval(() => {
     cacheService.cleanup();
 }, 10 * 60 * 1000);
 
