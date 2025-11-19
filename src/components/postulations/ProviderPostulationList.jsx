@@ -50,7 +50,9 @@ const PostulationList = ({ postulations, onEdit, onDelete }) => {
                 return (
                     <div key={postulation.id_postulation} className="postulation-card">
                         <div className="card-header">
-                            <h3>Postulación a Petición #{postulation.id_petition}</h3>
+                            <h3 title={postulation.petition?.description || `Petición #${postulation.id_petition}`}>
+                                Postulación a "{postulation.petition?.description || `Petición #${postulation.id_petition}`}"
+                            </h3>
                             <span className={`status ${statusInfo.className}`}>
                                 {statusInfo.text}
                             </span>
