@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button, Image, Badge } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Button, Image, Badge, Spinner } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import './PostulationList.css';
 
@@ -19,6 +19,10 @@ import './PostulationList.css';
  */
 const PostulationList = ({ postulations, loading, error, onUpdate, petitionId }) => {
 
+    // Estado para rastrear qué postulación se está actualizando.
+    const [updatingId, setUpdatingId] = useState(null);
+
+
     /**
      * @function getStatusInfo
      * @description Mapea el ID de estado numérico a un texto legible y una variante de color
@@ -36,6 +40,22 @@ const PostulationList = ({ postulations, loading, error, onUpdate, petitionId })
         }
     };
 
+    /**
+     * @async
+     * @function handleUpdate
+     * @description Envuelve la llamada a `onUpdate` para gestionar el estado de carga.
+     * Muestra un indicador de carga en el botón correspondiente mientras la operación está en curso.
+     * @param {number} postulationId - ID de la postulación a actualizar.
+     * @param {number} newState - Nuevo estado (3 para Rechazar, 4 para Aprobar).
+     */
+    const handleUpdate = async (postulationId, newState) => {
+        setUpdatingId(postulationId);
+        try {
+            await onUpdate(postulationId, newState, petitionId);
+        } finally {
+            setUpdatingId(null); // Restablece el estado de carga, incluso si hay un error.
+        }
+    };
     // 1. Renderizado Condicional: Carga
     if (loading) {
         return <p>Cargando postulaciones...</p>;
@@ -54,6 +74,7 @@ const PostulationList = ({ postulations, loading, error, onUpdate, petitionId })
             {postulations.map((postulation) => {
                 const status = getStatusInfo(postulation.id_state);
                 const isActionable = postulation.id_state === 1; // Can only accept/reject pending
+                const isUpdating = updatingId === postulation.id_postulation;
 
                 return (
                     <li key={postulation.id_postulation} className="list-group-item">
@@ -114,11 +135,22 @@ const PostulationList = ({ postulations, loading, error, onUpdate, petitionId })
 
                         {isActionable && (
                             <div className="actions-footer text-end">
-                                <Button variant="outline-danger" size="sm" className="me-2" onClick={() => onUpdate(postulation.id_postulation, 3, petitionId)}>
-                                    Rechazar
+                                <Button
+                                    variant="outline-danger"
+                                    size="sm"
+                                    className="me-2"
+                                    onClick={() => handleUpdate(postulation.id_postulation, 3)}
+                                    disabled={isUpdating}
+                                >
+                                    {isUpdating ? <><Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> Rechazando...</> : 'Rechazar'}
                                 </Button>
-                                <Button variant="success" size="sm" onClick={() => onUpdate(postulation.id_postulation, 4, petitionId)}>
-                                    Aprobar
+                                <Button
+                                    variant="success"
+                                    size="sm"
+                                    onClick={() => handleUpdate(postulation.id_postulation, 4)}
+                                    disabled={isUpdating}
+                                >
+                                    {isUpdating ? <><Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> Aprobando...</> : 'Aprobar'}
                                 </Button>
                             </div>
                         )}
