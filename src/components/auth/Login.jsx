@@ -17,6 +17,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth.js";
 import logo from '../../assets/favicon.png';
 import "../../Form.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 /**
  * Formulario de inicio de sesión para usuarios autenticables.
@@ -39,6 +41,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
     /**
    * Maneja el envío del formulario.
@@ -50,12 +53,15 @@ const Login = () => {
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     try {
       await login(email, password);
       navigate("/feed"); // redirigir al dashboard después del login
     } catch (err) {
       setError("Credenciales inválidas. Intenta de nuevo.");
+      setLoading(false);
     }
   };
 
@@ -87,7 +93,15 @@ const Login = () => {
         <p className="page-link">
           <span className="page-link-label">¿Olvidaste tu contraseña?</span>
         </p>
-        <button className="form-btn">Iniciar Sesión</button>
+        <button className="form-btn" disabled={loading}>
+          {loading ? (
+            <>
+              <FontAwesomeIcon icon={faSpinner} spin /> Iniciando sesión...
+            </>
+          ) : (
+            "Iniciar Sesión"
+          )}
+        </button>
       </form>
       <p className="sign-up-label">
         ¿No tienes una cuenta?
