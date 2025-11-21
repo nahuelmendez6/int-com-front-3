@@ -18,8 +18,8 @@ const CustomerProfile = ({ userData }) => {
 
   // Formulario editable
   const [formData, setFormData] = useState({
-    first_name: user.first_name || '',
-    last_name: user.last_name || '',
+    name: user.name || '',
+    lastname: user.lastname || '',
     email: user.email || '',
     phone_number: profileData.phone_number || '',
     address: profileData.address || {},
@@ -109,8 +109,8 @@ const CustomerProfile = ({ userData }) => {
     try {
       const data = new FormData();
       if (imageFile) data.append('profile_image', imageFile);
-      data.append('first_name', formData.first_name);
-      data.append('last_name', formData.last_name);
+      data.append('name', formData.name);
+      data.append('lastname', formData.lastname);
       data.append('email', formData.email);
       data.append('phone_number', formData.phone_number);
       if (formData.address) {
@@ -141,7 +141,7 @@ const CustomerProfile = ({ userData }) => {
             <ImageUpload currentImage={user.profile_image} disabled />
             <h4 className="mt-3 fw-bold">
               {/* <i className="bi bi-person-circle me-2"></i> */}
-              {user.first_name} {user.last_name}
+              {user.name} {user.lastname}
             </h4>
           </div>
           <div className="col-md-8">
@@ -187,11 +187,11 @@ const CustomerProfile = ({ userData }) => {
           <div className="col-md-8">
             <div className="mb-3">
               <label className="form-label fw-semibold">Nombre</label>
-              <input className="form-control form-control-social" name="first_name" value={formData.first_name} onChange={handleInputChange} />
+              <input className="form-control form-control-social" name="name" value={formData.name} onChange={handleInputChange} />
             </div>
             <div className="mb-3">
               <label className="form-label fw-semibold">Apellido</label>
-              <input className="form-control form-control-social" name="last_name" value={formData.last_name} onChange={handleInputChange} />
+              <input className="form-control form-control-social" name="lastname" value={formData.lastname} onChange={handleInputChange} />
             </div>
             <div className="mb-3">
               <label className="form-label fw-semibold">Email</label>
