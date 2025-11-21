@@ -143,115 +143,115 @@ const MessagePanel = ({ isOpen, onClose, initialConversationId = null }) => {
 
   if (!isOpen) return null;
 
-  if (selectedConversation) {
-    return (
-      <ChatWindow 
-        conversation={selectedConversation}
-        onBack={handleBackToList}
-        onClose={onClose}
-      />
-    );
-  }
-
   return (
-    <div className="message-panel">
-      <div className="panel-header">
-        <h3>
-          Mensajes 
-          {unreadCount > 0 && (
-            <span className="unread-count">({unreadCount} no leídos)</span>
-          )}
-        </h3>
-        <div className="panel-actions">
-          <button 
-            onClick={() => setShowSearch(!showSearch)}
-            className="search-btn"
-            title="Buscar conversaciones"
-          >
-            <i className="bi bi-search"></i>
-          </button>
-          <button onClick={onClose} className="close-btn">
-            <i className="bi bi-x"></i>
-          </button>
-        </div>
-      </div>
+    <div className="message-panel-overlay">
+      {selectedConversation ? (
+        <ChatWindow 
+          conversation={selectedConversation}
+          onBack={handleBackToList}
+          onClose={onClose}
+        />
+      ) : (
+        <div className="message-panel">
+          <div className="panel-header">
+            <h3>
+              Mensajes 
+              {unreadCount > 0 && (
+                <span className="unread-count">({unreadCount} no leídos)</span>
+              )}
+            </h3>
+            <div className="panel-actions">
+              <button 
+                onClick={() => setShowSearch(!showSearch)}
+                className="search-btn"
+                title="Buscar conversaciones"
+              >
+                <i className="bi bi-search"></i>
+              </button>
+              <button onClick={onClose} className="close-btn">
+                <i className="bi bi-x"></i>
+              </button>
+            </div>
+          </div>
 
-      {showSearch && (
-        <div className="search-container">
-          <input
-            type="text"
-            placeholder="Buscar conversaciones..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              handleSearch(e.target.value);
-            }}
-            className="search-input"
-          />
+          {showSearch && (
+            <div className="search-container">
+              <input
+                type="text"
+                placeholder="Buscar conversaciones..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  handleSearch(e.target.value);
+                }}
+                className="search-input"
+              />
+            </div>
+          )}
+
+          <div className="panel-body">
+            {loading && conversations.length === 0 ? (
+              <div className="loading-messages">
+                <i className="bi bi-hourglass-split"></i>
+                <p>Cargando conversaciones...</p>
+              </div>
+            ) : (showSearch ? searchResults : conversations).length === 0 ? (
+              <div className="no-messages">
+                <i className="bi bi-chat-dots"></i>
+                <p>
+                  {showSearch ? 'No se encontraron conversaciones' : 'No hay conversaciones'}
+                </p>
+              </div>
+            ) : (
+              <div className="conversations-list">
+                {(showSearch ? searchResults : conversations).map((conversation, index) => (
+                  <div 
+                    key={conversation.id || `conv-${index}-${conversation?.last_message?.id || 'noid'}`}
+                    className={`conversation-item ${conversation.unread_count > 0 ? 'unread' : ''}`}
+                    onClick={() => handleConversationClick(conversation)}
+                  >
+                    <div className="conversation-avatar">
+                      {getConversationAvatar(conversation) ? (
+                        <img 
+                          src={getConversationAvatar(conversation)} 
+                          alt="Avatar" 
+                          className="avatar-img"
+                        />
+                      ) : (
+                        <i className="bi bi-person-circle"></i>
+                      )}
+                      {conversation.unread_count > 0 && (
+                        <span className="unread-indicator"></span>
+                      )}
+                    </div>
+                    
+                    <div className="conversation-content">
+                      <div className="conversation-header">
+                        <h4 className="conversation-name">
+                          {getConversationDisplayName(conversation)}
+                        </h4>
+                        <span className="conversation-time">
+                          {formatTimeAgo(conversation.last_message?.created_at || conversation.updated_at)}
+                        </span>
+                      </div>
+                      
+                      <p className="conversation-preview">
+                        {conversation.last_message?.content || 'Sin mensajes'}
+                      </p>
+                      
+                      {conversation.unread_count > 0 && (
+                        <div className="unread-badge">
+                          {conversation.unread_count}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
-
-      <div className="panel-body">
-        {loading && conversations.length === 0 ? (
-          <div className="loading-messages">
-            <i className="bi bi-hourglass-split"></i>
-            <p>Cargando conversaciones...</p>
-          </div>
-        ) : (showSearch ? searchResults : conversations).length === 0 ? (
-          <div className="no-messages">
-            <i className="bi bi-chat-dots"></i>
-            <p>
-              {showSearch ? 'No se encontraron conversaciones' : 'No hay conversaciones'}
-            </p>
-          </div>
-        ) : (
-          <div className="conversations-list">
-            {(showSearch ? searchResults : conversations).map((conversation, index) => (
-              <div 
-                key={conversation.id || `conv-${index}-${conversation?.last_message?.id || 'noid'}`}
-                className={`conversation-item ${conversation.unread_count > 0 ? 'unread' : ''}`}
-                onClick={() => handleConversationClick(conversation)}
-              >
-                <div className="conversation-avatar">
-                  {getConversationAvatar(conversation) ? (
-                    <img 
-                      src={getConversationAvatar(conversation)} 
-                      alt="Avatar" 
-                      className="avatar-img"
-                    />
-                  ) : (
-                    <i className="bi bi-person-circle"></i>
-                  )}
-                  {conversation.unread_count > 0 && (
-                    <span className="unread-indicator"></span>
-                  )}
-                </div>
-                
-                <div className="conversation-content">
-                  <div className="conversation-header">
-                    <h4 className="conversation-name">
-                      {getConversationDisplayName(conversation)}
-                    </h4>
-                    <span className="conversation-time">
-                      {formatTimeAgo(conversation.last_message?.created_at || conversation.updated_at)}
-                    </span>
-                  </div>
-                  
-                  <p className="conversation-preview">
-                    {conversation.last_message?.content || 'Sin mensajes'}
-                  </p>
-                  
-                  {conversation.unread_count > 0 && (
-                    <div className="unread-badge">
-                      {conversation.unread_count}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 };
