@@ -4,7 +4,7 @@ import { Suspense, lazy } from "react";
 import { useAuth } from "../hooks/useAuth.js";
 import MainLayout from "../components/MainLayout.jsx";
 
-// 🔹 Lazy load de las páginas para mejorar rendimiento
+// Lazy load de las páginas para mejorar rendimiento
 const LoginPage = lazy(() => import("../pages/LoginPage.jsx"));
 const Feed = lazy(() => import("../pages/Feed.jsx"));
 const Profile = lazy(() => import("../pages/Profile.jsx"));
@@ -24,7 +24,7 @@ const ContratacionesPage = lazy(() => import("../pages/ContratacionesPage.jsx"))
 const PostulationsPage = lazy(() => import("../pages/PostulationsPage.jsx"));
 const DashboardPage = lazy(() => import("../pages/DashboardPage.jsx"));
 
-// 🔒 Componente para proteger rutas privadas
+// Componente para proteger rutas privadas
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
@@ -44,7 +44,7 @@ const PrivateRoute = ({ children }) => {
   return user ? children : <Navigate to="/login" replace />;
 };
 
-// 🔧 Envoltorio para manejar el Suspense (lazy loading)
+// Envoltorio para manejar el Suspense (lazy loading)
 const Loader = ({ children }) => (
   <Suspense
     fallback={

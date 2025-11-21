@@ -200,6 +200,9 @@ const ProviderProfile = ({ userData }) => {
                   )}
                 </h4>
                 <p className="text-muted mb-2">{user.email}</p>
+                <button onClick={startEditing} className="btn btn-social btn-primary-social mt-3">
+                  <i className="bi bi-pencil-square me-2"></i>Editar Perfil
+                </button>
               </div>
 
               <div className="col-12 col-md-8 ps-md-4">
@@ -236,11 +239,6 @@ const ProviderProfile = ({ userData }) => {
             </h5>
             <GradeList grades={grades} />
 
-            <div className="d-grid d-md-flex justify-content-md-end mt-4 gap-2">
-              <button onClick={startEditing} className="btn btn-social btn-primary-social">
-                <i className="bi bi-pencil-square me-2"></i>Editar Perfil
-              </button>
-            </div>
           </>
         )}
 

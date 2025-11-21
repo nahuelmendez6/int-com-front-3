@@ -16,6 +16,7 @@ const DashboardPage = () => {
         setError(null);
         const data = await getDashboard();
         setDashboardData(data);
+        console.log('Dashboard data:', data);
       } catch (err) {
         console.error('Error fetching dashboard:', err);
         setError(err.response?.data?.detail || err.message || 'Error al cargar el dashboard');
@@ -263,8 +264,6 @@ const DashboardPage = () => {
                     {dashboardData.recent_petitions.map((petition) => (
                       <div key={petition.id_petition} className="recent-item">
                         <div className="recent-item-header">
-                          {/* <span className="recent-item-id">#{petition.id_petition}</span> */}
-                          {/* <span className="badge bg-primary">{petition.id_state__name}</span> */}
                         </div>
                         <div className="recent-item-description">{petition.description}</div>
                         <div className="recent-item-meta">
