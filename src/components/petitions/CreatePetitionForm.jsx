@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
+import { Modal, Button, Form, Row, Col, Spinner } from 'react-bootstrap';
 import { getPetitionTypes, createPetition, updatePetition } from '../../services/petitions.service.js';
 import { getProfessions, getCategories, getTypeProviders } from '../../services/profile.service.js';
 
@@ -15,7 +15,7 @@ import { getProfessions, getCategories, getTypeProviders } from '../../services/
  * @param {function} onPetitionCreatedOrUpdated - Callback para notificar al componente padre que debe refrescar la lista.
  * @returns {JSX.Element} El Modal con el formulario de creación/edición de petición.
  */
-const CreatePetitionForm = ({ show, onHide, petitionToEdit, customerProfile, onPetitionCreatedOrUpdated }) => {
+const CreatePetitionForm = ({ show, onHide, petitionToEdit, customerProfile, onPetitionCreatedOrUpdated, setIsSubmitting: setPageSubmitting }) => {
   
   // 1. Estados para Datos de Selección (Lookups)
   const [petitionTypes, setPetitionTypes] = useState([]);
@@ -25,6 +25,7 @@ const CreatePetitionForm = ({ show, onHide, petitionToEdit, customerProfile, onP
   
   // Estado para manejar los archivos adjuntos (se envían como FormData).
   const [attachments, setAttachments] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
 
   // 2. Estado del Formulario
@@ -214,6 +215,9 @@ const CreatePetitionForm = ({ show, onHide, petitionToEdit, customerProfile, onP
    */
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setIsSubmitting(true);
+    setPageSubmitting(true);
     
     const petitionFormData = new FormData();
 
@@ -367,6 +371,9 @@ const CreatePetitionForm = ({ show, onHide, petitionToEdit, customerProfile, onP
         console.error('Error details:', error.response.data);
       }
       alert('Error al guardar la petición. Por favor, revisa la consola para más detalles.');
+    } finally {
+      setIsSubmitting(false);
+      setPageSubmitting(false);
     }
   };
 
@@ -491,8 +498,15 @@ const CreatePetitionForm = ({ show, onHide, petitionToEdit, customerProfile, onP
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>Cancelar</Button>
-        <Button variant="primary" onClick={handleSubmit}>{petitionToEdit ? 'Guardar Cambios' : 'Crear'}</Button>
+        <Button variant="secondary" onClick={onHide} disabled={isSubmitting}>Cancelar</Button>
+        <Button variant="primary" onClick={handleSubmit} disabled={isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+              <span className="ms-2">Guardando...</span>
+            </>
+          ) : (petitionToEdit ? 'Guardar Cambios' : 'Crear')}
+        </Button>
       </Modal.Footer>
     </Modal>
   );

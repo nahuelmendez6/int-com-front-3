@@ -16,6 +16,7 @@ const PetitionsPage = () => {
   const [petitionToDeleteId, setPetitionToDeleteId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [localError, setLocalError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para acciones de CUD
 
   const handleCreateClick = () => {
     setEditingPetition(null);
@@ -35,6 +36,7 @@ const PetitionsPage = () => {
   const confirmDelete = async () => {
     if (!petitionToDeleteId) return;
 
+    setIsSubmitting(true);
     try {
       await deletePetition(petitionToDeleteId);
       // En lugar de refetch, actualizamos el estado local para una UI más rápida.
@@ -49,6 +51,7 @@ const PetitionsPage = () => {
     } finally {
       setShowDeleteModal(false);
       setPetitionToDeleteId(null);
+      setIsSubmitting(false);
     }
   };
 
@@ -108,12 +111,21 @@ const PetitionsPage = () => {
               <p className="text-muted mb-0">Crea tu primera petición para comenzar a recibir ofertas de proveedores.</p>
             </div>
           ) : (
-            <PetitionList
-              petitions={petitions}
-              onEdit={handleEditClick}
-              onDelete={handleDeleteClick}
-              profile={profile}
-            />
+            <div style={{ position: 'relative' }}>
+              {isSubmitting && (
+                <div className="loading-overlay">
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Procesando...</span>
+                  </div>
+                </div>
+              )}
+              <PetitionList
+                petitions={petitions}
+                onEdit={handleEditClick}
+                onDelete={handleDeleteClick}
+                profile={profile}
+              />
+            </div>
           )}
         </div>
       </div>
@@ -124,6 +136,7 @@ const PetitionsPage = () => {
         petitionToEdit={editingPetition}
         customerProfile={profile}
         onPetitionCreatedOrUpdated={handlePetitionCreatedOrUpdated}
+        setIsSubmitting={setIsSubmitting} // Pasamos el setter para controlar el overlay
       />
 
       <ConfirmationModal
@@ -133,6 +146,21 @@ const PetitionsPage = () => {
         title="Confirmar Eliminación"
         body="¿Estás seguro de que quieres eliminar esta petición? Esta acción no se puede deshacer."
       />
+
+      <style>{`
+        .loading-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(255, 255, 255, 0.7);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 10;
+        }
+      `}</style>
     </div>
   );
 };
