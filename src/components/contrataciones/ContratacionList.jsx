@@ -66,27 +66,22 @@ const ContratacionList = ({ contrataciones }) => {
               <Card.Body>
                 <Row>
                   <Col md={3} className="text-center border-end">
-                    {profile.role === 'customer' ? (
-                      <Link to={`/provider/${otherUser.id}`}>
-                        <Image
-                          src={profileImageUrl}
-                          roundedCircle
-                          fluid
-                          style={{ width: '120px', height: '120px', objectFit: 'cover', cursor: 'pointer' }}
-                          alt={`Foto de perfil de ${otherUser.name}`}
-                        />
-                      </Link>
-                    ) : (
+                    <Link to={profile.role === 'customer' ? `/provider/${otherUser.id}` : `/customer/${otherUser.id}`}>
                       <Image 
                         src={profileImageUrl} 
                         roundedCircle 
                         fluid 
-                        style={{ width: '120px', height: '120px', objectFit: 'cover' }}
+                        style={{ width: '120px', height: '120px', objectFit: 'cover', cursor: 'pointer' }}
                         alt={`Foto de perfil de ${otherUser.name}`}
                       />
-                    )}
+                    </Link>
                     <h6 className="mt-3 mb-1">
-                      {profile.role === 'customer' ? <Link to={`/provider/${otherUser.id}`} className="text-dark text-decoration-none">{`${otherUser.name} ${otherUser.lastname}`}</Link> : `${otherUser.name} ${otherUser.lastname}`}
+                      <Link 
+                        to={profile.role === 'customer' ? `/provider/${otherUser.id}` : `/customer/${otherUser.id}`} 
+                        className="text-dark text-decoration-none"
+                      >
+                        {`${otherUser.name} ${otherUser.lastname}`}
+                      </Link>
                     </h6>
                     {otherUser.profession && <p className="text-muted small">{otherUser.profession}</p>}
                      <p className="mt-2">

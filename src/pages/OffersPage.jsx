@@ -3,6 +3,7 @@ import { Button } from 'react-bootstrap';
 import OfferForm from '../components/offers/OfferForm';
 import OfferList from '../components/offers/OfferList';
 import { getOffers, createOffer, updateOffer, deleteOffer, getOfferTypes } from '../services/offers.service.js';
+import ConfirmationModal from '../components/common/ConfirmationModal';
 
 const OffersPage = () => {
   const [offers, setOffers] = useState([]);
@@ -11,6 +12,9 @@ const OffersPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [offerToDeleteId, setOfferToDeleteId] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const fetchOffers = useCallback(async () => {
     try {
@@ -34,6 +38,8 @@ const OffersPage = () => {
   }, [fetchOffers]);
 
   const handleSubmit = async (offerData) => {
+    setIsSubmitting(true);
+    setError(null);
     try {
       if (editingOffer) {
         const response = await updateOffer(editingOffer.offer_id, offerData);
@@ -52,6 +58,8 @@ const OffersPage = () => {
       // La UI se actualiza manipulando el estado localmente.
     } catch (err) {
       setError(editingOffer ? 'Error al actualizar la oferta.' : 'Error al crear la oferta.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -65,15 +73,29 @@ const OffersPage = () => {
     setShowModal(true);
   };
 
-  const handleDelete = async (offerId) => {
+  const handleDeleteClick = (offerId) => {
+    setOfferToDeleteId(offerId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!offerToDeleteId) return;
+
+    setIsSubmitting(true);
+    setError(null);
     try {
-      await deleteOffer(offerId);
+      await deleteOffer(offerToDeleteId);
       // Filtramos la oferta eliminada del estado local en lugar de recargar.
-      setOffers(offers.filter(o => o.offer_id !== offerId));
+      setOffers(offers.filter(o => o.offer_id !== offerToDeleteId));
     } catch (err) {
       setError('Error al eliminar la oferta.');
+    } finally {
+      setShowDeleteModal(false);
+      setOfferToDeleteId(null);
+      setIsSubmitting(false);
     }
   };
+
 
   return (
     <div className="offers-page">
@@ -99,6 +121,7 @@ const OffersPage = () => {
             onSubmit={handleSubmit} 
             initialData={editingOffer}
             offerTypes={offerTypes}
+            isSubmitting={isSubmitting}
           />
 
           {loading ? (
@@ -122,10 +145,42 @@ const OffersPage = () => {
               <p className="text-muted mb-0">Crea tu primera oferta para comenzar a ofrecer tus servicios.</p>
             </div>
           ) : (
-            <OfferList offers={offers} onEdit={handleShowEditModal} onDelete={handleDelete} />
+            <div style={{ position: 'relative' }}>
+              {isSubmitting && (
+                <div className="loading-overlay">
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Procesando...</span>
+                  </div>
+                </div>
+              )}
+              <OfferList offers={offers} onEdit={handleShowEditModal} onDelete={handleDeleteClick} />
+            </div>
           )}
         </div>
       </div>
+
+      <ConfirmationModal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title="Confirmar Eliminación"
+        body="¿Estás seguro de que quieres eliminar esta oferta? Esta acción no se puede deshacer."
+      />
+
+      <style>{`
+        .loading-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(255, 255, 255, 0.7);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 10;
+        }
+      `}</style>
     </div>
   );
 };
