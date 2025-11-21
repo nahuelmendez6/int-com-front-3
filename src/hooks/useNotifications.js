@@ -5,7 +5,11 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'react-toastify';
 
 // Importa el servicio que maneja todas las operaciones relacionadas con notificaciones.
-import notificationsService from '../services/notifications.service';
+import notificationsService from '../services/notifications.service.js';
+
+// Importa el nuevo servicio para gestionar el WebSocket de notificaciones.
+import { connectNotificationSocket, disconnectNotificationSocket, sendNotificationCommand } from '../services/notificationSocket.service.js';
+
 
 // Hook personalizado: useNotifications
 // Gestiona todas las notificaciones de un usuario, incluyendo WebSocket en tiempo real,
@@ -23,133 +27,57 @@ export const useNotifications = () => {
   // Estadísticas relacionadas con notificaciones (p. ej., cantidad no leídas).
   const [stats, setStats] = useState(null);
 
-  // Referencia al WebSocket para mantener conexión persistente.
-  const socket = useRef(null);
+  /**
+   * Procesa los mensajes entrantes del WebSocket.
+   */
+  const handleSocketMessage = useCallback((event) => {
+    try {
+      const data = JSON.parse(event.data);
+      console.log('📨 Received notification:', data);
 
-  // Timeout para reconexión automática del WebSocket.
-  const reconnectTimeout = useRef(null);
+      switch (data.type) {
+        case 'connection_established':
+          setUnreadCount(data.unread_count || 0);
+          break;
 
-  // Conectar WebSocket
-  const connectSocket = useCallback(() => {
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null;
-    const userId = user?.id_user || user?.id; // Usar id_user si existe, sino id como fallback
-    
-    // Deshabilitar WebSocket temporalmente si el servidor no está disponible
-    const disableWebSocket = localStorage.getItem('disableWebSocket') === 'true';
-    if (disableWebSocket) {
-      console.log('WebSocket disabled for development');
-      return;
-    }
-    
-    if (!token || !userId || (socket.current && socket.current.readyState === WebSocket.OPEN)) {
-      return;
-    }
+        case 'notification_created':
+          const newNotification = { ...data.notification };
+          setNotifications(prev => [newNotification, ...prev]);
+          setUnreadCount(data.unread_count || 0);
+          showNotificationToast(newNotification);
+          break;
 
-    // Cerrar conexión anterior si existe
-    if (socket.current) {
-      socket.current.close();
-    }
+        case 'notification_updated':
+          setNotifications(prev =>
+            prev.map(notif =>
+              notif.id === data.notification.id ? { ...notif, ...data.notification } : notif
+            )
+          );
+          setUnreadCount(data.unread_count || 0);
+          break;
 
-    const wsUrl = `ws://127.0.0.1:8000/ws/notifications/${userId}/`;
-    socket.current = new WebSocket(wsUrl);
-
-    socket.current.onopen = () => {
-      console.log('Notification WebSocket connected');
-      // Limpiar timeout de reconexión si existe
-      if (reconnectTimeout.current) {
-        clearTimeout(reconnectTimeout.current);
-        reconnectTimeout.current = null;
-      }
-    };
-
-    socket.current.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log('📨 Received notification:', data);
+        case 'notification_deleted':
+          setNotifications(prev =>
+            prev.filter(notif => notif.id !== data.notification_id)
+          );
+          setUnreadCount(data.unread_count || 0);
+          break;
         
-        switch (data.type) {
-          case 'connection_established':
-            setUnreadCount(data.unread_count || 0);
-            break;
-            
-          case 'notification_created':
-            const newNotification = {
-              ...data.notification,
-              id: data.notification.id,
-              is_read: data.notification.is_read,
-              created_at: data.notification.created_at,
-              time_ago: data.notification.time_ago
-            };
-            
-            setNotifications(prev => [newNotification, ...prev]);
-            setUnreadCount(data.unread_count || 0);
-            
-            // Mostrar toast según el tipo
-            showNotificationToast(newNotification);
-            break;
-            
-          case 'notification_updated':
-            setNotifications(prev => 
-              prev.map(notif => 
-                notif.id === data.notification.id ? { ...notif, ...data.notification } : notif
-              )
-            );
-            setUnreadCount(data.unread_count || 0);
-            break;
-            
-          case 'notification_deleted':
-            setNotifications(prev => 
-              prev.filter(notif => notif.id !== data.notification_id)
-            );
-            setUnreadCount(data.unread_count || 0);
-            break;
-        }
-      } catch (error) {
-        console.error('Error parsing WebSocket message:', error);
+        default:
+          console.warn(`Tipo de mensaje desconocido: ${data.type}`);
       }
-    };
-
-     // Cierre del WebSocket
-    socket.current.onclose = (event) => {
-      // Solo mostrar logs en desarrollo si el servidor está disponible
-      if (event.code !== 1000 && event.code !== 1006) {
-        console.log('Notification WebSocket disconnected:', event.code, event.reason);
-      }
-      
-      // Reconectar automáticamente después de 3 segundos si no fue un cierre intencional
-      if (event.code !== 1000) {
-        reconnectTimeout.current = setTimeout(() => {
-          // Solo intentar reconectar si no es un error de conexión
-          if (event.code !== 1006) {
-            console.log('🔄 Attempting to reconnect WebSocket...');
-            connectSocket();
-          }
-        }, 3000);
-      }
-    };
-
-    // Manejo de errores del WebSocket
-    socket.current.onerror = (error) => {
-      // Solo mostrar errores si no es un error de conexión (servidor no disponible)
-      if (error.target.readyState === WebSocket.CLOSED) {
-        console.log('🔔 WebSocket server not available - notifications will work when backend is ready');
-      } else {
-        console.error('🔔 Notification WebSocket error:', error);
-      }
-    };
+    } catch (error) {
+      console.error('Error al procesar mensaje de WebSocket:', error);
+    }
   }, []);
 
-  // Desconectar WebSocket
+  // Conectar y desconectar el socket
+  const connectSocket = useCallback(() => {
+    connectNotificationSocket(handleSocketMessage);
+  }, [handleSocketMessage]);
+
   const disconnectSocket = useCallback(() => {
-    if (socket.current) {
-      socket.current.close(1000, 'User logout');
-      socket.current = null;
-    }
-    if (reconnectTimeout.current) {
-      clearTimeout(reconnectTimeout.current);
-      reconnectTimeout.current = null;
-    }
+    disconnectNotificationSocket();
   }, []);
 
   // Mostrar toast de notificación
@@ -285,6 +213,6 @@ export const useNotifications = () => {
     markAllAsRead,
     markAsReadWebSocket,
     getUnreadCountWebSocket,
-    sendWebSocketCommand
+    sendWebSocketCommand: sendNotificationCommand
   };
 };
