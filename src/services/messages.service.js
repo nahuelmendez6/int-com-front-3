@@ -69,6 +69,16 @@ const messagesService = {
     const response = await api.patch(`${BASE}/conversations/${conversationId}/mark_as_read/`, {});
     return response.data;
   },
+
+  /**
+   * Buscar conversaciones por un término de búsqueda.
+   * @param {string} query - Término de búsqueda.
+   * @returns {Promise<Object[]>} Lista de conversaciones que coinciden.
+   */
+  async searchConversations(query) {
+    const response = await api.get(`${BASE}/conversations/`, { params: { search: query } });
+    return response.data;
+  },
 };
 
 export default messagesService;

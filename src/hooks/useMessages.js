@@ -153,13 +153,13 @@ export const useMessages = () => {
   const searchConversations = useCallback(async (query) => {
     try {
       const response = await messagesService.searchConversations(query);
-      return response;
+      return Array.isArray(response) ? response : response.results || [];
     } catch (error) {
       console.error('Error searching conversations:', error);
       toast.error('Error al buscar conversaciones');
       return [];
     }
-  }, []);
+  }, []); // No necesita dependencias porque messagesService es estable
 
   // Cargar datos iniciales
   useEffect(() => {
@@ -183,14 +183,13 @@ export const useMessages = () => {
     if (!convId) return;
     const interval = setInterval(async () => {
       try {
-        await loadMessages(convId);
-        await loadConversations();
+        await loadMessages(convId); // Solo recargamos los mensajes, no todas las conversaciones
       } catch (_) {
         // Evitar ruido; typical transient errors
       }
     }, 5000);
     return () => clearInterval(interval);
-  }, [currentConversation, loadMessages, loadConversations]);
+  }, [currentConversation, loadMessages]);
 
   return {
     conversations,

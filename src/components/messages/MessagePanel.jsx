@@ -75,21 +75,16 @@ const MessagePanel = ({ isOpen, onClose, initialConversationId = null }) => {
 
   // --- Efecto: abrir conversación inicial si se pasa un ID ---
   useEffect(() => {
-    if (!isOpen || !initialConversationId) return;
-    const conv = conversations.find(c => c.id === initialConversationId);
-    if (conv) {
-      // Si ya existe en la lista, abrirla directamente
-      setSelectedConversation(conv);
-      openConversation(conv);
-    } else {
-      // Abrir inmediatamente con objeto mínimo si aún no está en la lista
+    if (isOpen && initialConversationId) {
+      // Abrir inmediatamente con un objeto mínimo.
+      // `openConversation` se encargará de cargar los datos completos.
       const minimal = { id: initialConversationId, participants: [] };
       setSelectedConversation(minimal);
       openConversation(minimal);
-      // Asegurar refresco de la lista
+      // Asegurar que la lista de conversaciones esté actualizada.
       loadConversations();
     }
-  }, [isOpen, initialConversationId, conversations, openConversation, loadConversations]);
+  }, [isOpen, initialConversationId]); // Dependencias simplificadas
 
   const handleSearch = async (query) => {
     if (query.trim()) {
