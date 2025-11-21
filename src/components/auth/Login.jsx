@@ -15,6 +15,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth.js";
+import logo from '../../assets/favicon.png';
 import "../../Form.css";
 
 /**
@@ -59,7 +60,12 @@ const Login = () => {
   };
 
   return (
-    <div className="form-container">
+    <div className="form-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <img 
+        src={logo} 
+        alt="Logo Integración Comunitaria" 
+        style={{ width: '100px', marginBottom: '1rem', borderRadius: '50%' }} 
+      />
       <p className="title">Integración Comunitaria</p>
       <form className="form" onSubmit={handleSubmit}>
         <input
