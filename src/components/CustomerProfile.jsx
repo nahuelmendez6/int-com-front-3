@@ -140,30 +140,32 @@ const CustomerProfile = ({ userData }) => {
           <div className="col-md-4 text-center">
             <ImageUpload currentImage={user.profile_image} disabled />
             <h4 className="mt-3 fw-bold">
-              <i className="bi bi-person-circle me-2"></i>
+              {/* <i className="bi bi-person-circle me-2"></i> */}
               {user.first_name} {user.last_name}
             </h4>
-            {averageRating > 0 && (
-                <div className="d-flex justify-content-center align-items-center mb-2">
-                    <StarRating rating={averageRating} readOnly />
-                    <span className="ms-2 text-muted">({grades.length} calificaciones)</span>
-                </div>
-            )}
-            <p className="text-muted">
-              <i className="bi bi-envelope me-1"></i>
-              {user.email}
-            </p>
-            <p className="text-muted">
-              <i className="bi bi-telephone me-1"></i>
-              <strong>Teléfono:</strong> {profileData.phone_number || 'No registrado'}
-            </p>
           </div>
           <div className="col-md-8">
-            <h5 className="border-start border-3 border-primary ps-3 mb-3 fw-semibold">
-              <i className="bi bi-geo-alt me-2"></i>
-              Dirección
-            </h5>
-            <p className="text-muted">{fullAddress}</p>
+            <div className="d-flex justify-content-between align-items-start">
+              <div>
+                <h5 className="border-start border-3 border-primary ps-3 mb-3 fw-semibold">
+                  <i className="bi bi-geo-alt me-2"></i>
+                  Dirección
+                </h5>
+                <p className="text-muted">{fullAddress}</p>
+              </div>
+              <div className="text-end">
+                {averageRating > 0 && (
+                  <div className="d-flex justify-content-end align-items-center mb-2">
+                      <StarRating rating={averageRating} readOnly />
+                      <span className="ms-2 text-muted">({grades.length} calificaciones)</span>
+                  </div>
+                )}
+                <p className="text-muted mb-2"><i className="bi bi-envelope me-1"></i>{user.email}</p>
+                <button onClick={() => setIsEditing(true)} className="btn btn-social btn-primary-social">
+                  <i className="bi bi-pencil-square me-2"></i>Editar Perfil
+                </button>
+              </div>
+            </div>
           </div>
         </div>
         <hr />
@@ -171,11 +173,6 @@ const CustomerProfile = ({ userData }) => {
             Calificaciones Recibidas
         </h5>
         <CustomerGradeList grades={grades} />
-        <div className="d-grid d-md-flex justify-content-md-end mt-4">
-          <button onClick={() => setIsEditing(true)} className="btn btn-social btn-primary-social">
-            <i className="bi bi-pencil-square me-2"></i>Editar Perfil
-          </button>
-        </div>
       </div>
     );
   }
@@ -200,10 +197,10 @@ const CustomerProfile = ({ userData }) => {
               <label className="form-label fw-semibold">Email</label>
               <input className="form-control form-control-social" name="email" value={formData.email} onChange={handleInputChange} />
             </div>
-            <div className="mb-3">
+            {/* <div className="mb-3">
               <label className="form-label fw-semibold">Teléfono</label>
               <input className="form-control form-control-social" name="phone_number" value={formData.phone_number} onChange={handleInputChange} />
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -235,4 +232,3 @@ const CustomerProfile = ({ userData }) => {
 };
 
 export default CustomerProfile;
-

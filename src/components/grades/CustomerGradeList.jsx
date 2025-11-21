@@ -72,12 +72,15 @@ const CustomerGradeList = ({ grades }) => {
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
                     <strong>{grade.provider.name} {grade.provider.lastname}</strong>
+                    <p>{grade.comment || 'Sin comentario'}</p>
                   </div>
                   <div className="text-end">
                     <StarRating rating={grade.rating} readOnly />
+                    
                     <small className="text-muted ms-2">
                       {new Date(grade.date_create).toLocaleDateString('es-ES')}
                     </small>
+                    
                   </div>
                 </div>
                 {grade.comment && <p className="mt-2 mb-0 fst-italic">"{grade.comment}"</p>}

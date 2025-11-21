@@ -263,8 +263,8 @@ const DashboardPage = () => {
                     {dashboardData.recent_petitions.map((petition) => (
                       <div key={petition.id_petition} className="recent-item">
                         <div className="recent-item-header">
-                          <span className="recent-item-id">#{petition.id_petition}</span>
-                          <span className="badge bg-primary">{petition.id_state__name}</span>
+                          {/* <span className="recent-item-id">#{petition.id_petition}</span> */}
+                          {/* <span className="badge bg-primary">{petition.id_state__name}</span> */}
                         </div>
                         <div className="recent-item-description">{petition.description}</div>
                         <div className="recent-item-meta">
