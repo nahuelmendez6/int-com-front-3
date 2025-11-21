@@ -11,7 +11,7 @@
 // Este componente solo es accesible para usuarios con rol "provider".
 // Incluye manejo de carga, errores, confirmaciones y actualizaciones dinámicas.
 // =====================================================
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, ListGroup, Alert, Spinner } from 'react-bootstrap';
 import { useAuth } from '../../hooks/useAuth.js';
 import {
@@ -105,10 +105,10 @@ const AvailabilityManager = () => {
    * Maneja el clic para eliminar un horario (slot) mostrando el modal de confirmación.
    * @param {number} id - ID del slot de disponibilidad a eliminar.
    */
-  const handleDeleteClick = (id) => {
+  const handleDeleteClick = useCallback((id) => {
     setSlotToDelete(id);
     setShowModal(true);
-  };
+  }, []);
   /**
    * Confirma la eliminación del horario seleccionado y actualiza la lista.
    */
@@ -117,11 +117,21 @@ const AvailabilityManager = () => {
     setIsSubmitting(true);
     try {
       await deleteProviderAvailability(slotToDelete);
+      // Actualiza el estado local para reflejar la eliminación sin recargar todo.
+      setAvailability((prev) => {
+        const newAvailability = { ...prev };
+        for (const day in newAvailability) {
+          newAvailability[day] = newAvailability[day].filter(
+            (slot) => slot.id_availability !== slotToDelete
+          );
+        }
+        return newAvailability;
+      });
       setShowModal(false);
       setSlotToDelete(null);
-      await fetchAvailability();
     } catch (err) {
       setError('Error al eliminar el horario.');
+      // Asegurarse de cerrar el modal incluso si hay un error
       setShowModal(false);
     } finally {
       setIsSubmitting(false);
@@ -155,7 +165,6 @@ const AvailabilityManager = () => {
                 dayName={daysMap[day]}
                 slots={availability[day] || []}
                 setAvailability={setAvailability}
-                fetchAvailability={fetchAvailability}
                 isSubmitting={isSubmitting}
                 setIsSubmitting={setIsSubmitting}
                 setError={setError}

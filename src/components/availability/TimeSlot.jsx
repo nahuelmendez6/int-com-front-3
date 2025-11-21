@@ -13,7 +13,7 @@
 // Forma parte del módulo de gestión de disponibilidad del proveedor.
 // =====================================================
 
-import React from 'react';
+import React, { memo } from 'react';
 import { Row, Col, Form, Button, Spinner } from 'react-bootstrap';
 import { updateProviderAvailability, editProviderAvailability } from '../../services/availability.service.js';
 
@@ -51,7 +51,7 @@ import { updateProviderAvailability, editProviderAvailability } from '../../serv
  *   id_provider={23}
  * />
  */
-const TimeSlot = ({ slot, index, day, slots, setAvailability, fetchAvailability, isSubmitting, setIsSubmitting, setError, handleDeleteClick, id_provider }) => {
+const TimeSlot = ({ slot, index, day, setAvailability, isSubmitting, setIsSubmitting, setError, handleDeleteClick, id_provider }) => {
   
     /**
    * Actualiza el valor de un campo ("start_time" o "end_time") dentro del slot actual.
@@ -60,9 +60,17 @@ const TimeSlot = ({ slot, index, day, slots, setAvailability, fetchAvailability,
    * @param {string} value - Nuevo valor ingresado (formato "HH:MM").
    */
   const handleTimeChange = (field, value) => {
-    const updatedSlots = [...slots];
-    updatedSlots[index] = { ...updatedSlots[index], [field]: value };
-    setAvailability(prev => ({ ...prev, [day]: updatedSlots }));
+    setAvailability(prev => {
+      const daySlots = prev[day] || [];
+      const updatedSlots = daySlots.map(s => {
+        // Identifica el slot por su ID real o temporal
+        if ((s.id_availability && s.id_availability === slot.id_availability) || (s.tempId && s.tempId === slot.tempId)) {
+          return { ...s, [field]: value };
+        }
+        return s;
+      });
+      return { ...prev, [day]: updatedSlots };
+    });
   };
 
     /**
@@ -86,6 +94,14 @@ const TimeSlot = ({ slot, index, day, slots, setAvailability, fetchAvailability,
 
     setIsSubmitting(true);
 
+    // Guarda el estado original para poder revertir en caso de error.
+    let originalSlots = [];
+    setAvailability(prev => {
+      originalSlots = [...(prev[day] || [])];
+      return prev;
+    });
+
+
     // Prepara el payload con formato adecuado para el backend
     const payload = {
       id_provider,
@@ -97,13 +113,34 @@ const TimeSlot = ({ slot, index, day, slots, setAvailability, fetchAvailability,
     try {
       setError(null);
       if (slot.id_availability) {
-        await editProviderAvailability(slot.id_availability, payload);
+        // Editar un horario existente
+        const updatedSlot = await editProviderAvailability(slot.id_availability, payload);
+        setAvailability((prev) => {
+          const daySlots = prev[day] || [];
+          const updatedSlots = daySlots.map((s) =>
+            s.id_availability === updatedSlot.id_availability ? updatedSlot : s
+          );
+          return { ...prev, [day]: updatedSlots };
+        });
       } else {
-        await updateProviderAvailability(payload);
+        // Crear un nuevo horario
+        const newSlot = await updateProviderAvailability(payload);
+        setAvailability((prev) => {
+          const daySlots = prev[day] || [];
+          const updatedSlots = daySlots.map((s) => {
+            if (s.tempId === slot.tempId) return newSlot;
+            return s;
+          });
+          return { ...prev, [day]: updatedSlots };
+        });
       }
-      await fetchAvailability();
+      // Ya no es necesario recargar todo.
+      // await fetchAvailability(); 
     } catch (err) {
-      setError('Error al guardar el horario. Verifique que los tiempos no se superpongan.');
+      const errorMessage = err.response?.data?.detail || 'Error al guardar el horario. Verifique que los tiempos no se superpongan.';
+      setError(errorMessage);
+      // En caso de error, revierte los cambios en la UI al estado original.
+      setAvailability(prev => ({ ...prev, [day]: originalSlots }));
     } finally {
       setIsSubmitting(false);
     }
@@ -129,4 +166,4 @@ const TimeSlot = ({ slot, index, day, slots, setAvailability, fetchAvailability,
   );
 };
 
-export default TimeSlot;
+export default memo(TimeSlot);

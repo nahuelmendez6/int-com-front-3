@@ -54,14 +54,14 @@ import TimeSlot from './TimeSlot';
  *   id_provider={5}
  * />
  */
-const DayAvailability = ({ day, dayName, slots, setAvailability, fetchAvailability, isSubmitting, setIsSubmitting, setError, handleDeleteClick, id_provider }) => {
+const DayAvailability = ({ day, dayName, slots, setAvailability, isSubmitting, setIsSubmitting, setError, handleDeleteClick, id_provider }) => {
   
     /**
    * Agrega un nuevo horario vacío a la lista del día actual.
    * Se usa cuando el proveedor desea añadir una nueva franja horaria.
    */
   const handleAddNewSlot = () => {
-    const newSlot = { id_availability: null, start_time: '', end_time: '' };
+    const newSlot = { tempId: `new-${Date.now()}`, id_availability: null, start_time: '', end_time: '' };
     const daySlots = [...slots, newSlot];
     setAvailability(prev => ({ ...prev, [day]: daySlots }));
   };
@@ -71,13 +71,11 @@ const DayAvailability = ({ day, dayName, slots, setAvailability, fetchAvailabili
       <h5>{dayName}</h5>
       {slots.map((slot, index) => (
         <TimeSlot
-          key={slot.id_availability || `new-${index}`}
+          key={slot.id_availability || slot.tempId}
           slot={slot}
           index={index}
           day={day}
-          slots={slots}
           setAvailability={setAvailability}
-          fetchAvailability={fetchAvailability}
           isSubmitting={isSubmitting}
           setIsSubmitting={setIsSubmitting}
           setError={setError}
