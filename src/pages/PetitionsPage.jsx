@@ -9,7 +9,7 @@ import { deletePetition } from '../services/petitions.service.js';
 
 const PetitionsPage = () => {
   const { profile } = useAuth();
-  const { petitions, loading, error, refetch } = usePetitions(profile);
+  const { petitions, setPetitions, loading, error, refetch } = usePetitions(profile);
 
   const [editingPetition, setEditingPetition] = useState(null);
   const [showFormModal, setShowFormModal] = useState(false);
@@ -37,7 +37,12 @@ const PetitionsPage = () => {
 
     try {
       await deletePetition(petitionToDeleteId);
-      refetch(); // recarga las peticiones del customer
+      // En lugar de refetch, actualizamos el estado local para una UI más rápida.
+      setPetitions(prevPetitions => 
+        prevPetitions.filter(p => p.id_petition !== petitionToDeleteId)
+      );
+      // Opcionalmente, se podría llamar a refetch() si se necesita consistencia absoluta,
+      // pero para UX, la actualización local es mejor.
     } catch (err) {
       console.error(err);
       setLocalError('Error al eliminar la petición.');
@@ -47,9 +52,18 @@ const PetitionsPage = () => {
     }
   };
 
-  const handlePetitionCreatedOrUpdated = () => {
-    // Llama a refetch para recargar la lista de peticiones desde el servidor.
-    refetch();
+  const handlePetitionCreatedOrUpdated = (savedPetition) => {
+    if (editingPetition) {
+      // Modo Edición: Reemplaza la petición existente en la lista.
+      setPetitions(prevPetitions =>
+        prevPetitions.map(p =>
+          p.id_petition === savedPetition.id_petition ? savedPetition : p
+        )
+      );
+    } else {
+      // Modo Creación: Añade la nueva petición al principio de la lista.
+      setPetitions(prevPetitions => [savedPetition, ...prevPetitions]);
+    }
     setShowFormModal(false);
     setEditingPetition(null);
   };

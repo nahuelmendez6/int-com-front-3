@@ -97,5 +97,5 @@ export const usePetitions = (profile) => {
   }, [fetchPetitions]);
 
   // Retorna los estados y una función refetch para volver a cargar manualmente.
-  return { petitions, loading, error, refetch: fetchPetitions };
+  return { petitions, setPetitions,loading, error, refetch: fetchPetitions };
 };
